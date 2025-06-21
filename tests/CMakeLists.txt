@@ -1,4 +1,3 @@
-enable_testing()
 find_package(GTest CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 include(GoogleTest)
