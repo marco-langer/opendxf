@@ -6,9 +6,12 @@
 
 namespace odxf {
 
+using HeaderKey = std::string;
+using HeaderValue = std::variant<std::string>;
+
 struct Header
 {
-    std::unordered_map<std::string, std::variant<std::string>> entries;
+    std::unordered_map<HeaderKey, HeaderValue> entries;
 };
 
 }   // namespace odxf

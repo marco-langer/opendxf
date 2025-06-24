@@ -3,6 +3,11 @@ find_package(fmt CONFIG REQUIRED)
 include(GoogleTest)
 
 add_executable(opendxf-tests
+    Matchers/DocumentMatcher.cpp
+    Matchers/DocumentMatcher.hpp
+    Matchers/HeaderMatcher.cpp
+    Matchers/HeaderMatcher.hpp
+    read_test.cpp
     write_test.cpp
 )
 
@@ -13,7 +18,7 @@ target_compile_definitions(opendxf-tests PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_
 target_link_libraries(opendxf-tests
     PRIVATE
         opendxf
-        fmt::fmt-header-only
+        fmt::fmt
         GTest::gmock_main
 )
 
