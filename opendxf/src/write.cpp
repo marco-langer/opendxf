@@ -114,10 +114,10 @@ void writeExtrusion(std::ofstream& stream, const std::optional<odxf::Vector3d>& 
     }
 }
 
-void writePoint(std::ofstream& stream, const odxf::Point& point, const std::string& layerName)
+void writePoint(std::ofstream& stream, const odxf::Point& point)
 {
     stream << "\n0\nLINE\n100\nAcDbPoint";
-    stream << "\n8\n" << layerName;
+    stream << "\n8\n" << point.layer;
     stream << "\n62\n" << point.color;
     writeThickness(stream, point.thickness);
     stream << "\n10\n" << std::to_string(point.coordinate.x);
@@ -127,10 +127,10 @@ void writePoint(std::ofstream& stream, const odxf::Point& point, const std::stri
 }
 
 
-void writeRay(std::ofstream& stream, const odxf::Ray& ray, const std::string& layerName)
+void writeRay(std::ofstream& stream, const odxf::Ray& ray)
 {
     stream << "\n0\nLINE\n100\nAcDbRay";
-    stream << "\n8\n" << layerName;
+    stream << "\n8\n" << ray.layer;
     stream << "\n62\n" << ray.color;
     stream << "\n10\n" << std::to_string(ray.startPoint.x);
     stream << "\n20\n" << std::to_string(ray.startPoint.y);
@@ -140,10 +140,10 @@ void writeRay(std::ofstream& stream, const odxf::Ray& ray, const std::string& la
     stream << "\n31\n" << std::to_string(ray.direction.z);
 }
 
-void writeLine(std::ofstream& stream, const odxf::Line& line, const std::string& layerName)
+void writeLine(std::ofstream& stream, const odxf::Line& line)
 {
     stream << "\n0\nLINE\n100\nAcDbLine";
-    stream << "\n8\n" << layerName;
+    stream << "\n8\n" << line.layer;
     stream << "\n62\n" << line.color;
     writeThickness(stream, line.thickness);
     stream << "\n10\n" << std::to_string(line.start.x);
@@ -155,10 +155,10 @@ void writeLine(std::ofstream& stream, const odxf::Line& line, const std::string&
     writeExtrusion(stream, line.extrusion);
 }
 
-void writeCircle(std::ofstream& stream, const odxf::Circle& circle, const std::string& layerName)
+void writeCircle(std::ofstream& stream, const odxf::Circle& circle)
 {
     stream << "\n0\nCIRCLE\n100\nAcDbCircle";
-    stream << "\n8\n" << layerName;
+    stream << "\n8\n" << circle.layer;
     stream << "\n62\n" << circle.color;
     writeThickness(stream, circle.thickness);
     stream << "\n10\n" << std::to_string(circle.center.x);
@@ -168,10 +168,10 @@ void writeCircle(std::ofstream& stream, const odxf::Circle& circle, const std::s
     writeExtrusion(stream, circle.extrusion);
 }
 
-void writeArc(std::ofstream& stream, const odxf::Arc& arc, const std::string& layerName)
+void writeArc(std::ofstream& stream, const odxf::Arc& arc)
 {
     stream << "\n0\nARC\n100\nAcDbCircle";
-    stream << "\n8\n" << layerName;
+    stream << "\n8\n" << arc.layer;
     stream << "\n62\n" << arc.color;
     writeThickness(stream, arc.thickness);
     stream << "\n10\n" << std::to_string(arc.center.x);
@@ -184,10 +184,10 @@ void writeArc(std::ofstream& stream, const odxf::Arc& arc, const std::string& la
     writeExtrusion(stream, arc.extrusion);
 }
 
-void writeEllipse(std::ofstream& stream, const odxf::Ellipse& ellipse, const std::string& layerName)
+void writeEllipse(std::ofstream& stream, const odxf::Ellipse& ellipse)
 {
     stream << "\n0\nARC\n100\nAcDbEllipse";
-    stream << "\n8\n" << layerName;
+    stream << "\n8\n" << ellipse.layer;
     stream << "\n62\n" << ellipse.color;
     stream << "\n10\n" << std::to_string(ellipse.center.x);
     stream << "\n20\n" << std::to_string(ellipse.center.y);
@@ -207,27 +207,27 @@ void writeEntities(
     stream << "\n0\nSECTION\n2\nENTITIES";
 
     for (const odxf::Point& point : entities.points) {
-        writePoint(stream, point, tables.layers.at(point.layer).name);
+        writePoint(stream, point);
     }
 
     for (const odxf::Ray& ray : entities.rays) {
-        writeRay(stream, ray, tables.layers.at(ray.layer).name);
+        writeRay(stream, ray);
     }
 
     for (const odxf::Line& line : entities.lines) {
-        writeLine(stream, line, tables.layers.at(line.layer).name);
+        writeLine(stream, line);
     }
 
     for (const odxf::Circle& circle : entities.circles) {
-        writeCircle(stream, circle, tables.layers.at(circle.layer).name);
+        writeCircle(stream, circle);
     }
 
     for (const odxf::Arc& arc : entities.arcs) {
-        writeArc(stream, arc, tables.layers.at(arc.layer).name);
+        writeArc(stream, arc);
     }
 
     for (const odxf::Ellipse& ellipse : entities.ellipses) {
-        writeEllipse(stream, ellipse, tables.layers.at(ellipse.layer).name);
+        writeEllipse(stream, ellipse);
     }
 
     stream << "\n0\nENDSEC";

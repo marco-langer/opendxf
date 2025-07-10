@@ -34,27 +34,52 @@ std::vector<std::string> readFile(const std::filesystem::path& filePath)
 
 TEST(write, example)
 {
-    const auto expectedFilePath{ std::filesystem::path{ TEST_DATA_DIR } / "example.txt" };
+    const auto expectedFilePath{ std::filesystem::path{ TEST_DATA_DIR } / "example.dxf" };
     ASSERT_TRUE(std::filesystem::is_regular_file(expectedFilePath));
 
+    const std::string layerName1{ "Test Layer" };
+
     odxf::Document document{
-        .header{ .entries{ { "$ACADVER", "AC1032" } } },
-        .tables{ .lineTypes{ { .name{ "CONTINUOUS" }, .displayName{ "Solid Line" } } },
-                 .layers{ { .name{ "Test Layer" } } } },
-        .entities{ .lines{ { .start{ 0.0F, 0.5F, 0.0F }, .end{ 1.0F, 1.5F, 0.0F } },
-                           { .end{ 1.0F, 1.0F, 0.0F } } },
-                   .circles{ { .center{}, .radius{ 1.0F } } },
-                   .arcs{ { .center{ 0.0F, 2.0F },
-                            .radius{ 0.5F },
-                            .startAngle{ 0.0F },
-                            .endAngle{ 180.0F } } } }
+        .header{
+            .entries{ { "$ACADVER", "AC1032" } },
+        },
+        .tables{
+            .lineTypes{
+                { .name{ "CONTINUOUS" }, .displayName{ "Solid Line" } },
+            },
+            .layers{ { .name{ layerName1 } } },
+        },
+        .entities{
+            .lines{ {
+                        .start{ 0.0F, 0.5F, 0.0F },
+                        .end{ 1.0F, 1.5F, 0.0F },
+                    },
+                    {
+                        .end{ 1.0F, 1.0F, 0.0F },
+                    } },
+            .circles{
+                { .center{}, .radius{ 1.0F } },
+            },
+            .arcs{ {
+                .center{ 0.0F, 2.0F },
+                .radius{ 0.5F },
+                .startAngle{ 0.0F },
+                .endAngle{ 180.0F },
+            } },
+        },
     };
+
+    // TODO C++26: use designated initializers from base class
+    document.entities.lines.front().layer = layerName1;
+    document.entities.lines.back().layer = layerName1;
+    document.entities.circles.back().layer = layerName1;
+    document.entities.arcs.back().layer = layerName1;
 
     const std::filesystem::path filePath{ "test.dxf" };
     std::filesystem::remove(filePath);
     ASSERT_FALSE(std::filesystem::exists(filePath));
 
-    odxf::writeDxf(document, "test.dxf");
+    odxf::writeDxf(document, filePath);
 
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 

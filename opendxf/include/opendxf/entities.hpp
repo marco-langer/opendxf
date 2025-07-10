@@ -2,6 +2,7 @@
 
 #include <numbers>
 #include <optional>
+#include <string>
 #include <vector>
 
 namespace odxf {
@@ -22,7 +23,7 @@ struct Vector3d
 
 struct Entity
 {
-    int layer{ 0 };
+    std::string layer;
     int color{ 0 };
 };
 
@@ -80,13 +81,17 @@ struct Ellipse : Entity
     std::optional<Vector3d> extrusion;
 };
 
+using Lines = std::vector<Line>;
+using Circles = std::vector<Circle>;
+using Arcs = std::vector<Arc>;
+
 struct Entities
 {
     std::vector<Point> points;
     std::vector<Ray> rays;
-    std::vector<Line> lines;
-    std::vector<Circle> circles;
-    std::vector<Arc> arcs;
+    Lines lines;
+    Circles circles;
+    Arcs arcs;
     std::vector<Ellipse> ellipses;
 };
 

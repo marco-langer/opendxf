@@ -1,6 +1,7 @@
 {
     "dependencies": [
         "gtest",
-        "fmt"
+        "fmt",
+        "tl-expected"
     ]
 }
