@@ -43,6 +43,7 @@ private:
     tl::expected<void, Error> readLine();
     tl::expected<void, Error> readCircle();
     tl::expected<void, Error> readArc();
+    tl::expected<void, Error> readLWPolyline();
 
     bool readNext();
 
@@ -62,6 +63,7 @@ private:
     bool isLine() const;
     bool isCircle() const;
     bool isArc() const;
+    bool isLWPolyline() const;
 
     bool isEOF() const;
 

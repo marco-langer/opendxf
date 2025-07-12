@@ -7,6 +7,12 @@
 
 namespace odxf {
 
+struct Coordinate2d
+{
+    float x{ 0.0F };
+    float y{ 0.0F };
+};
+
 struct Coordinate3d
 {
     float x{ 0.0F };
@@ -81,18 +87,38 @@ struct Ellipse : Entity
     std::optional<Vector3d> extrusion;
 };
 
-using Lines = std::vector<Line>;
-using Circles = std::vector<Circle>;
+struct Vertex
+{
+    Coordinate2d position;
+    std::optional<float> bulge;
+};
+
+using Vertices = std::vector<Vertex>;
+
+struct LWPolyline : Entity
+{
+    std::optional<float> elevation;
+    bool isClosed{ false };
+    Vertices vertices;
+};
+
 using Arcs = std::vector<Arc>;
+using Circles = std::vector<Circle>;
+using Ellipses = std::vector<Ellipse>;
+using Lines = std::vector<Line>;
+using Points = std::vector<Point>;
+using LWPolylines = std::vector<LWPolyline>;
+using Rays = std::vector<Ray>;
 
 struct Entities
 {
-    std::vector<Point> points;
-    std::vector<Ray> rays;
-    Lines lines;
-    Circles circles;
     Arcs arcs;
-    std::vector<Ellipse> ellipses;
+    Circles circles;
+    Ellipses ellipses;
+    Lines lines;
+    Points points;
+    LWPolylines lwPolylines;
+    Rays rays;
 };
 
 }   // namespace odxf

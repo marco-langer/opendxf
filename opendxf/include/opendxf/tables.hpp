@@ -15,10 +15,11 @@ struct LineType
 };
 
 using Layers = std::vector<Layer>;
+using LineTypes = std::vector<LineType>;
 
 struct Tables
 {
-    std::vector<LineType> lineTypes;
+    LineTypes lineTypes;
     Layers layers;
 };
 

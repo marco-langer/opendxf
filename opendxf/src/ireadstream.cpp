@@ -16,4 +16,6 @@ void IReadStream::circle(const Circle& /* circle */) {}
 
 void IReadStream::line(const Line& /* line */) {}
 
+void IReadStream::lwPolyline(const LWPolyline& /* lwPolyline */) {}
+
 }   // namespace odxf

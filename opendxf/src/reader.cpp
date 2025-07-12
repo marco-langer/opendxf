@@ -305,6 +305,11 @@ tl::expected<void, Error> Reader::readEntities()
             if (!maybeResult) {
                 return maybeResult;
             }
+        } else if (isLWPolyline()) {
+            tl::expected<void, Error> maybeResult{ readLWPolyline() };
+            if (!maybeResult) {
+                return maybeResult;
+            }
         } else {
             readNext();
         }
@@ -530,6 +535,109 @@ tl::expected<void, Error> Reader::readArc()
     return tl::expected<void, Error>();
 }
 
+tl::expected<void, Error> Reader::readLWPolyline()
+{
+    if (!readNext()) {
+        return tl::make_unexpected(m_error.value());
+    }
+
+    LWPolyline lwPolyline;
+
+    Vertex vertex;
+    int numXY{ 0 };
+
+    while (m_data.groupCode != 0) {
+        switch (m_data.groupCode) {
+        case 90: {
+            const std::optional<int> maybeVerticesCount{ parseAs<int>(m_data.value) };
+            if (maybeVerticesCount.has_value()) {
+                if (*maybeVerticesCount >= 0) {
+                    lwPolyline.vertices.reserve(static_cast<std::size_t>(*maybeVerticesCount));
+                }
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        }
+
+        case 70: {
+            const std::optional<int> maybeFlag{ parseAs<int>(m_data.value) };
+            if (maybeFlag.has_value()) {
+                lwPolyline.isClosed = (*maybeFlag & 1 != 0);
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        }
+
+        case 10: {
+            const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
+            if (numXY == 2) {
+                lwPolyline.vertices.push_back(vertex);
+                numXY = 0;
+                vertex.bulge.reset();
+            }
+            if (maybeX.has_value()) {
+                vertex.position.x = *maybeX;
+                numXY++;
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        }
+
+        case 20: {
+            const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
+            if (numXY == 2) {
+                lwPolyline.vertices.push_back(vertex);
+                numXY = 0;
+                vertex.bulge.reset();
+            }
+            if (maybeY.has_value()) {
+                vertex.position.y = *maybeY;
+                numXY++;
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        }
+
+        case 42: {
+            const std::optional<double> maybeBulge{ parseAs<double>(m_data.value) };
+            if (maybeBulge.has_value()) {
+                vertex.bulge = *maybeBulge;
+
+                if (numXY == 2) {
+                    lwPolyline.vertices.push_back(vertex);
+                    numXY = 0;
+                    vertex.bulge.reset();
+                }
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        }
+        }
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+    }
+
+    if (numXY == 2) {
+        lwPolyline.vertices.push_back(vertex);
+    }
+
+    m_stream.lwPolyline(lwPolyline);
+
+    return tl::expected<void, Error>();
+}
+
 bool Reader::readNext()
 {
     m_currentLine++;
@@ -596,6 +704,8 @@ bool Reader::isLine() const { return m_data.groupCode == 0 && m_data.value == "L
 bool odxf::Reader::isCircle() const { return m_data.groupCode == 0 && m_data.value == "CIRCLE"; }
 
 bool Reader::isArc() const { return m_data.groupCode == 0 && m_data.value == "ARC"; }
+
+bool Reader::isLWPolyline() const { return m_data.groupCode == 0 && m_data.value == "LWPOLYLINE"; }
 
 bool Reader::isEOF() const { return m_data.groupCode == 0 && m_data.value == "EOF"; }
 

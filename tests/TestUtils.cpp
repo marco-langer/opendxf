@@ -1,0 +1,101 @@
+#include "TestUtils.hpp"
+
+#include "opendxf/entities.hpp"
+#include "opendxf/header.hpp"
+#include "opendxf/layer.hpp"
+
+odxf::Document createExampleDocument()
+{
+    using namespace odxf;
+
+    Document expectedDocument;
+    expectedDocument.header.entries.try_emplace("$ACADVER", "AC1032");
+
+    const std::string layerName1{ "Test Layer" };
+    const std::string layerNameLines{ "Lines" };
+    const std::string layerNameLWPolylines{ "LW Polylines" };
+
+    LineTypes& lineTypes{ expectedDocument.tables.lineTypes };
+    lineTypes.push_back(LineType{
+        .name = "CONTINUOUS",
+        .displayName = "Solid Line",
+    });
+
+    Layers& layers{ expectedDocument.tables.layers };
+    layers.push_back(Layer{ .name = layerName1 });
+    layers.push_back(Layer{ .name = layerNameLines });
+    layers.push_back(Layer{ .name = layerNameLWPolylines });
+
+    Entities& entities{ expectedDocument.entities };
+
+    Lines& lines{ entities.lines };
+    lines
+        .emplace_back(Line{
+            .start = Coordinate3d{ 0.0, 0.5, 0.0 },
+            .end = Coordinate3d{ 1.0, 1.5, 0.0 },
+        })
+        .layer = layerNameLines;
+
+    lines
+        .emplace_back(Line{
+            .start = Coordinate3d{ 0.0, 0.0, 0.0 },
+            .end = Coordinate3d{ 1.0, 1.0, 0.0 },
+        })
+        .layer = layerNameLines;
+
+    Circles& circles{ entities.circles };
+    circles
+        .emplace_back(Circle{
+            .center = Coordinate3d{ 0.0, 0.0, 0.0 },
+            .radius = 1.0F,
+        })
+        .layer = layerName1;
+
+    Arcs& arcs{ entities.arcs };
+    arcs.emplace_back(Arc{
+                          .center = Coordinate3d{ 0.0F, 2.0F, 0.0F },
+                          .radius = 0.5F,
+                          .startAngle = 0.0F,
+                          .endAngle = 180.0F,
+                      })
+        .layer = layerName1;
+
+    LWPolylines& lwPolylines{ entities.lwPolylines };
+    lwPolylines.emplace_back(LWPolyline{}).layer = layerNameLWPolylines;
+    lwPolylines
+        .emplace_back(LWPolyline{
+            .vertices = { Vertex{ .position = { 200.0, 200.0 } } },
+        })
+        .layer = layerNameLWPolylines;
+    lwPolylines.emplace_back(LWPolyline{
+        .isClosed = true,
+        .vertices = {
+            Vertex{
+                .position = { 10.0, 10.0 },
+            },
+            Vertex{
+                .position = { 10.0, 50.0 },
+                .bulge = 1.0F,
+            },
+            Vertex{
+                .position = { 20.0, 60.0, },
+            },
+            Vertex{
+                .position = { 60.0, 60.0, },
+                .bulge = -1.0F
+            },
+            Vertex{
+                .position = { 70.0, 50.0, },
+            },
+            Vertex{
+                .position = { 70.0, 20.0 },
+                .bulge = 1.0F,
+            },
+            Vertex{
+                .position = { 60.0, 10.0 },
+            },
+        },
+    }).layer = layerNameLWPolylines;
+
+    return expectedDocument;
+}

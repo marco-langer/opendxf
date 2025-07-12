@@ -33,7 +33,7 @@ void writeLineType(std::ofstream& stream, const odxf::LineType& lineType)
 {
     stream << "\n0\nLTYPE";
     stream << "\n2\n" << lineType.name;
-    stream << "\n70\n0" << lineType.flags;
+    stream << "\n70\n" << lineType.flags;
     stream << "\n3\n" << lineType.displayName;
     stream << "\n72\n65";
     stream << "\n73\n0";
@@ -201,6 +201,23 @@ void writeEllipse(std::ofstream& stream, const odxf::Ellipse& ellipse)
     writeExtrusion(stream, ellipse.extrusion);
 }
 
+void writeLWPolyline(std::ofstream& stream, const odxf::LWPolyline& lwPolyline)
+{
+    stream << "\n0\nLWPOLYLINE\n100\nAcDbPolyline";
+    stream << "\n8\n" << lwPolyline.layer;
+    stream << "\n62\n" << lwPolyline.color;
+    stream << "\n90\n" << lwPolyline.vertices.size();
+    stream << "\n70\n" << lwPolyline.isClosed ? 1 : 0;
+
+    for (const odxf::Vertex& vertex : lwPolyline.vertices) {
+        stream << "\n10\n" << std::to_string(vertex.position.x);
+        stream << "\n20\n" << std::to_string(vertex.position.y);
+        if (vertex.bulge.has_value()) {
+            stream << "\n42\n" << std::to_string(*vertex.bulge);
+        }
+    }
+}
+
 void writeEntities(
     std::ofstream& stream, const odxf::Entities& entities, const odxf::Tables& tables)
 {
@@ -228,6 +245,10 @@ void writeEntities(
 
     for (const odxf::Ellipse& ellipse : entities.ellipses) {
         writeEllipse(stream, ellipse);
+    }
+
+    for (const odxf::LWPolyline& lwPolyline : entities.lwPolylines) {
+        writeLWPolyline(stream, lwPolyline);
     }
 
     stream << "\n0\nENDSEC";

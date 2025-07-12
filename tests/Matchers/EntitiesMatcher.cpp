@@ -2,6 +2,20 @@
 
 namespace {
 
+testing::Matcher<odxf::Coordinate2d>
+IsCoordinate(const odxf::Coordinate2d& coordinate, double maxError)
+{
+    return testing::AllOf(
+        testing::Field(
+            "x",
+            &odxf::Coordinate2d::x,
+            testing::FloatNear(coordinate.x, static_cast<float>(maxError))),
+        testing::Field(
+            "y",
+            &odxf::Coordinate2d::y,
+            testing::FloatNear(coordinate.y, static_cast<float>(maxError))));
+}
+
 testing::Matcher<odxf::Coordinate3d>
 IsCoordinate(const odxf::Coordinate3d& coordinate, double maxError)
 {
@@ -18,6 +32,46 @@ IsCoordinate(const odxf::Coordinate3d& coordinate, double maxError)
             "z",
             &odxf::Coordinate3d::z,
             testing::FloatNear(coordinate.z, static_cast<float>(maxError))));
+}
+
+testing::Matcher<odxf::Vertex> IsVertex(const odxf::Vertex& expected, double maxError)
+{
+    return testing::AllOf(
+        testing::Field(
+            "position", &odxf::Vertex::position, IsCoordinate(expected.position, maxError)),
+        testing::Field("bulge", &odxf::Vertex::bulge, expected.bulge));
+}
+
+testing::Matcher<std::vector<odxf::Vertex>>
+AreVertices(const odxf::Vertices& expected, double maxError)
+{
+    std::vector<testing::Matcher<odxf::Vertex>> elementMatchers;
+    elementMatchers.reserve(expected.size());
+    for (const odxf::Vertex& expectedVertex : expected) {
+        elementMatchers.push_back(IsVertex(expectedVertex, maxError));
+    }
+
+    return testing::ElementsAreArray(std::move(elementMatchers));
+}
+
+testing::Matcher<odxf::LWPolyline> IsLWPolyline(const odxf::LWPolyline& expected, double maxError)
+{
+    return testing::AllOf(
+        testing::Field("isClosed", &odxf::LWPolyline::isClosed, expected.isClosed),
+        testing::Field(
+            "vertices", &odxf::LWPolyline::vertices, AreVertices(expected.vertices, maxError)));
+}
+
+testing::Matcher<odxf::LWPolylines>
+AreLWPolylines(const odxf::LWPolylines& expected, double maxError)
+{
+    std::vector<testing::Matcher<odxf::LWPolyline>> elementMatchers;
+    elementMatchers.reserve(expected.size());
+    for (const odxf::LWPolyline& expectedLWPolyline : expected) {
+        elementMatchers.push_back(IsLWPolyline(expectedLWPolyline, maxError));
+    }
+
+    return testing::ElementsAreArray(std::move(elementMatchers));
 }
 
 testing::Matcher<odxf::Line> IsLine(const odxf::Line& expected, double maxError)
@@ -100,5 +154,9 @@ testing::Matcher<odxf::Entities> AreEntities(const odxf::Entities& expected, dou
     return testing::AllOf(
         testing::Field("lines", &odxf::Entities::lines, AreLines(expected.lines, maxError)),
         testing::Field("circles", &odxf::Entities::circles, AreCircles(expected.circles, maxError)),
-        testing::Field("arcs", &odxf::Entities::arcs, AreArcs(expected.arcs, maxError)));
+        testing::Field("arcs", &odxf::Entities::arcs, AreArcs(expected.arcs, maxError)),
+        testing::Field(
+            "lwPolylines",
+            &odxf::Entities::lwPolylines,
+            AreLWPolylines(expected.lwPolylines, maxError)));
 }

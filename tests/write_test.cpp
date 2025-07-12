@@ -1,4 +1,6 @@
-#include "opendxf/opendxf.hpp"
+#include "opendxf/write.hpp"
+
+#include "TestUtils.hpp"
 
 #include <fmt/core.h>
 
@@ -34,55 +36,21 @@ std::vector<std::string> readFile(const std::filesystem::path& filePath)
 
 TEST(write, example)
 {
-    const auto expectedFilePath{ std::filesystem::path{ TEST_DATA_DIR } / "example.dxf" };
-    ASSERT_TRUE(std::filesystem::is_regular_file(expectedFilePath));
-
-    const std::string layerName1{ "Test Layer" };
-    const std::string layerName2{ "Lines" };
-
-    odxf::Document document{
-        .header{
-            .entries{ { "$ACADVER", "AC1032" } },
-        },
-        .tables{
-            .lineTypes{
-                { .name{ "CONTINUOUS" }, .displayName{ "Solid Line" } },
-            },
-            .layers{ { .name{ layerName1 } }, { .name{ layerName2 } } },
-        },
-        .entities{
-            .lines{ {
-                        .start{ 0.0F, 0.5F, 0.0F },
-                        .end{ 1.0F, 1.5F, 0.0F },
-                    },
-                    {
-                        .end{ 1.0F, 1.0F, 0.0F },
-                    } },
-            .circles{
-                { .center{}, .radius{ 1.0F } },
-            },
-            .arcs{ {
-                .center{ 0.0F, 2.0F },
-                .radius{ 0.5F },
-                .startAngle{ 0.0F },
-                .endAngle{ 180.0F },
-            } },
-        },
-    };
-
-    // TODO C++26: use designated initializers from base class
-    document.entities.lines.front().layer = layerName2;
-    document.entities.lines.back().layer = layerName2;
-    document.entities.circles.back().layer = layerName1;
-    document.entities.arcs.back().layer = layerName1;
+    // Arrange
+    const odxf::Document document{ createExampleDocument() };
 
     const std::filesystem::path filePath{ "test.dxf" };
     std::filesystem::remove(filePath);
     ASSERT_FALSE(std::filesystem::exists(filePath));
 
+    // Act
     odxf::writeDxf(document, filePath);
 
+    // Assert
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
+
+    const auto expectedFilePath{ std::filesystem::path{ TEST_DATA_DIR } / "example.dxf" };
+    ASSERT_TRUE(std::filesystem::is_regular_file(expectedFilePath));
 
     EXPECT_THAT(readFile(filePath), testing::ElementsAreArray(readFile(expectedFilePath)));
 }

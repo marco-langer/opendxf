@@ -7,6 +7,7 @@ class Circle;
 class Header;
 class Layer;
 class Line;
+class LWPolyline;
 
 class IReadStream
 {
@@ -20,6 +21,7 @@ public:
     virtual void arc(const Arc& arc);
     virtual void circle(const Circle& circle);
     virtual void line(const Line& line);
+    virtual void lwPolyline(const LWPolyline& lwPolyline);
 
 protected:
     IReadStream(const IReadStream&) = default;

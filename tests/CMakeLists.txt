@@ -14,6 +14,8 @@ add_executable(opendxf-tests
     Matchers/TablesMatcher.cpp
     Matchers/TablesMatcher.hpp
     read_test.cpp
+    TestUtils.cpp
+    TestUtils.hpp
     write_test.cpp
 )
 
