@@ -38,6 +38,7 @@ TEST(write, example)
     ASSERT_TRUE(std::filesystem::is_regular_file(expectedFilePath));
 
     const std::string layerName1{ "Test Layer" };
+    const std::string layerName2{ "Lines" };
 
     odxf::Document document{
         .header{
@@ -47,9 +48,7 @@ TEST(write, example)
             .lineTypes{
                 { .name{ "CONTINUOUS" }, .displayName{ "Solid Line" } },
             },
-            .layers{
-                { .name{ layerName1 } },
-            },
+            .layers{ { .name{ layerName1 } }, { .name{ layerName2 } } },
         },
         .entities{
             .lines{ {
@@ -72,8 +71,8 @@ TEST(write, example)
     };
 
     // TODO C++26: use designated initializers from base class
-    document.entities.lines.front().layer = layerName1;
-    document.entities.lines.back().layer = layerName1;
+    document.entities.lines.front().layer = layerName2;
+    document.entities.lines.back().layer = layerName2;
     document.entities.circles.back().layer = layerName1;
     document.entities.arcs.back().layer = layerName1;
 

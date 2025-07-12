@@ -39,11 +39,21 @@ TABLE
 2
 LAYER
 70
-1
+2
 0
 LAYER
 2
 Test Layer
+70
+0
+62
+7
+6
+CONTINUOUS
+0
+LAYER
+2
+Lines
 70
 0
 62
@@ -69,7 +79,7 @@ LINE
 100
 AcDbLine
 8
-Test Layer
+Lines
 62
 0
 10
@@ -89,7 +99,7 @@ LINE
 100
 AcDbLine
 8
-Test Layer
+Lines
 62
 0
 10

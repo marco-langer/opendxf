@@ -181,7 +181,7 @@ tl::expected<void, Error> Reader::readTables()
         });
     }
 
-    while (readNext() && !isSectionEnd()) {
+    while (!isSectionEnd()) {
         if (hasError()) {
             return makeError();
         }
@@ -191,6 +191,12 @@ tl::expected<void, Error> Reader::readTables()
             if (!maybeResult) {
                 return maybeResult;
             }
+        } else {
+            readNext();
+        }
+
+        if (hasError()) {
+            return makeError();
         }
     }
 

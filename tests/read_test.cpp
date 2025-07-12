@@ -52,8 +52,10 @@ TEST(read, example)
     expectedDocument.header.entries.try_emplace("$ACADVER", "AC1032");
 
     const std::string layerName1{ "Test Layer" };
+    const std::string layerName2{ "Lines" };
     odxf::Layers& layers{ expectedDocument.tables.layers };
     layers.push_back(odxf::Layer{ .name = layerName1 });
+    layers.push_back(odxf::Layer{ .name = layerName2 });
 
     odxf::Lines& lines{ expectedDocument.entities.lines };
     lines
@@ -61,14 +63,14 @@ TEST(read, example)
             .start = odxf::Coordinate3d{ 0.0, 0.5, 0.0 },
             .end = odxf::Coordinate3d{ 1.0, 1.5, 0.0 },
         })
-        .layer = layerName1;
+        .layer = layerName2;
 
     lines
         .emplace_back(odxf::Line{
             .start = odxf::Coordinate3d{ 0.0, 0.0, 0.0 },
             .end = odxf::Coordinate3d{ 1.0, 1.0, 0.0 },
         })
-        .layer = layerName1;
+        .layer = layerName2;
 
     odxf::Circles& circles{ expectedDocument.entities.circles };
     circles
