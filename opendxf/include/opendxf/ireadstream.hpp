@@ -2,6 +2,7 @@
 
 namespace odxf {
 
+class Arc;
 class Circle;
 class Header;
 class Layer;
@@ -16,8 +17,9 @@ public:
     virtual void header(const Header& header);
     virtual void layer(const Layer& layer);
 
-    virtual void line(const Line& line);
+    virtual void arc(const Arc& arc);
     virtual void circle(const Circle& circle);
+    virtual void line(const Line& line);
 
 protected:
     IReadStream(const IReadStream&) = default;

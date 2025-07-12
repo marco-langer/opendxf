@@ -14,10 +14,12 @@ struct LineType
     int flags{ 64 };
 };
 
+using Layers = std::vector<Layer>;
+
 struct Tables
 {
     std::vector<LineType> lineTypes;
-    std::vector<Layer> layers;
+    Layers layers;
 };
 
 }   // namespace odxf

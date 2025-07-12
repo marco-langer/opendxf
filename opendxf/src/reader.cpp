@@ -294,6 +294,11 @@ tl::expected<void, Error> Reader::readEntities()
             if (!maybeResult) {
                 return maybeResult;
             }
+        } else if (isArc()) {
+            tl::expected<void, Error> maybeResult{ readArc() };
+            if (!maybeResult) {
+                return maybeResult;
+            }
         } else {
             readNext();
         }
@@ -437,6 +442,88 @@ tl::expected<void, Error> Reader::readCircle()
     return tl::expected<void, Error>();
 }
 
+tl::expected<void, Error> Reader::readArc()
+{
+    if (!readNext()) {
+        return tl::make_unexpected(m_error.value());
+    }
+
+    Arc arc;
+
+    while (m_data.groupCode != 0) {
+        switch (m_data.groupCode) {
+        case 8: {
+            arc.layer = m_data.value;
+
+            break;
+        }
+
+        case 10: {
+            const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
+            if (maybeX.has_value()) {
+                arc.center.x = *maybeX;
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        };
+
+        case 20: {
+            const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
+            if (maybeY.has_value()) {
+                arc.center.y = *maybeY;
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        }
+
+        case 40: {
+            const std::optional<double> maybeRadius{ parseAs<double>(m_data.value) };
+            if (maybeRadius.has_value()) {
+                arc.radius = *maybeRadius;
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        }
+
+        case 50: {
+            const std::optional<double> maybeStartAngle{ parseAs<double>(m_data.value) };
+            if (maybeStartAngle.has_value()) {
+                arc.startAngle = *maybeStartAngle;
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        }
+
+        case 51: {
+            const std::optional<double> maybeEndAngle{ parseAs<double>(m_data.value) };
+            if (maybeEndAngle.has_value()) {
+                arc.endAngle = *maybeEndAngle;
+            } else {
+                return tl::make_unexpected(Error{});
+            }
+
+            break;
+        }
+        }
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+    }
+
+    m_stream.arc(arc);
+
+    return tl::expected<void, Error>();
+}
+
 bool Reader::readNext()
 {
     m_currentLine++;
@@ -501,6 +588,8 @@ bool Reader::isLayer() const { return m_data.groupCode == 0 && m_data.value == "
 bool Reader::isLine() const { return m_data.groupCode == 0 && m_data.value == "LINE"; }
 
 bool odxf::Reader::isCircle() const { return m_data.groupCode == 0 && m_data.value == "CIRCLE"; }
+
+bool Reader::isArc() const { return m_data.groupCode == 0 && m_data.value == "ARC"; }
 
 bool Reader::isEOF() const { return m_data.groupCode == 0 && m_data.value == "EOF"; }
 

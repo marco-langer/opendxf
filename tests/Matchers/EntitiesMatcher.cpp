@@ -39,6 +39,25 @@ testing::Matcher<odxf::Circle> IsCircle(const odxf::Circle& expected, double max
             testing::FloatNear(expected.radius, static_cast<float>(maxError))));
 }
 
+testing::Matcher<odxf::Arc> IsArc(const odxf::Arc& expected, double maxError)
+{
+    return testing::AllOf(
+        testing::Field("layer", &odxf::Entity::layer, expected.layer),
+        testing::Field("center", &odxf::Arc::center, IsCoordinate(expected.center, maxError)),
+        testing::Field(
+            "radius",
+            &odxf::Arc::radius,
+            testing::FloatNear(expected.radius, static_cast<float>(maxError))),
+        testing::Field(
+            "startAngle",
+            &odxf::Arc::startAngle,
+            testing::FloatNear(expected.startAngle, static_cast<float>(maxError))),
+        testing::Field(
+            "endAngle",
+            &odxf::Arc::endAngle,
+            testing::FloatNear(expected.endAngle, static_cast<float>(maxError))));
+}
+
 testing::Matcher<std::vector<odxf::Line>>
 AreLines(const std::vector<odxf::Line>& expected, double maxError)
 {
@@ -63,12 +82,23 @@ AreCircles(const std::vector<odxf::Circle>& expected, double maxError)
     return testing::ElementsAreArray(elementMatchers);
 }
 
+testing::Matcher<odxf::Arcs> AreArcs(const odxf::Arcs& expected, double maxError)
+{
+    std::vector<testing::Matcher<odxf::Arc>> elementMatchers;
+    elementMatchers.reserve(expected.size());
+    for (const odxf::Arc& expectedArc : expected) {
+        elementMatchers.push_back(IsArc(expectedArc, maxError));
+    }
+
+    return testing::ElementsAreArray(std::move(elementMatchers));
+}
+
 }   // namespace
 
 testing::Matcher<odxf::Entities> AreEntities(const odxf::Entities& expected, double maxError)
 {
     return testing::AllOf(
         testing::Field("lines", &odxf::Entities::lines, AreLines(expected.lines, maxError)),
-        testing::Field(
-            "circles", &odxf::Entities::circles, AreCircles(expected.circles, maxError)));
+        testing::Field("circles", &odxf::Entities::circles, AreCircles(expected.circles, maxError)),
+        testing::Field("arcs", &odxf::Entities::arcs, AreArcs(expected.arcs, maxError)));
 }

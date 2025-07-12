@@ -47,7 +47,9 @@ TEST(write, example)
             .lineTypes{
                 { .name{ "CONTINUOUS" }, .displayName{ "Solid Line" } },
             },
-            .layers{ { .name{ layerName1 } } },
+            .layers{
+                { .name{ layerName1 } },
+            },
         },
         .entities{
             .lines{ {

@@ -17,11 +17,12 @@ public:
     void header(const odxf::Header& header) override { m_document.header = header; }
     void layer(const odxf::Layer& layer) override { m_document.tables.layers.push_back(layer); }
 
-    void line(const odxf::Line& line) override { m_document.entities.lines.push_back(line); }
+    void arc(const odxf::Arc& arc) override { m_document.entities.arcs.push_back(arc); }
     void circle(const odxf::Circle& circle) override
     {
         m_document.entities.circles.push_back(circle);
     }
+    void line(const odxf::Line& line) override { m_document.entities.lines.push_back(line); }
 
 private:
     odxf::Document m_document;
@@ -51,7 +52,8 @@ TEST(read, example)
     expectedDocument.header.entries.try_emplace("$ACADVER", "AC1032");
 
     const std::string layerName1{ "Test Layer" };
-    expectedDocument.tables.layers.push_back(odxf::Layer{ .name = layerName1 });
+    odxf::Layers& layers{ expectedDocument.tables.layers };
+    layers.push_back(odxf::Layer{ .name = layerName1 });
 
     odxf::Lines& lines{ expectedDocument.entities.lines };
     lines
@@ -71,6 +73,15 @@ TEST(read, example)
     odxf::Circles& circles{ expectedDocument.entities.circles };
     circles
         .emplace_back(odxf::Circle{ .center = odxf::Coordinate3d{ 0.0, 0.0, 0.0 }, .radius = 1.0F })
+        .layer = layerName1;
+
+    odxf::Arcs& arcs{ expectedDocument.entities.arcs };
+    arcs.emplace_back(odxf::Arc{
+                          .center = odxf::Coordinate3d{ 0.0F, 2.0F, 0.0F },
+                          .radius = 0.5F,
+                          .startAngle = 0.0F,
+                          .endAngle = 180.0F,
+                      })
         .layer = layerName1;
 
     EXPECT_THAT(document, IsDocument(expectedDocument));

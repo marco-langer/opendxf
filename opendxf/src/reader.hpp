@@ -42,6 +42,7 @@ private:
     tl::expected<void, Error> readEntities();
     tl::expected<void, Error> readLine();
     tl::expected<void, Error> readCircle();
+    tl::expected<void, Error> readArc();
 
     bool readNext();
 
@@ -60,6 +61,7 @@ private:
 
     bool isLine() const;
     bool isCircle() const;
+    bool isArc() const;
 
     bool isEOF() const;
 

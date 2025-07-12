@@ -10,8 +10,10 @@ void IReadStream::header(const Header& /* header */) {}
 
 void IReadStream::layer(const Layer& /* layer */) {}
 
-void IReadStream::line(const Line& /* line */) {}
+void IReadStream::arc(const Arc& /* arc */) {}
 
 void IReadStream::circle(const Circle& /* circle */) {}
+
+void IReadStream::line(const Line& /* line */) {}
 
 }   // namespace odxf
