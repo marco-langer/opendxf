@@ -46,6 +46,7 @@ private:
     tl::expected<void, Error> readLWPolyline();
 
     bool readNext();
+    bool readNextSingle();
 
     bool hasError() const;
     tl::expected<void, Error> makeError() const;

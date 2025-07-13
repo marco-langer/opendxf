@@ -15,7 +15,8 @@ overload(Ts...) -> overload<Ts...>;
 
 void writeHeader(std::ofstream& stream, const odxf::Header& header)
 {
-    stream << "0\nSECTION";
+    stream << "999\nopendxf";
+    stream << "\n0\nSECTION";
     stream << "\n2\nHEADER";
 
     for (const auto& [key, value] : header.entries) {

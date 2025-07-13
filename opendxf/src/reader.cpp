@@ -680,6 +680,16 @@ tl::expected<void, Error> Reader::readLWPolyline()
 
 bool Reader::readNext()
 {
+    bool success{ false };
+    do {
+        success = readNextSingle();
+    } while (m_data.groupCode == 999 && success);
+
+    return success;
+}
+
+bool Reader::readNextSingle()
+{
     m_currentLine++;
 
     if (!std::getline(m_fileStream, m_data.value)) {
