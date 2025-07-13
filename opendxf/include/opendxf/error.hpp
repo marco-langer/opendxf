@@ -13,7 +13,7 @@ struct Error
         InvalidFile
     };
 
-    Type type;
+    Type type{ Type::InvalidFile };
     std::optional<int> lineNumber;
     std::string what;
 };

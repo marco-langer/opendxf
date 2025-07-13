@@ -87,7 +87,6 @@ tl::expected<void, Error> Reader::readHeader()
 
     if (!isSectionBegin()) {
         return tl::make_unexpected(Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "expected section begin",
         });
@@ -125,7 +124,6 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     if (m_data.groupCode != 9) {
         return tl::make_unexpected(Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "expected group code 9 for header variable name",
         });
@@ -146,7 +144,6 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     default: {
         return tl::make_unexpected(Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what =
                 fmt::format("unexpected group code {} for header variable name", m_data.groupCode),
@@ -165,7 +162,6 @@ tl::expected<void, Error> Reader::readTables()
 
     if (!isSectionBegin()) {
         return tl::make_unexpected(Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "expected section begin",
         });
@@ -177,7 +173,6 @@ tl::expected<void, Error> Reader::readTables()
 
     if (!isTablesBegin()) {
         return tl::make_unexpected(Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "expected tables begin",
         });
@@ -252,7 +247,6 @@ tl::expected<void, Error> Reader::readBlocks()
 
     if (!isSectionBegin()) {
         return tl::make_unexpected(Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "expected section begin",
         });
@@ -264,7 +258,6 @@ tl::expected<void, Error> Reader::readBlocks()
 
     if (!isBlocksBegin()) {
         return tl::make_unexpected(Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "expected blocks begin",
         });
@@ -287,7 +280,6 @@ tl::expected<void, Error> Reader::readEntities()
 
     if (!isSectionBegin()) {
         return tl::make_unexpected(Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "expected section begin",
         });
@@ -299,7 +291,6 @@ tl::expected<void, Error> Reader::readEntities()
 
     if (!isEntitiesBegin()) {
         return tl::make_unexpected(Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "expected entities begin",
         });
@@ -709,7 +700,6 @@ bool Reader::readNextSingle()
 
     if (!std::getline(m_fileStream, m_data.value)) {
         m_error = Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "unable to read line",
         };
@@ -721,7 +711,6 @@ bool Reader::readNextSingle()
         m_data.value.c_str(), m_data.value.c_str() + m_data.value.size(), m_data.groupCode) };
     if (errorCode != std::errc()) {
         m_error = Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "unable to parse group code",
         };
@@ -732,7 +721,6 @@ bool Reader::readNextSingle()
     m_currentLine++;
     if (!std::getline(m_fileStream, m_data.value)) {
         m_error = Error{
-            .type = Error::Type::InvalidFile,
             .lineNumber = m_currentLine,
             .what = "unable to read line",
         };
