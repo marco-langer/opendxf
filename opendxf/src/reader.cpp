@@ -216,6 +216,21 @@ tl::expected<void, Error> Reader::readLayer()
         switch (m_data.groupCode) {
         case 2: {
             layer.name = m_data.value;
+
+            break;
+        }
+
+        case 70: {
+            const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
+            if (maybeFlags.has_value()) {
+                layer.flags = static_cast<odxf::Layer::Flags>(*maybeFlags);
+            } else {
+                return tl::make_unexpected(Error{
+                    .lineNumber = m_currentLine,
+                });
+            }
+
+            break;
         }
         }
 

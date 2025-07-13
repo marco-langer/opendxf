@@ -11,7 +11,7 @@ odxf::Document createExampleDocument()
     Document expectedDocument;
     expectedDocument.header.entries.try_emplace("$ACADVER", "AC1032");
 
-    const std::string layerName1{ "Test Layer" };
+    const std::string layerNameTest{ "Test Layer" };
     const std::string layerNameLines{ "Lines" };
     const std::string layerNameLWPolylines{ "LW Polylines" };
 
@@ -22,7 +22,7 @@ odxf::Document createExampleDocument()
     });
 
     Layers& layers{ expectedDocument.tables.layers };
-    layers.push_back(Layer{ .name = layerName1 });
+    layers.emplace_back(Layer{ .name = layerNameTest }).flags = Layer::Flags::Frozen;
     layers.push_back(Layer{ .name = layerNameLines });
     layers.push_back(Layer{ .name = layerNameLWPolylines });
 
@@ -49,7 +49,7 @@ odxf::Document createExampleDocument()
             .center = Coordinate3d{ 0.0, 0.0, 0.0 },
             .radius = 1.0F,
         })
-        .layer = layerName1;
+        .layer = layerNameTest;
 
     Arcs& arcs{ entities.arcs };
     arcs.emplace_back(Arc{
@@ -58,7 +58,7 @@ odxf::Document createExampleDocument()
                           .startAngle = 0.0F,
                           .endAngle = 180.0F,
                       })
-        .layer = layerName1;
+        .layer = layerNameTest;
 
     LWPolylines& lwPolylines{ entities.lwPolylines };
     lwPolylines.emplace_back(LWPolyline{}).layer = layerNameLWPolylines;

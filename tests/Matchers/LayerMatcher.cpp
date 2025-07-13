@@ -4,7 +4,9 @@ namespace {
 
 testing::Matcher<odxf::Layer> IsLayer(const odxf::Layer& expected)
 {
-    return testing::AllOf(testing::Field("name", &odxf::Layer::name, expected.name));
+    return testing::AllOf(
+        testing::Field("name", &odxf::Layer::name, expected.name),
+        testing::Field("flags", &odxf::Layer::flags, expected.flags));
 }
 
 }   // namespace
