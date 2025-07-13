@@ -3,6 +3,8 @@
 #include "Matchers/DocumentMatcher.hpp"
 #include "TestUtils.hpp"
 
+#include <fmt/format.h>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -48,7 +50,8 @@ TEST(read, example)
 
     // Assert
     if (!maybeError) {
-        FAIL() << maybeError.error().what;
+        const odxf::Error& error{ maybeError.error() };
+        FAIL() << fmt::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
     }
 
     const odxf::Document& document{ istream.document() };

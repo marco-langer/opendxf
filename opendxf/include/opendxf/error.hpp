@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 
 namespace odxf {
@@ -13,6 +14,7 @@ struct Error
     };
 
     Type type;
+    std::optional<int> lineNumber;
     std::string what;
 };
 
