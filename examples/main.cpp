@@ -10,15 +10,14 @@ int main()
             },
             .layers{ { .name{ "Test Layer" } } },
         },
-        .entities{ .arcs{ { .center{ 0.0F, 2.0F },
-                            .radius{ 0.5F },
-                            .startAngle{ 0.0F },
-                            .endAngle{ 180.0F } } },
-                   .circles{ { .center{}, .radius{ 1.0F } } },
-                   .lines{
-                       { .start{ 0.0F, 0.5F, 0.0F }, .end{ 1.0F, 1.5F, 0.0F } },
-                       { .end{ 1.0F, 1.0F, 0.0F } },
-                   } },
+        .entities{
+            .arcs{
+                { .center{ 0.0, 2.0 }, .radius{ 0.5 }, .startAngle{ 0.0 }, .endAngle{ 180.0 } } },
+            .circles{ { .center{}, .radius{ 1.0 } } },
+            .lines{
+                { .start{ 0.0, 0.5, 0.0 }, .end{ 1.0, 1.5, 0.0 } },
+                { .end{ 1.0, 1.0, 0.0 } },
+            } },
     };
     odxf::writeDxf(document, "test.dxf");
 

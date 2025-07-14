@@ -47,16 +47,16 @@ odxf::Document createExampleDocument()
     circles
         .emplace_back(Circle{
             .center = Coordinate3d{ 0.0, 0.0, 0.0 },
-            .radius = 1.0F,
+            .radius = 1.0,
         })
         .layer = layerNameTest;
 
     Arcs& arcs{ entities.arcs };
     arcs.emplace_back(Arc{
-                          .center = Coordinate3d{ 0.0F, 2.0F, 0.0F },
-                          .radius = 0.5F,
-                          .startAngle = 0.0F,
-                          .endAngle = 180.0F,
+                          .center = Coordinate3d{ 0.0, 2.0, 0.0 },
+                          .radius = 0.5,
+                          .startAngle = 0.0,
+                          .endAngle = 180.0,
                       })
         .layer = layerNameTest;
 
@@ -75,21 +75,21 @@ odxf::Document createExampleDocument()
             },
             Vertex{
                 .position = { 10.0, 50.0 },
-                .bulge = 1.0F,
+                .bulge = 1.0,
             },
             Vertex{
                 .position = { 20.0, 60.0, },
             },
             Vertex{
                 .position = { 60.0, 60.0, },
-                .bulge = -1.0F
+                .bulge = -1.0
             },
             Vertex{
                 .position = { 70.0, 50.0, },
             },
             Vertex{
                 .position = { 70.0, 20.0 },
-                .bulge = 1.0F,
+                .bulge = 1.0,
             },
             Vertex{
                 .position = { 60.0, 10.0 },

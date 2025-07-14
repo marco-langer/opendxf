@@ -98,7 +98,7 @@ void writeCoordinate(std::ofstream& stream, const odxf::Coordinate3d& coordinate
     stream << "\n30\n" << std::to_string(coordinate.z);
 }
 
-void writeThickness(std::ofstream& stream, const std::optional<float>& maybeThickness)
+void writeThickness(std::ofstream& stream, const std::optional<double>& maybeThickness)
 {
     if (maybeThickness) {
         stream << "\n39\n" << *maybeThickness;

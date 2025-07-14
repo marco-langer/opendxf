@@ -9,22 +9,22 @@ namespace odxf {
 
 struct Coordinate2d
 {
-    float x{ 0.0F };
-    float y{ 0.0F };
+    double x{ 0.0 };
+    double y{ 0.0 };
 };
 
 struct Coordinate3d
 {
-    float x{ 0.0F };
-    float y{ 0.0F };
-    float z{ 0.0F };
+    double x{ 0.0 };
+    double y{ 0.0 };
+    double z{ 0.0 };
 };
 
 struct Vector3d
 {
-    float x{ 0.0F };
-    float y{ 0.0F };
-    float z{ 0.0F };
+    double x{ 0.0 };
+    double y{ 0.0 };
+    double z{ 0.0 };
 };
 
 struct Entity
@@ -38,7 +38,7 @@ struct Point : Entity
     Coordinate3d coordinate;
 
     std::optional<Vector3d> extrusion;
-    std::optional<float> thickness;
+    std::optional<double> thickness;
 };
 
 struct Ray : Entity
@@ -53,36 +53,36 @@ struct Line : Entity
     Coordinate3d end;
 
     std::optional<Vector3d> extrusion;
-    std::optional<float> thickness;
+    std::optional<double> thickness;
 };
 
 struct Circle : Entity
 {
     Coordinate3d center;
-    float radius{ 0.0F };
+    double radius{ 0.0 };
 
     std::optional<Vector3d> extrusion;
-    std::optional<float> thickness;
+    std::optional<double> thickness;
 };
 
 struct Arc : Entity
 {
     Coordinate3d center;
-    float radius{ 0.0F };
-    float startAngle{ 0.0F };
-    float endAngle{ 0.0F };
+    double radius{ 0.0 };
+    double startAngle{ 0.0 };
+    double endAngle{ 0.0 };
 
     std::optional<Vector3d> extrusion;
-    std::optional<float> thickness;
+    std::optional<double> thickness;
 };
 
 struct Ellipse : Entity
 {
     Coordinate3d center;
     Coordinate3d endPointMajor;
-    float axisRatio{ 1.0F };
-    float startParameter{ 0.0F };
-    float endParameter{ 2 * std::numbers::pi_v<float> };
+    double axisRatio{ 1.0 };
+    double startParameter{ 0.0 };
+    double endParameter{ 2 * std::numbers::pi };
 
     std::optional<Vector3d> extrusion;
 };
@@ -90,14 +90,14 @@ struct Ellipse : Entity
 struct Vertex
 {
     Coordinate2d position;
-    std::optional<float> bulge;
+    std::optional<double> bulge;
 };
 
 using Vertices = std::vector<Vertex>;
 
 struct LWPolyline : Entity
 {
-    std::optional<float> elevation;
+    std::optional<double> elevation;
     bool isClosed{ false };
     Vertices vertices;
 };

@@ -6,32 +6,17 @@ testing::Matcher<odxf::Coordinate2d>
 IsCoordinate(const odxf::Coordinate2d& coordinate, double maxError)
 {
     return testing::AllOf(
-        testing::Field(
-            "x",
-            &odxf::Coordinate2d::x,
-            testing::FloatNear(coordinate.x, static_cast<float>(maxError))),
-        testing::Field(
-            "y",
-            &odxf::Coordinate2d::y,
-            testing::FloatNear(coordinate.y, static_cast<float>(maxError))));
+        testing::Field("x", &odxf::Coordinate2d::x, testing::DoubleNear(coordinate.x, maxError)),
+        testing::Field("y", &odxf::Coordinate2d::y, testing::DoubleNear(coordinate.y, maxError)));
 }
 
 testing::Matcher<odxf::Coordinate3d>
 IsCoordinate(const odxf::Coordinate3d& coordinate, double maxError)
 {
     return testing::AllOf(
-        testing::Field(
-            "x",
-            &odxf::Coordinate3d::x,
-            testing::FloatNear(coordinate.x, static_cast<float>(maxError))),
-        testing::Field(
-            "y",
-            &odxf::Coordinate3d::y,
-            testing::FloatNear(coordinate.y, static_cast<float>(maxError))),
-        testing::Field(
-            "z",
-            &odxf::Coordinate3d::z,
-            testing::FloatNear(coordinate.z, static_cast<float>(maxError))));
+        testing::Field("x", &odxf::Coordinate3d::x, testing::DoubleNear(coordinate.x, maxError)),
+        testing::Field("y", &odxf::Coordinate3d::y, testing::DoubleNear(coordinate.y, maxError)),
+        testing::Field("z", &odxf::Coordinate3d::z, testing::DoubleNear(coordinate.z, maxError)));
 }
 
 testing::Matcher<odxf::Vertex> IsVertex(const odxf::Vertex& expected, double maxError)
@@ -88,9 +73,7 @@ testing::Matcher<odxf::Circle> IsCircle(const odxf::Circle& expected, double max
         testing::Field("layer", &odxf::Entity::layer, expected.layer),
         testing::Field("center", &odxf::Circle::center, IsCoordinate(expected.center, maxError)),
         testing::Field(
-            "radius",
-            &odxf::Circle::radius,
-            testing::FloatNear(expected.radius, static_cast<float>(maxError))));
+            "radius", &odxf::Circle::radius, testing::DoubleNear(expected.radius, maxError)));
 }
 
 testing::Matcher<odxf::Arc> IsArc(const odxf::Arc& expected, double maxError)
@@ -99,17 +82,13 @@ testing::Matcher<odxf::Arc> IsArc(const odxf::Arc& expected, double maxError)
         testing::Field("layer", &odxf::Entity::layer, expected.layer),
         testing::Field("center", &odxf::Arc::center, IsCoordinate(expected.center, maxError)),
         testing::Field(
-            "radius",
-            &odxf::Arc::radius,
-            testing::FloatNear(expected.radius, static_cast<float>(maxError))),
+            "radius", &odxf::Arc::radius, testing::DoubleNear(expected.radius, maxError)),
         testing::Field(
             "startAngle",
             &odxf::Arc::startAngle,
-            testing::FloatNear(expected.startAngle, static_cast<float>(maxError))),
+            testing::DoubleNear(expected.startAngle, maxError)),
         testing::Field(
-            "endAngle",
-            &odxf::Arc::endAngle,
-            testing::FloatNear(expected.endAngle, static_cast<float>(maxError))));
+            "endAngle", &odxf::Arc::endAngle, testing::DoubleNear(expected.endAngle, maxError)));
 }
 
 testing::Matcher<std::vector<odxf::Line>>
