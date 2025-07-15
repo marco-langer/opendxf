@@ -4,7 +4,7 @@
 
 namespace odxf {
 
-struct Layer
+struct Layer final
 {
     enum Flags
     {

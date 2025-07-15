@@ -6,7 +6,7 @@
 
 namespace odxf {
 
-struct Document
+struct Document final
 {
     Header header;
     Tables tables;

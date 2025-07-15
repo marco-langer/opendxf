@@ -7,7 +7,7 @@
 
 namespace odxf {
 
-struct LineType
+struct LineType final
 {
     std::string name;
     std::string displayName;
@@ -17,7 +17,7 @@ struct LineType
 using Layers = std::vector<Layer>;
 using LineTypes = std::vector<LineType>;
 
-struct Tables
+struct Tables final
 {
     LineTypes lineTypes;
     Layers layers;

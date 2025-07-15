@@ -5,7 +5,7 @@
 
 namespace odxf {
 
-struct Error
+struct Error final
 {
     enum class Type
     {

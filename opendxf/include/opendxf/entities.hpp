@@ -7,20 +7,20 @@
 
 namespace odxf {
 
-struct Coordinate2d
+struct Coordinate2d final
 {
     double x{ 0.0 };
     double y{ 0.0 };
 };
 
-struct Coordinate3d
+struct Coordinate3d final
 {
     double x{ 0.0 };
     double y{ 0.0 };
     double z{ 0.0 };
 };
 
-struct Vector3d
+struct Vector3d final
 {
     double x{ 0.0 };
     double y{ 0.0 };
@@ -33,7 +33,7 @@ struct Entity
     int color{ 0 };
 };
 
-struct Point : Entity
+struct Point final : Entity
 {
     Coordinate3d coordinate;
 
@@ -41,13 +41,13 @@ struct Point : Entity
     std::optional<double> thickness;
 };
 
-struct Ray : Entity
+struct Ray final : Entity
 {
     Coordinate3d startPoint;
     Vector3d direction;
 };
 
-struct Line : Entity
+struct Line final : Entity
 {
     Coordinate3d start;
     Coordinate3d end;
@@ -56,7 +56,7 @@ struct Line : Entity
     std::optional<double> thickness;
 };
 
-struct Circle : Entity
+struct Circle final : Entity
 {
     Coordinate3d center;
     double radius{ 0.0 };
@@ -65,7 +65,7 @@ struct Circle : Entity
     std::optional<double> thickness;
 };
 
-struct Arc : Entity
+struct Arc final : Entity
 {
     Coordinate3d center;
     double radius{ 0.0 };
@@ -76,7 +76,7 @@ struct Arc : Entity
     std::optional<double> thickness;
 };
 
-struct Ellipse : Entity
+struct Ellipse final : Entity
 {
     Coordinate3d center;
     Coordinate3d endPointMajor;
@@ -87,7 +87,7 @@ struct Ellipse : Entity
     std::optional<Vector3d> extrusion;
 };
 
-struct Vertex
+struct Vertex final
 {
     Coordinate2d position;
     std::optional<double> bulge;
@@ -95,7 +95,7 @@ struct Vertex
 
 using Vertices = std::vector<Vertex>;
 
-struct LWPolyline : Entity
+struct LWPolyline final : Entity
 {
     std::optional<double> elevation;
     bool isClosed{ false };
@@ -110,7 +110,7 @@ using Points = std::vector<Point>;
 using LWPolylines = std::vector<LWPolyline>;
 using Rays = std::vector<Ray>;
 
-struct Entities
+struct Entities final
 {
     Arcs arcs;
     Circles circles;
