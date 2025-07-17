@@ -139,7 +139,8 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     }
 
     switch (m_data.groupCode) {
-    case 1: {
+    case 1:
+    case 3: {
         HeaderValue value{ m_data.value };
 
         return std::pair{ std::move(key), std::move(value) };
@@ -147,7 +148,7 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     default: {
         return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine,
+            .lineNumber = m_currentLine - 1,
             .what =
                 fmt::format("unexpected group code {} for header variable name", m_data.groupCode),
         });
