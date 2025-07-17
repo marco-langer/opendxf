@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024 Marco Langer
+
 #include "reader.hpp"
 
 #include "opendxf/ireadstream.hpp"

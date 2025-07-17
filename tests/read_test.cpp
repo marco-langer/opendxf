@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024 Marco Langer
+
 #include "opendxf/opendxf.hpp"
 
 #include "Matchers/DocumentMatcher.hpp"

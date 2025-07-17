@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2024 Marco Langer
+
 #include "LayerMatcher.hpp"
 
 namespace {
