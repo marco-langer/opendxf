@@ -710,8 +710,14 @@ bool Reader::readNextSingle()
         return false;
     }
 
+    const char* first{ m_data.value.c_str() };
+    if (!m_data.value.empty()) {
+        while (*first == ' ') {
+            ++first;
+        }
+    }
     const auto [_, errorCode]{ std::from_chars(
-        m_data.value.c_str(), m_data.value.c_str() + m_data.value.size(), m_data.groupCode) };
+        first, first + m_data.value.size(), m_data.groupCode) };
     if (errorCode != std::errc()) {
         m_error = Error{
             .lineNumber = m_currentLine,
