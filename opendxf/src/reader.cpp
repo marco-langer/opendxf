@@ -139,7 +139,8 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     }
 
     switch (m_data.groupCode) {
-    case 1: {
+    case 1:
+    case 3: {
         HeaderValue value{ m_data.value };
 
         return std::pair{ std::move(key), std::move(value) };
