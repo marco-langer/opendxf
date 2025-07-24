@@ -30,6 +30,10 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
                          stream << "\n70\n";
                          stream << element;
                      },
+                      [&stream](double element) {
+                          stream << "\n40\n";
+                          stream << element;
+                      },
                       [&stream](const std::string& element) {
                           stream << "\n1\n";
                           stream << element;

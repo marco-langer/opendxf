@@ -176,6 +176,21 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
         return std::pair{ std::move(key), value };
     }
 
+    case 40: {
+        const std::optional<double> maybeValue{ parseAs<double>(m_data.value) };
+        if (!maybeValue) {
+            return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+        }
+
+        HeaderValue value{ *maybeValue };
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+
+        return std::pair{ std::move(key), std::move(value) };
+    }
+
     case 70: {
         const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
         if (!maybeValue) {

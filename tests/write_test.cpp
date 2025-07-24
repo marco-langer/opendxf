@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024 Marco Langer
 
+#include "opendxf/read.hpp"
 #include "opendxf/write.hpp"
 
+#include "Matchers/DocumentMatcher.hpp"
 #include "TestUtils.hpp"
 
 #include <fmt/core.h>
@@ -52,10 +54,12 @@ TEST(write, example)
     // Assert
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
-    const auto expectedFilePath{ std::filesystem::path{ TEST_DATA_DIR } / "example.dxf" };
-    ASSERT_TRUE(std::filesystem::is_regular_file(expectedFilePath));
+    ReadStream istream;
+    const tl::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
 
-    // TODO this is a brittle test because of the unordered nature of the header entries
-    // replace it perhaps with a write-read roundtrip verification?
-    EXPECT_THAT(readFile(filePath), testing::ElementsAreArray(readFile(expectedFilePath)));
+    ASSERT_TRUE(result.has_value());
+
+    const odxf::Document& readDocument{ istream.document() };
+
+    EXPECT_THAT(readDocument, IsDocument(document));
 }

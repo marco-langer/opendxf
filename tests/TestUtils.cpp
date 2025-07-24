@@ -14,6 +14,7 @@ odxf::Document createExampleDocument()
 
     Document expectedDocument;
     auto& headerEntries{ expectedDocument.header.entries };
+    headerEntries.try_emplace("$TEXTSIZE", 2.5);
     headerEntries.try_emplace("$REGENMODE", 1);
     headerEntries.try_emplace("$ORTHOMODE", 0);
     headerEntries.try_emplace("$LIMMAX", odxf::Coordinate2d{ 420, 297 });
