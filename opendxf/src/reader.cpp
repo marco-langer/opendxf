@@ -176,7 +176,7 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     }
 
     case 7: {
-        if (key != "$TEXTSTYLE") {
+        if (key != "$TEXTSTYLE" && key != "$DIMTXSTY") {
             return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
         }
 

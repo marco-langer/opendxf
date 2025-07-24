@@ -43,7 +43,7 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
                               stream << "\n2\n";
                           } else if (key == "$CELTYPE") {
                               stream << "\n6\n";
-                          } else if (key == "$TEXTSTYLE") {
+                          } else if (key == "$TEXTSTYLE" || key == "$DIMTXSTY") {
                               stream << "\n7\n";
                           } else if (key == "$CLAYER") {
                               stream << "\n8\n";

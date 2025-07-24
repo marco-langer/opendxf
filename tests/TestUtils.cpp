@@ -31,6 +31,7 @@ odxf::Document createExampleDocument()
     headerEntries.try_emplace("$CELTYPE", "BYLAYER");
     headerEntries.try_emplace("$CECOLOR", 200);
     headerEntries.try_emplace("$DIMSTYLE", "STANDARD");
+    headerEntries.try_emplace("$DIMTXSTY", "STANDARD");
 
     const std::string layerNameLines{ "Lines" };
     const std::string layerNameLWPolylines{ "LW Polylines" };
