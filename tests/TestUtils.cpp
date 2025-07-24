@@ -23,8 +23,13 @@ odxf::Document createExampleDocument()
         "$EXTMIN", odxf::Coordinate3d{ 77.48842691804612, 27.48842691804612, 0.0 });
     headerEntries.try_emplace("$INSBASE", odxf::Coordinate3d{});
     headerEntries.try_emplace("$ACADVER", "AC1032");
+    headerEntries.try_emplace("$TEXTSTYLE", "STANDARD");
 
     const std::string layerNameTest{ "Test Layer" };
+
+    headerEntries.try_emplace("$CLAYER", layerNameTest);
+    headerEntries.try_emplace("$CELTYPE", "BYLAYER");
+
     const std::string layerNameLines{ "Lines" };
     const std::string layerNameLWPolylines{ "LW Polylines" };
 

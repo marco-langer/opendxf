@@ -160,6 +160,48 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
         return std::pair{ std::move(key), std::move(value) };
     };
 
+    case 6: {
+        if (key != "$CELTYPE") {
+            return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+        }
+
+        HeaderValue value{ m_data.value };
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+
+        return std::pair{ std::move(key), std::move(value) };
+    }
+
+    case 7: {
+        if (key != "$TEXTSTYLE") {
+            return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+        }
+
+        HeaderValue value{ m_data.value };
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+
+        return std::pair{ std::move(key), std::move(value) };
+    }
+
+    case 8: {
+        if (key != "$CLAYER") {
+            return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+        }
+
+        HeaderValue value{ m_data.value };
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+
+        return std::pair{ std::move(key), std::move(value) };
+    }
+
     case 10: {
         tl::expected<std::variant<Coordinate2d, Coordinate3d>, Error> maybeCoordinate{
             readHeaderCoordinate()

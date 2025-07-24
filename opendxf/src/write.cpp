@@ -34,8 +34,16 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
                           stream << "\n40\n";
                           stream << element;
                       },
-                      [&stream](const std::string& element) {
-                          stream << "\n1\n";
+                      [&stream, &key](const std::string& element) {
+                          if (key == "$CELTYPE") {
+                              stream << "\n6\n";
+                          } else if (key == "$TEXTSTYLE") {
+                              stream << "\n7\n";
+                          } else if (key == "$CLAYER") {
+                              stream << "\n8\n";
+                          } else {
+                              stream << "\n1\n";
+                          }
                           stream << element;
                       },
                       [&stream](const odxf::Coordinate2d& coord) {
