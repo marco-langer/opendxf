@@ -150,6 +150,7 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     switch (m_data.groupCode) {
     case 1:
+    case 2:
     case 3: {
         HeaderValue value{ m_data.value };
 
