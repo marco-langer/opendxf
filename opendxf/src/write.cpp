@@ -39,9 +39,11 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
                           stream << element;
                       },
                       [&stream, &key](const std::string& element) {
-                          if (key == "DIMSTYLE") {
+                          if (key == "$DIMSTYLE") {
                               stream << "\n2\n";
-                          } else if (key == "$CELTYPE") {
+                          } else if (
+                              key == "$CELTYPE" || key == "$DIMLTYPE" || key == "$DIMLTEX1"
+                              || key == "$DIMLTEX2") {
                               stream << "\n6\n";
                           } else if (key == "$TEXTSTYLE" || key == "$DIMTXSTY") {
                               stream << "\n7\n";

@@ -162,7 +162,7 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     };
 
     case 6: {
-        if (key != "$CELTYPE") {
+        if (key != "$CELTYPE" && key != "$DIMLTYPE" && key != "$DIMLTEX1" && key != "$DIMLTEX2") {
             return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
         }
 

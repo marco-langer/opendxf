@@ -84,6 +84,18 @@ STANDARD
 $DIMTXSTY
   7
 STANDARD
+  9
+$DIMLTYPE
+  6
+
+  9
+$DIMLTEX1
+  6
+
+  9
+$DIMLTEX2
+  6
+
   0
 ENDSEC
   0

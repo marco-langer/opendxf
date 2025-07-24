@@ -32,6 +32,9 @@ odxf::Document createExampleDocument()
     headerEntries.try_emplace("$CECOLOR", 200);
     headerEntries.try_emplace("$DIMSTYLE", "STANDARD");
     headerEntries.try_emplace("$DIMTXSTY", "STANDARD");
+    headerEntries.try_emplace("$DIMLTYPE", std::string{});
+    headerEntries.try_emplace("$DIMLTEX1", std::string{});
+    headerEntries.try_emplace("$DIMLTEX2", std::string{});
 
     const std::string layerNameLines{ "Lines" };
     const std::string layerNameLWPolylines{ "LW Polylines" };
