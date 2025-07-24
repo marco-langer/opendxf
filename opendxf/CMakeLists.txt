@@ -5,6 +5,7 @@ message(STATUS "Using fmt v.${fmt_VERSION}")
 message(STATUS "Using tl-expected v.${tl-expected_VERSION}")
 
 add_library(opendxf STATIC
+    include/opendxf/coordinate.hpp
     include/opendxf/document.hpp
     include/opendxf/entities.hpp
     include/opendxf/error.hpp

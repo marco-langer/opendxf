@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "coordinate.hpp"
 #include "document.hpp"
 #include "entities.hpp"
 #include "error.hpp"

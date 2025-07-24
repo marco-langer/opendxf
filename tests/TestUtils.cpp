@@ -3,6 +3,7 @@
 
 #include "TestUtils.hpp"
 
+#include "opendxf/coordinate.hpp"
 #include "opendxf/entities.hpp"
 #include "opendxf/header.hpp"
 #include "opendxf/layer.hpp"
@@ -12,7 +13,13 @@ odxf::Document createExampleDocument()
     using namespace odxf;
 
     Document expectedDocument;
-    expectedDocument.header.entries.try_emplace("$ACADVER", "AC1032");
+    auto& headerEntries{ expectedDocument.header.entries };
+    headerEntries.try_emplace("$LIMMAX", odxf::Coordinate2d{ 420, 297 });
+    headerEntries.try_emplace("$LIMMIN", odxf::Coordinate2d{});
+    headerEntries.try_emplace(
+        "$EXTMIN", odxf::Coordinate3d{ 77.48842691804612, 27.48842691804612, 0.0 });
+    headerEntries.try_emplace("$INSBASE", odxf::Coordinate3d{});
+    headerEntries.try_emplace("$ACADVER", "AC1032");
 
     const std::string layerNameTest{ "Test Layer" };
     const std::string layerNameLines{ "Lines" };

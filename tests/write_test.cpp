@@ -55,5 +55,7 @@ TEST(write, example)
     const auto expectedFilePath{ std::filesystem::path{ TEST_DATA_DIR } / "example.dxf" };
     ASSERT_TRUE(std::filesystem::is_regular_file(expectedFilePath));
 
+    // TODO this is a brittle test because of the unordered nature of the header entries
+    // replace it perhaps with a write-read roundtrip verification?
     EXPECT_THAT(readFile(filePath), testing::ElementsAreArray(readFile(expectedFilePath)));
 }

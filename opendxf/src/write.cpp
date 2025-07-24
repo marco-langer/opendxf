@@ -4,6 +4,7 @@
 #include "opendxf/write.hpp"
 
 #include <fstream>
+#include <iomanip>
 
 namespace {
 
@@ -25,8 +26,24 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
     for (const auto& [key, value] : header.entries) {
         stream << "\n9\n" << key;
         std::visit(
-            overload{ [&stream](const std::string& element) { stream << "\n1\n"
-                                                                     << element; } },
+            overload{ [&stream](const std::string& element) {
+                         stream << "\n1\n";
+                         stream << element;
+                     },
+                      [&stream](const odxf::Coordinate2d& coord) {
+                          stream << "\n10\n";
+                          stream << coord.x;
+                          stream << "\n20\n";
+                          stream << coord.y;
+                      },
+                      [&stream](const odxf::Coordinate3d& coord) {
+                          stream << "\n10\n";
+                          stream << coord.x;
+                          stream << "\n20\n";
+                          stream << coord.y;
+                          stream << "\n30\n";
+                          stream << coord.z;
+                      } },
             value);
     }
 
@@ -270,6 +287,8 @@ void writeDxf(const Document& document, const std::filesystem::path& file_path)
     if (!stream.is_open()) {
         return;
     }
+
+    stream << std::setprecision(16);
 
     writeHeader(stream, document.header);
     writeTables(stream, document.tables);

@@ -3,25 +3,14 @@
 
 #pragma once
 
+#include "opendxf/coordinate.hpp"
+
 #include <numbers>
 #include <optional>
 #include <string>
 #include <vector>
 
 namespace odxf {
-
-struct Coordinate2d final
-{
-    double x{ 0.0 };
-    double y{ 0.0 };
-};
-
-struct Coordinate3d final
-{
-    double x{ 0.0 };
-    double y{ 0.0 };
-    double z{ 0.0 };
-};
 
 struct Vector3d final
 {

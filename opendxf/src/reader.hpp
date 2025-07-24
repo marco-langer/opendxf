@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opendxf/coordinate.hpp"
 #include "opendxf/entities.hpp"
 #include "opendxf/error.hpp"
 #include "opendxf/header.hpp"
@@ -13,6 +14,7 @@
 #include <fstream>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace odxf {
@@ -36,6 +38,7 @@ private:
 
     tl::expected<void, Error> readHeader();
     tl::expected<HeaderEntry, Error> readHeaderEntry();
+    tl::expected<std::variant<Coordinate2d, Coordinate3d>, Error> readHeaderCoordinate();
 
     tl::expected<void, Error> readTables();
     tl::expected<void, Error> readLayer();

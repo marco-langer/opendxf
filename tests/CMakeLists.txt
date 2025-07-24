@@ -2,7 +2,11 @@ find_package(GTest CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 include(GoogleTest)
 
+message(STATUS "Using GTest v.${GTest_VERSION}")
+
 add_executable(opendxf-tests
+    Matchers/CoordinateMatcher.cpp
+    Matchers/CoordinateMatcher.hpp
     Matchers/DocumentMatcher.cpp
     Matchers/DocumentMatcher.hpp
     Matchers/EntitiesMatcher.cpp

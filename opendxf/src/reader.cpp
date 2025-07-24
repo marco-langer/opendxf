@@ -103,8 +103,16 @@ tl::expected<void, Error> Reader::readHeader()
         return {};   // header is optional
     }
 
+    if (!readNext()) {
+        return makeError();
+    }
+
     Header header;
-    while (readNext() && !isSectionEnd()) {
+    while (!isSectionEnd()) {
+        if (hasError()) {
+            return tl::make_unexpected(m_error.value());
+        }
+
         tl::expected<HeaderEntry, Error> maybeHeaderEntry{ readHeaderEntry() };
         if (!maybeHeaderEntry) {
             return tl::make_unexpected(maybeHeaderEntry.error());
@@ -121,10 +129,6 @@ tl::expected<void, Error> Reader::readHeader()
 
 tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 {
-    if (hasError()) {
-        return tl::make_unexpected(m_error.value());
-    }
-
     if (m_data.groupCode != 9) {
         return tl::make_unexpected(Error{
             .lineNumber = m_currentLine,
@@ -143,8 +147,28 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     case 3: {
         HeaderValue value{ m_data.value };
 
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+
         return std::pair{ std::move(key), std::move(value) };
     };
+
+    case 10: {
+        tl::expected<std::variant<Coordinate2d, Coordinate3d>, Error> maybeCoordinate{
+            readHeaderCoordinate()
+        };
+
+        if (!maybeCoordinate) {
+            return tl::make_unexpected(maybeCoordinate.error());
+        }
+
+        HeaderValue value{ std::visit(
+            [](const auto& coordinate) -> HeaderValue { return coordinate; },
+            maybeCoordinate.value()) };
+
+        return std::pair{ std::move(key), value };
+    }
 
     default: {
         return tl::make_unexpected(Error{
@@ -156,6 +180,57 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     }
 
     return {};
+}
+
+tl::expected<std::variant<Coordinate2d, Coordinate3d>, Error> Reader::readHeaderCoordinate()
+{
+    double x{ 0.0 };
+    double y{ 0.0 };
+    std::optional<double> z;
+
+    while (m_data.groupCode == 10 || m_data.groupCode == 20 || m_data.groupCode == 30) {
+        switch (m_data.groupCode) {
+        case 10: {
+            const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
+            if (!maybeX) {
+                return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+            }
+            x = *maybeX;
+
+            break;
+        }
+
+        case 20: {
+            const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
+            if (!maybeY) {
+                return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+            }
+            y = *maybeY;
+
+            break;
+        }
+
+        case 30: {
+            const std::optional<double> maybeZ{ parseAs<double>(m_data.value) };
+            if (!maybeZ) {
+                return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+            }
+            z = *maybeZ;
+
+            break;
+        }
+        }
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+    }
+
+    if (z.has_value()) {
+        return Coordinate3d{ x, y, *z };
+    }
+
+    return Coordinate2d{ x, y };
 }
 
 tl::expected<void, Error> Reader::readTables()
