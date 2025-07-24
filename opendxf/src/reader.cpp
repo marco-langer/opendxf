@@ -234,6 +234,24 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
         return std::pair{ std::move(key), std::move(value) };
     }
 
+    case 50: {
+        if (key != "$ANGBASE") {
+            return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+        }
+        const std::optional<double> maybeValue{ parseAs<double>(m_data.value) };
+        if (!maybeValue) {
+            return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+        }
+
+        HeaderValue value{ *maybeValue };
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+
+        return std::pair{ std::move(key), std::move(value) };
+    }
+
     case 62: {
         if (key != "$CECOLOR") {
             return tl::make_unexpected(Error{ .lineNumber = m_currentLine });

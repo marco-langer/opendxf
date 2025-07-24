@@ -35,6 +35,7 @@ odxf::Document createExampleDocument()
     headerEntries.try_emplace("$DIMLTYPE", std::string{});
     headerEntries.try_emplace("$DIMLTEX1", std::string{});
     headerEntries.try_emplace("$DIMLTEX2", std::string{});
+    headerEntries.try_emplace("$ANGBASE", 0.0);
 
     const std::string layerNameLines{ "Lines" };
     const std::string layerNameLWPolylines{ "LW Polylines" };

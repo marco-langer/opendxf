@@ -34,8 +34,12 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
                          }
                          stream << element;
                      },
-                      [&stream](double element) {
-                          stream << "\n40\n";
+                      [&stream, &key](double element) {
+                          if (key == "$ANGBASE") {
+                              stream << "\n50\n";
+                          } else {
+                              stream << "\n40\n";
+                          }
                           stream << element;
                       },
                       [&stream, &key](const std::string& element) {
