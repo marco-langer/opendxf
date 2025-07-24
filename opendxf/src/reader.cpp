@@ -161,6 +161,20 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
         return std::pair{ std::move(key), std::move(value) };
     };
 
+    case 5: {
+        if (key != "$HANDSEED") {
+            return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+        }
+
+        HeaderValue value{ m_data.value };
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+
+        return std::pair{ std::move(key), std::move(value) };
+    }
+
     case 6: {
         if (key != "$CELTYPE" && key != "$DIMLTYPE" && key != "$DIMLTEX1" && key != "$DIMLTEX2") {
             return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
