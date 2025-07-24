@@ -23,6 +23,10 @@ testing::Matcher<std::unordered_map<odxf::HeaderKey, odxf::HeaderValue>> AreHead
     for (const auto& [key, variantValue] : expected) {
         std::visit(
             overload{
+                [&](int value) {
+                    elementMatchers.push_back(
+                        testing::Pair(key, testing::VariantWith<int>(testing::Eq(value))));
+                },
                 [&](const std::string& value) {
                     elementMatchers.push_back(
                         testing::Pair(key, testing::VariantWith<std::string>(testing::Eq(value))));

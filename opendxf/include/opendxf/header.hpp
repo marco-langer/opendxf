@@ -12,7 +12,7 @@
 namespace odxf {
 
 using HeaderKey = std::string;
-using HeaderValue = std::variant<std::string, Coordinate2d, Coordinate3d>;
+using HeaderValue = std::variant<int, std::string, Coordinate2d, Coordinate3d>;
 using HeaderEntry = std::pair<HeaderKey, HeaderValue>;
 
 struct Header final

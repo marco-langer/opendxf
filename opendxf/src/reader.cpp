@@ -15,9 +15,15 @@ namespace {
 template <typename T>
 std::optional<T> parseAs(const std::string& value)
 {
+    const char* first{ value.c_str() };
+    if (!value.empty()) {
+        while (*first == ' ') {
+            ++first;
+        }
+    }
+
     T result;
-    const auto [_, errorCode]{ std::from_chars(
-        value.c_str(), value.c_str() + value.size(), result) };
+    const auto [_, errorCode]{ std::from_chars(first, first + value.size(), result) };
 
     return errorCode == std::errc() ? result : std::optional<T>{};
 }
@@ -168,6 +174,21 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
             maybeCoordinate.value()) };
 
         return std::pair{ std::move(key), value };
+    }
+
+    case 70: {
+        const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
+        if (!maybeValue) {
+            return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
+        }
+
+        HeaderValue value{ *maybeValue };
+
+        if (!readNext()) {
+            return tl::make_unexpected(m_error.value());
+        }
+
+        return std::pair{ std::move(key), std::move(value) };
     }
 
     default: {

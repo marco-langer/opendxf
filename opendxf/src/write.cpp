@@ -26,10 +26,14 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
     for (const auto& [key, value] : header.entries) {
         stream << "\n9\n" << key;
         std::visit(
-            overload{ [&stream](const std::string& element) {
-                         stream << "\n1\n";
+            overload{ [&stream](int element) {
+                         stream << "\n70\n";
                          stream << element;
                      },
+                      [&stream](const std::string& element) {
+                          stream << "\n1\n";
+                          stream << element;
+                      },
                       [&stream](const odxf::Coordinate2d& coord) {
                           stream << "\n10\n";
                           stream << coord.x;
