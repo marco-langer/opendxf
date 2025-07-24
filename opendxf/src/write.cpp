@@ -26,8 +26,12 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
     for (const auto& [key, value] : header.entries) {
         stream << "\n9\n" << key;
         std::visit(
-            overload{ [&stream](int element) {
-                         stream << "\n70\n";
+            overload{ [&stream, &key](int element) {
+                         if (key == "$CECOLOR") {
+                             stream << "\n62\n";
+                         } else {
+                             stream << "\n70\n";
+                         }
                          stream << element;
                      },
                       [&stream](double element) {

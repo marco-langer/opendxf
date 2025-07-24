@@ -72,6 +72,10 @@ Test Layer
 $CELTYPE
   6
 BYLAYER
+  9
+$CECOLOR
+ 62
+  256
   0
 ENDSEC
   0
