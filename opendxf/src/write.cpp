@@ -29,6 +29,10 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
             overload{ [&stream, &key](int element) {
                          if (key == "$CECOLOR") {
                              stream << "\n62\n";
+                         } else if (key == "$ENDCAPS" || key == "$JOINSTYLE") {
+                             stream << "\n280\n";
+                         } else if (key == "$CELWEIGHT") {
+                             stream << "\n370\n";
                          } else {
                              stream << "\n70\n";
                          }

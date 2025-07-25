@@ -104,6 +104,18 @@ $ANGBASE
 $HANDSEED
   5
 20000
+  9
+$CELWEIGHT
+370
+   -1
+  9
+$ENDCAPS
+280
+    0
+  9
+$JOINSTYLE
+280
+    0
   0
 ENDSEC
   0
