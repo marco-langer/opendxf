@@ -37,6 +37,8 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
                               stream << "\n280\n";
                           } else if (key == "$CELWEIGHT") {
                               stream << "\n370\n";
+                          } else if (key == "$CEPSNTYPE") {
+                              stream << "\n380\n";
                           } else {
                               stream << "\n70\n";
                           }

@@ -42,6 +42,7 @@ odxf::Document createExampleDocument()
     headerEntries.try_emplace("$JOINSTYLE", 2);
     headerEntries.try_emplace("$LWDISPLAY", false);
     headerEntries.try_emplace("$XEDIT", true);
+    headerEntries.try_emplace("$CEPSNTYPE", 1);
 
     const std::string layerNameLines{ "Lines" };
     const std::string layerNameLWPolylines{ "LW Polylines" };
