@@ -26,18 +26,22 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
     for (const auto& [key, value] : header.entries) {
         stream << "\n9\n" << key;
         std::visit(
-            overload{ [&stream, &key](int element) {
-                         if (key == "$CECOLOR") {
-                             stream << "\n62\n";
-                         } else if (key == "$ENDCAPS" || key == "$JOINSTYLE") {
-                             stream << "\n280\n";
-                         } else if (key == "$CELWEIGHT") {
-                             stream << "\n370\n";
-                         } else {
-                             stream << "\n70\n";
-                         }
+            overload{ [&stream, &key](bool element) {
+                         stream << "\n290\n";
                          stream << element;
                      },
+                      [&stream, &key](int element) {
+                          if (key == "$CECOLOR") {
+                              stream << "\n62\n";
+                          } else if (key == "$ENDCAPS" || key == "$JOINSTYLE") {
+                              stream << "\n280\n";
+                          } else if (key == "$CELWEIGHT") {
+                              stream << "\n370\n";
+                          } else {
+                              stream << "\n70\n";
+                          }
+                          stream << element;
+                      },
                       [&stream, &key](double element) {
                           if (key == "$ANGBASE") {
                               stream << "\n50\n";
