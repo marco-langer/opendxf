@@ -267,7 +267,7 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     }
 
     case 62: {
-        if (key != "$CECOLOR") {
+        if (key != "$CECOLOR" && key != "$INTERFERECOLOR") {
             return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
         }
 
@@ -301,7 +301,12 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     }
 
     case 280: {
-        if (key != "$ENDCAPS" && key != "$JOINSTYLE") {
+        if (key != "$ENDCAPS" && key != "$JOINSTYLE" && key != "$SORTENTS" && key != "$INDEXCTL"
+            && key != "$HIDETEXT" && key != "$HALOGAP" && key != "$OBSLTYPE"
+            && key != "$INTERSECTIONDISPLAY" && key != "$DIMASSOC" && key != "$LOFTNORMALS"
+            && key != "$LIGHTGLYPHDISPLAY" && key != "$TILEMODELIGHTSYNCH" && key != "$SOLIDHIST"
+            && key != "$SHOWHIST" && key != "$DWFFRAME" && key != "$DGNFRAME"
+            && key != "$CSHADOW") {
             return tl::make_unexpected(Error{ .lineNumber = m_currentLine });
         }
 

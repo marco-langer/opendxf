@@ -31,9 +31,16 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
                          stream << element;
                      },
                       [&stream, &key](int element) {
-                          if (key == "$CECOLOR") {
+                          if (key == "$CECOLOR" || key == "$INTERFERECOLOR") {
                               stream << "\n62\n";
-                          } else if (key == "$ENDCAPS" || key == "$JOINSTYLE") {
+                          } else if (
+                              key == "$ENDCAPS" || key == "$JOINSTYLE" || key == "$SORTENTS"
+                              || key == "$INDEXCTL" || key == "$HIDETEXT" || key == "$HALOGAP"
+                              || key == "$OBSLTYPE" || key == "$INTERSECTIONDISPLAY"
+                              || key == "$DIMASSOC" || key == "$LOFTNORMALS"
+                              || key == "$LIGHTGLYPHDISPLAY" || key == "$TILEMODELIGHTSYNCH"
+                              || key == "$SOLIDHIST" || key == "$SHOWHIST" || key == "$DWFFRAME"
+                              || key == "$DGNFRAME" || key == "$CSHADOW") {
                               stream << "\n280\n";
                           } else if (key == "$CELWEIGHT") {
                               stream << "\n370\n";

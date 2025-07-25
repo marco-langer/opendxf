@@ -43,6 +43,22 @@ odxf::Document createExampleDocument()
     headerEntries.try_emplace("$LWDISPLAY", false);
     headerEntries.try_emplace("$XEDIT", true);
     headerEntries.try_emplace("$CEPSNTYPE", 1);
+    headerEntries.try_emplace("$SORTENTS", 127);
+    headerEntries.try_emplace("$INDEXCTL", 0);
+    headerEntries.try_emplace("$HIDETEXT", 1);
+    headerEntries.try_emplace("$HALOGAP", 0);
+    headerEntries.try_emplace("$OBSLTYPE", 0);
+    headerEntries.try_emplace("$INTERSECTIONDISPLAY", 1);
+    headerEntries.try_emplace("$DIMASSOC", 1);
+    headerEntries.try_emplace("$LOFTNORMALS", 1);
+    headerEntries.try_emplace("$LIGHTGLYPHDISPLAY", 1);
+    headerEntries.try_emplace("$TILEMODELIGHTSYNCH", 1);
+    headerEntries.try_emplace("$SOLIDHIST", 1);
+    headerEntries.try_emplace("$SHOWHIST", 1);
+    headerEntries.try_emplace("$DWFFRAME", 2);
+    headerEntries.try_emplace("$DGNFRAME", 0);
+    headerEntries.try_emplace("$CSHADOW", 0);
+    headerEntries.try_emplace("$INTERFERECOLOR", 1);
 
     const std::string layerNameLines{ "Lines" };
     const std::string layerNameLWPolylines{ "LW Polylines" };
