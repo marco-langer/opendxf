@@ -24,7 +24,7 @@ add_library(opendxf STATIC
 
 target_include_directories(opendxf PUBLIC include)
 
-target_compile_features(opendxf PRIVATE cxx_std_20)
+target_compile_features(opendxf PRIVATE cxx_std_23)
 
 target_link_libraries(opendxf
     PUBLIC

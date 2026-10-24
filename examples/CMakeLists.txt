@@ -2,10 +2,10 @@ add_executable(opendxf_example_write main_write.cpp)
 
 target_link_libraries(opendxf_example_write PRIVATE opendxf)
 
-target_compile_features(opendxf_example_write PRIVATE cxx_std_20)
+target_compile_features(opendxf_example_write PRIVATE cxx_std_23)
 
 add_executable(opendxf_example_read main_read.cpp)
 
 target_link_libraries(opendxf_example_read PRIVATE opendxf)
 
-target_compile_features(opendxf_example_read PRIVATE cxx_std_20)
+target_compile_features(opendxf_example_read PRIVATE cxx_std_23)
