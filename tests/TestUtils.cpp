@@ -64,10 +64,11 @@ odxf::Document createExampleDocument()
     const std::string layerNameLWPolylines{ "LW Polylines" };
 
     LineTypes& lineTypes{ expectedDocument.tables.lineTypes };
-    lineTypes.push_back(LineType{
-        .name = "CONTINUOUS",
-        .displayName = "Solid Line",
-    });
+    lineTypes.push_back(
+        LineType{
+            .name = "CONTINUOUS",
+            .displayName = "Solid Line",
+        });
 
     Layers& layers{ expectedDocument.tables.layers };
     layers.emplace_back(Layer{ .name = layerNameTest }).flags = Layer::Flags::Frozen;
@@ -78,42 +79,47 @@ odxf::Document createExampleDocument()
 
     Lines& lines{ entities.lines };
     lines
-        .emplace_back(Line{
-            .start = Coordinate3d{ 0.0, 0.5, 0.0 },
-            .end = Coordinate3d{ 1.0, 1.5, 0.0 },
-        })
+        .emplace_back(
+            Line{
+                .start = Coordinate3d{ 0.0, 0.5, 0.0 },
+                .end = Coordinate3d{ 1.0, 1.5, 0.0 },
+            })
         .layer = layerNameLines;
 
     lines
-        .emplace_back(Line{
-            .start = Coordinate3d{ 0.0, 0.0, 0.0 },
-            .end = Coordinate3d{ 1.0, 1.0, 0.0 },
-        })
+        .emplace_back(
+            Line{
+                .start = Coordinate3d{ 0.0, 0.0, 0.0 },
+                .end = Coordinate3d{ 1.0, 1.0, 0.0 },
+            })
         .layer = layerNameLines;
 
     Circles& circles{ entities.circles };
     circles
-        .emplace_back(Circle{
-            .center = Coordinate3d{ 0.0, 0.0, 0.0 },
-            .radius = 1.0,
-        })
+        .emplace_back(
+            Circle{
+                .center = Coordinate3d{ 0.0, 0.0, 0.0 },
+                .radius = 1.0,
+            })
         .layer = layerNameTest;
 
     Arcs& arcs{ entities.arcs };
-    arcs.emplace_back(Arc{
-                          .center = Coordinate3d{ 0.0, 2.0, 0.0 },
-                          .radius = 0.5,
-                          .startAngle = 0.0,
-                          .endAngle = 180.0,
-                      })
+    arcs.emplace_back(
+            Arc{
+                .center = Coordinate3d{ 0.0, 2.0, 0.0 },
+                .radius = 0.5,
+                .startAngle = 0.0,
+                .endAngle = 180.0,
+            })
         .layer = layerNameTest;
 
     LWPolylines& lwPolylines{ entities.lwPolylines };
     lwPolylines.emplace_back(LWPolyline{}).layer = layerNameLWPolylines;
     lwPolylines
-        .emplace_back(LWPolyline{
-            .vertices = { Vertex{ .position = { 200.0, 200.0 } } },
-        })
+        .emplace_back(
+            LWPolyline{
+                .vertices = { Vertex{ .position = { 200.0, 200.0 } } },
+            })
         .layer = layerNameLWPolylines;
     lwPolylines.emplace_back(LWPolyline{
         .isClosed = true,

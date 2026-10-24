@@ -95,10 +95,11 @@ tl::expected<void, Error> Reader::readHeader()
     }
 
     if (!isSectionBegin()) {
-        return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine,
-            .what = "expected section begin",
-        });
+        return tl::make_unexpected(
+            Error{
+                .lineNumber = m_currentLine,
+                .what = "expected section begin",
+            });
     }
 
     if (!readNext()) {
@@ -136,10 +137,11 @@ tl::expected<void, Error> Reader::readHeader()
 tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 {
     if (m_data.groupCode != 9) {
-        return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine,
-            .what = "expected group code 9 for header variable name",
-        });
+        return tl::make_unexpected(
+            Error{
+                .lineNumber = m_currentLine,
+                .what = "expected group code 9 for header variable name",
+            });
     }
 
     HeaderKey key{ m_data.value };
@@ -378,11 +380,12 @@ tl::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     }
 
     default: {
-        return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine - 1,
-            .what =
-                fmt::format("unexpected group code {} for header variable name", m_data.groupCode),
-        });
+        return tl::make_unexpected(
+            Error{
+                .lineNumber = m_currentLine - 1,
+                .what = fmt::format(
+                    "unexpected group code {} for header variable name", m_data.groupCode),
+            });
     }
     }
 
@@ -447,10 +450,11 @@ tl::expected<void, Error> Reader::readTables()
     }
 
     if (!isSectionBegin()) {
-        return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine,
-            .what = "expected section begin",
-        });
+        return tl::make_unexpected(
+            Error{
+                .lineNumber = m_currentLine,
+                .what = "expected section begin",
+            });
     }
 
     if (!readNext()) {
@@ -458,10 +462,11 @@ tl::expected<void, Error> Reader::readTables()
     }
 
     if (!isTablesBegin()) {
-        return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine,
-            .what = "expected tables begin",
-        });
+        return tl::make_unexpected(
+            Error{
+                .lineNumber = m_currentLine,
+                .what = "expected tables begin",
+            });
     }
 
     while (!isSectionEnd()) {
@@ -506,9 +511,10 @@ tl::expected<void, Error> Reader::readLayer()
             if (maybeFlags.has_value()) {
                 layer.flags = static_cast<odxf::Layer::Flags>(*maybeFlags);
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -532,10 +538,11 @@ tl::expected<void, Error> Reader::readBlocks()
     }
 
     if (!isSectionBegin()) {
-        return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine,
-            .what = "expected section begin",
-        });
+        return tl::make_unexpected(
+            Error{
+                .lineNumber = m_currentLine,
+                .what = "expected section begin",
+            });
     }
 
     if (!readNext()) {
@@ -543,10 +550,11 @@ tl::expected<void, Error> Reader::readBlocks()
     }
 
     if (!isBlocksBegin()) {
-        return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine,
-            .what = "expected blocks begin",
-        });
+        return tl::make_unexpected(
+            Error{
+                .lineNumber = m_currentLine,
+                .what = "expected blocks begin",
+            });
     }
 
     while (readNext() && !isSectionEnd()) {
@@ -565,10 +573,11 @@ tl::expected<void, Error> Reader::readEntities()
     }
 
     if (!isSectionBegin()) {
-        return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine,
-            .what = "expected section begin",
-        });
+        return tl::make_unexpected(
+            Error{
+                .lineNumber = m_currentLine,
+                .what = "expected section begin",
+            });
     }
 
     if (!readNext()) {
@@ -576,10 +585,11 @@ tl::expected<void, Error> Reader::readEntities()
     }
 
     if (!isEntitiesBegin()) {
-        return tl::make_unexpected(Error{
-            .lineNumber = m_currentLine,
-            .what = "expected entities begin",
-        });
+        return tl::make_unexpected(
+            Error{
+                .lineNumber = m_currentLine,
+                .what = "expected entities begin",
+            });
     }
 
     while (!isSectionEnd()) {
@@ -641,9 +651,10 @@ tl::expected<void, Error> Reader::readLine()
             if (maybeX.has_value()) {
                 line.start.x = *maybeX;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -654,9 +665,10 @@ tl::expected<void, Error> Reader::readLine()
             if (maybeY.has_value()) {
                 line.start.y = *maybeY;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -667,9 +679,10 @@ tl::expected<void, Error> Reader::readLine()
             if (maybeX.has_value()) {
                 line.end.x = *maybeX;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -680,9 +693,10 @@ tl::expected<void, Error> Reader::readLine()
             if (maybeY.has_value()) {
                 line.end.y = *maybeY;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -720,9 +734,10 @@ tl::expected<void, Error> Reader::readCircle()
             if (maybeX.has_value()) {
                 circle.center.x = *maybeX;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -733,9 +748,10 @@ tl::expected<void, Error> Reader::readCircle()
             if (maybeY.has_value()) {
                 circle.center.y = *maybeY;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -746,9 +762,10 @@ tl::expected<void, Error> Reader::readCircle()
             if (maybeRadius.has_value()) {
                 circle.radius = *maybeRadius;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -786,9 +803,10 @@ tl::expected<void, Error> Reader::readArc()
             if (maybeX.has_value()) {
                 arc.center.x = *maybeX;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -799,9 +817,10 @@ tl::expected<void, Error> Reader::readArc()
             if (maybeY.has_value()) {
                 arc.center.y = *maybeY;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -812,9 +831,10 @@ tl::expected<void, Error> Reader::readArc()
             if (maybeRadius.has_value()) {
                 arc.radius = *maybeRadius;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -825,9 +845,10 @@ tl::expected<void, Error> Reader::readArc()
             if (maybeStartAngle.has_value()) {
                 arc.startAngle = *maybeStartAngle;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -838,9 +859,10 @@ tl::expected<void, Error> Reader::readArc()
             if (maybeEndAngle.has_value()) {
                 arc.endAngle = *maybeEndAngle;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -877,9 +899,10 @@ tl::expected<void, Error> Reader::readLWPolyline()
                     lwPolyline.vertices.reserve(static_cast<std::size_t>(*maybeVerticesCount));
                 }
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -890,9 +913,10 @@ tl::expected<void, Error> Reader::readLWPolyline()
             if (maybeFlag.has_value()) {
                 lwPolyline.isClosed = (*maybeFlag & 1 != 0);
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -909,9 +933,10 @@ tl::expected<void, Error> Reader::readLWPolyline()
                 vertex.position.x = *maybeX;
                 numXY++;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -928,9 +953,10 @@ tl::expected<void, Error> Reader::readLWPolyline()
                 vertex.position.y = *maybeY;
                 numXY++;
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
@@ -947,9 +973,10 @@ tl::expected<void, Error> Reader::readLWPolyline()
                     vertex.bulge.reset();
                 }
             } else {
-                return tl::make_unexpected(Error{
-                    .lineNumber = m_currentLine,
-                });
+                return tl::make_unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
             }
 
             break;
