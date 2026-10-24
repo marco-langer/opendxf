@@ -55,7 +55,7 @@ TEST(write, example)
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     ReadStream istream;
-    const tl::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
 
     ASSERT_TRUE(result.has_value());
 

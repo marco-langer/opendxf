@@ -8,8 +8,7 @@
 #include "opendxf/error.hpp"
 #include "opendxf/header.hpp"
 
-#include <tl/expected.hpp>
-
+#include <expected>
 #include <filesystem>
 #include <fstream>
 #include <optional>
@@ -31,31 +30,31 @@ public:
     Reader& operator=(const Reader&) = delete;
     Reader& operator=(Reader&&) = delete;
 
-    tl::expected<void, Error> readAll(const std::filesystem::path& filePath);
+    std::expected<void, Error> readAll(const std::filesystem::path& filePath);
 
 private:
     bool open(const std::filesystem::path& filePath);
 
-    tl::expected<void, Error> readHeader();
-    tl::expected<HeaderEntry, Error> readHeaderEntry();
-    tl::expected<std::variant<Coordinate2d, Coordinate3d>, Error> readHeaderCoordinate();
+    std::expected<void, Error> readHeader();
+    std::expected<HeaderEntry, Error> readHeaderEntry();
+    std::expected<std::variant<Coordinate2d, Coordinate3d>, Error> readHeaderCoordinate();
 
-    tl::expected<void, Error> readTables();
-    tl::expected<void, Error> readLayer();
+    std::expected<void, Error> readTables();
+    std::expected<void, Error> readLayer();
 
-    tl::expected<void, Error> readBlocks();
+    std::expected<void, Error> readBlocks();
 
-    tl::expected<void, Error> readEntities();
-    tl::expected<void, Error> readLine();
-    tl::expected<void, Error> readCircle();
-    tl::expected<void, Error> readArc();
-    tl::expected<void, Error> readLWPolyline();
+    std::expected<void, Error> readEntities();
+    std::expected<void, Error> readLine();
+    std::expected<void, Error> readCircle();
+    std::expected<void, Error> readArc();
+    std::expected<void, Error> readLWPolyline();
 
     bool readNext();
     bool readNextSingle();
 
     bool hasError() const;
-    tl::expected<void, Error> makeError() const;
+    std::expected<void, Error> makeError() const;
     bool isSectionBegin() const;
     bool isSectionEnd() const;
     bool isHeaderBegin() const;

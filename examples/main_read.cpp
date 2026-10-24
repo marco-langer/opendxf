@@ -4,8 +4,8 @@
 #include "opendxf/opendxf.hpp"
 
 #include <fmt/core.h>
-#include <tl/expected.hpp>
 
+#include <expected>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -40,10 +40,10 @@ void printError(const odxf::Error& error)
     }
 }
 
-tl::expected<std::filesystem::path, std::string> parseFilePath(int argc, char** argv)
+std::expected<std::filesystem::path, std::string> parseFilePath(int argc, char** argv)
 {
     if (argc != 2) {
-        return tl::make_unexpected("invalid number of arguments");
+        return std::unexpected("invalid number of arguments");
     }
 
     return reinterpret_cast<const char8_t*>(argv[1]);
@@ -77,16 +77,21 @@ int main(int argc, char** argv)
 {
     Reader reader;
 
-    const tl::expected<std::filesystem::path, std::string> filePath{ parseFilePath(argc, argv) };
+    const std::expected<std::filesystem::path, std::string> filePath{ parseFilePath(argc, argv) };
     if (!filePath.has_value()) {
         printUsage(filePath.error());
 
         return EXIT_FAILURE;
     }
 
-    odxf::read(reader, filePath.value())
-        .transform([&reader] { printDocumentStats(reader.stats()); })
-        .or_else(printError);
+    const std::expected<void, odxf::Error> result{ odxf::read(reader, filePath.value()) };
+    if (!result.has_value()) {
+        printError(result.error());
+
+        return EXIT_FAILURE;
+    }
+
+    printDocumentStats(reader.stats());
 
     return EXIT_SUCCESS;
 }

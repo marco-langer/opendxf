@@ -1,8 +1,6 @@
 find_package(fmt CONFIG REQUIRED)
-find_package(tl-expected CONFIG REQUIRED)
 
 message(STATUS "Using fmt v.${fmt_VERSION}")
-message(STATUS "Using tl-expected v.${tl-expected_VERSION}")
 
 add_library(opendxf STATIC
     include/opendxf/coordinate.hpp
@@ -24,11 +22,9 @@ add_library(opendxf STATIC
 
 target_include_directories(opendxf PUBLIC include)
 
-target_compile_features(opendxf PRIVATE cxx_std_23)
+target_compile_features(opendxf PUBLIC cxx_std_23)
 
 target_link_libraries(opendxf
-    PUBLIC
-        tl::expected
     PRIVATE
         fmt::fmt
 )
