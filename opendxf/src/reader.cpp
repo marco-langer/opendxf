@@ -164,7 +164,7 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     case 5: {
         if (key != "$HANDSEED") {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ m_data.value };
@@ -178,7 +178,7 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     case 6: {
         if (key != "$CELTYPE" && key != "$DIMLTYPE" && key != "$DIMLTEX1" && key != "$DIMLTEX2") {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ m_data.value };
@@ -192,7 +192,7 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     case 7: {
         if (key != "$TEXTSTYLE" && key != "$DIMTXSTY") {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ m_data.value };
@@ -206,7 +206,7 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     case 8: {
         if (key != "$CLAYER") {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ m_data.value };
@@ -237,7 +237,7 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     case 40: {
         const std::optional<double> maybeValue{ parseAs<double>(m_data.value) };
         if (!maybeValue) {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ *maybeValue };
@@ -251,11 +251,11 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     case 50: {
         if (key != "$ANGBASE") {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
         const std::optional<double> maybeValue{ parseAs<double>(m_data.value) };
         if (!maybeValue) {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ *maybeValue };
@@ -269,12 +269,12 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     case 62: {
         if (key != "$CECOLOR" && key != "$INTERFERECOLOR") {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
         if (!maybeValue) {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ *maybeValue };
@@ -289,7 +289,7 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     case 70: {
         const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
         if (!maybeValue) {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ *maybeValue };
@@ -308,12 +308,12 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
             && key != "$LIGHTGLYPHDISPLAY" && key != "$TILEMODELIGHTSYNCH" && key != "$SOLIDHIST"
             && key != "$SHOWHIST" && key != "$DWFFRAME" && key != "$DGNFRAME"
             && key != "$CSHADOW") {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
         if (!maybeValue) {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ *maybeValue };
@@ -328,7 +328,7 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
     case 290: {
         const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
         if (!maybeValue) {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ *maybeValue != 0 };
@@ -342,12 +342,12 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     case 370: {
         if (key != "$CELWEIGHT") {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
         if (!maybeValue) {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ *maybeValue };
@@ -361,12 +361,12 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
 
     case 380: {
         if (key != "$CEPSNTYPE") {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
         if (!maybeValue) {
-            return std::unexpected(Error{ .lineNumber = m_currentLine });
+            return parseError();
         }
 
         HeaderValue value{ *maybeValue };
@@ -402,7 +402,7 @@ std::expected<std::variant<Coordinate2d, Coordinate3d>, Error> Reader::readHeade
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (!maybeX) {
-                return std::unexpected(Error{ .lineNumber = m_currentLine });
+                return parseError();
             }
             x = *maybeX;
 
@@ -412,7 +412,7 @@ std::expected<std::variant<Coordinate2d, Coordinate3d>, Error> Reader::readHeade
         case 20: {
             const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
             if (!maybeY) {
-                return std::unexpected(Error{ .lineNumber = m_currentLine });
+                return parseError();
             }
             y = *maybeY;
 
@@ -422,7 +422,7 @@ std::expected<std::variant<Coordinate2d, Coordinate3d>, Error> Reader::readHeade
         case 30: {
             const std::optional<double> maybeZ{ parseAs<double>(m_data.value) };
             if (!maybeZ) {
-                return std::unexpected(Error{ .lineNumber = m_currentLine });
+                return parseError();
             }
             z = *maybeZ;
 
@@ -505,15 +505,34 @@ std::expected<void, Error> Reader::readLayer()
             break;
         }
 
+        case 62: {
+            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
+            if (maybeColor.has_value()) {
+                layer.color = *maybeColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                layer.trueColor = *maybeTrueColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 70: {
             const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
             if (maybeFlags.has_value()) {
                 layer.flags = static_cast<odxf::Layer::Flags>(*maybeFlags);
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -645,15 +664,34 @@ std::expected<void, Error> Reader::readLine()
             break;
         }
 
+        case 62: {
+            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
+            if (maybeColor.has_value()) {
+                line.color = *maybeColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                line.trueColor = *maybeTrueColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
                 line.start.x = *maybeX;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -664,10 +702,7 @@ std::expected<void, Error> Reader::readLine()
             if (maybeY.has_value()) {
                 line.start.y = *maybeY;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -678,10 +713,7 @@ std::expected<void, Error> Reader::readLine()
             if (maybeX.has_value()) {
                 line.end.x = *maybeX;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -692,10 +724,7 @@ std::expected<void, Error> Reader::readLine()
             if (maybeY.has_value()) {
                 line.end.y = *maybeY;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -728,15 +757,34 @@ std::expected<void, Error> Reader::readCircle()
             break;
         }
 
+        case 62: {
+            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
+            if (maybeColor.has_value()) {
+                circle.color = *maybeColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                circle.trueColor = *maybeTrueColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
                 circle.center.x = *maybeX;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -747,10 +795,7 @@ std::expected<void, Error> Reader::readCircle()
             if (maybeY.has_value()) {
                 circle.center.y = *maybeY;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -761,10 +806,7 @@ std::expected<void, Error> Reader::readCircle()
             if (maybeRadius.has_value()) {
                 circle.radius = *maybeRadius;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -797,15 +839,34 @@ std::expected<void, Error> Reader::readArc()
             break;
         }
 
+        case 62: {
+            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
+            if (maybeColor.has_value()) {
+                arc.color = *maybeColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                arc.trueColor = *maybeTrueColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
                 arc.center.x = *maybeX;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -816,10 +877,7 @@ std::expected<void, Error> Reader::readArc()
             if (maybeY.has_value()) {
                 arc.center.y = *maybeY;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -830,10 +888,7 @@ std::expected<void, Error> Reader::readArc()
             if (maybeRadius.has_value()) {
                 arc.radius = *maybeRadius;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -844,10 +899,7 @@ std::expected<void, Error> Reader::readArc()
             if (maybeStartAngle.has_value()) {
                 arc.startAngle = *maybeStartAngle;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -858,10 +910,7 @@ std::expected<void, Error> Reader::readArc()
             if (maybeEndAngle.has_value()) {
                 arc.endAngle = *maybeEndAngle;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -891,6 +940,28 @@ std::expected<void, Error> Reader::readLWPolyline()
 
     while (m_data.groupCode != 0) {
         switch (m_data.groupCode) {
+        case 62: {
+            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
+            if (maybeColor.has_value()) {
+                lwPolyline.color = *maybeColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                lwPolyline.trueColor = *maybeTrueColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 90: {
             const std::optional<int> maybeVerticesCount{ parseAs<int>(m_data.value) };
             if (maybeVerticesCount.has_value()) {
@@ -898,10 +969,7 @@ std::expected<void, Error> Reader::readLWPolyline()
                     lwPolyline.vertices.reserve(static_cast<std::size_t>(*maybeVerticesCount));
                 }
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -912,10 +980,7 @@ std::expected<void, Error> Reader::readLWPolyline()
             if (maybeFlag.has_value()) {
                 lwPolyline.isClosed = (*maybeFlag & 1 != 0);
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -932,10 +997,7 @@ std::expected<void, Error> Reader::readLWPolyline()
                 vertex.position.x = *maybeX;
                 numXY++;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -952,10 +1014,7 @@ std::expected<void, Error> Reader::readLWPolyline()
                 vertex.position.y = *maybeY;
                 numXY++;
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -972,10 +1031,7 @@ std::expected<void, Error> Reader::readLWPolyline()
                     vertex.bulge.reset();
                 }
             } else {
-                return std::unexpected(
-                    Error{
-                        .lineNumber = m_currentLine,
-                    });
+                return parseError();
             }
 
             break;
@@ -1052,6 +1108,11 @@ bool Reader::readNextSingle()
 bool Reader::hasError() const { return m_error.has_value(); }
 
 std::expected<void, Error> Reader::makeError() const { return std::unexpected(m_error.value()); }
+
+std::unexpected<Error> Reader::parseError() const
+{
+    return std::unexpected(Error{ .lineNumber = m_currentLine });
+}
 
 bool Reader::isSectionBegin() const { return m_data.groupCode == 0 && m_data.value == "SECTION"; }
 

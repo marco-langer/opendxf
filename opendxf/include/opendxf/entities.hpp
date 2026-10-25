@@ -22,7 +22,8 @@ struct Vector3d final
 struct Entity
 {
     std::string layer;
-    int color{ 0 };
+    int color{ 256 };               // BYLAYER
+    std::optional<int> trueColor;   // 0x00RRGGBB, takes precedence over color
 };
 
 struct Point final : Entity

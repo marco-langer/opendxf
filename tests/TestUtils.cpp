@@ -63,6 +63,7 @@ odxf::Document createExampleDocument()
 
     const std::string layerNameLines{ "Lines" };
     const std::string layerNameLWPolylines{ "LW Polylines" };
+    const std::string layerNameTrueColor{ "True Color" };
 
     LineTypes& lineTypes{ expectedDocument.tables.lineTypes };
     lineTypes.push_back(
@@ -73,8 +74,9 @@ odxf::Document createExampleDocument()
 
     Layers& layers{ expectedDocument.tables.layers };
     layers.emplace_back(Layer{ .name = layerNameTest }).flags = Layer::Flags::Frozen;
-    layers.push_back(Layer{ .name = layerNameLines });
-    layers.push_back(Layer{ .name = layerNameLWPolylines });
+    layers.push_back(Layer{ .name = layerNameLines, .color = 1 });
+    layers.push_back(Layer{ .name = layerNameLWPolylines, .color = -3 });
+    layers.push_back(Layer{ .name = layerNameTrueColor, .color = 5, .trueColor = 0x3050A0 });
 
     Entities& entities{ expectedDocument.entities };
 
@@ -151,6 +153,18 @@ odxf::Document createExampleDocument()
             },
         },
     }).layer = layerNameLWPolylines;
+
+    // lines[0] has no group code 62 and keeps the default
+    lines[0].trueColor = 0xFF8000;
+    lines[1].color = 3;
+    circles[0].color = 2;
+    circles[0].trueColor = 0x00FF00;
+    arcs[0].color = 5;
+    arcs[0].trueColor = 0x0000FF;
+    lwPolylines[0].color = 6;
+    lwPolylines[0].trueColor = 0x808080;
+    lwPolylines[1].color = 256;
+    lwPolylines[2].color = 0;
 
     return expectedDocument;
 }

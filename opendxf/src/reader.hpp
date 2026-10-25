@@ -55,6 +55,8 @@ private:
 
     bool hasError() const;
     std::expected<void, Error> makeError() const;
+    // an Error at the current line, without a description
+    std::unexpected<Error> parseError() const;
     bool isSectionBegin() const;
     bool isSectionEnd() const;
     bool isHeaderBegin() const;
