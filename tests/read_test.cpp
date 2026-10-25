@@ -55,6 +55,26 @@ TEST(read, padded)
     }
 }
 
+TEST(read, minimalExample)
+{
+    GTEST_SKIP() << "reader requires a HEADER section";
+
+    // Arrange
+    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "minimal_example.dxf" };
+    ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
+
+    ReadStream istream;
+
+    // Act
+    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+
+    // Assert
+    if (!result) {
+        const odxf::Error& error{ result.error() };
+        FAIL() << std::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
+    }
+}
+
 struct ParseErrorParam final
 {
     std::string filename;
