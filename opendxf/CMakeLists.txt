@@ -4,11 +4,13 @@ add_library(opendxf STATIC
     include/opendxf/entities.hpp
     include/opendxf/error.hpp
     include/opendxf/header.hpp
+    include/opendxf/headervariables.hpp
     include/opendxf/ireadstream.hpp
     include/opendxf/opendxf.hpp
     include/opendxf/read.hpp
     include/opendxf/tables.hpp
     include/opendxf/write.hpp
+    src/headervariables.cpp
     src/ireadstream.cpp
     src/read.cpp
     src/reader.cpp

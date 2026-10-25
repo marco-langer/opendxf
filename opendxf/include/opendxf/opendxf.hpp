@@ -8,6 +8,7 @@
 #include "entities.hpp"
 #include "error.hpp"
 #include "header.hpp"
+#include "headervariables.hpp"
 #include "ireadstream.hpp"
 #include "layer.hpp"
 #include "read.hpp"
