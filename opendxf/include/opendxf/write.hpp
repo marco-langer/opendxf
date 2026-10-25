@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "document.hpp"
+#include "opendxf/document.hpp"
 
 #include <filesystem>
 

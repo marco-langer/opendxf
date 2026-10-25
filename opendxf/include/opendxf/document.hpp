@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "entities.hpp"
-#include "header.hpp"
-#include "tables.hpp"
+#include "opendxf/entities.hpp"
+#include "opendxf/header.hpp"
+#include "opendxf/tables.hpp"
 
 namespace odxf {
 
