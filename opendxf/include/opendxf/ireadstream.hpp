@@ -5,12 +5,12 @@
 
 namespace odxf {
 
-class Arc;
-class Circle;
-class Header;
-class Layer;
-class Line;
-class LWPolyline;
+struct Arc;
+struct Circle;
+struct Header;
+struct Layer;
+struct Line;
+struct LWPolyline;
 
 class IReadStream
 {
