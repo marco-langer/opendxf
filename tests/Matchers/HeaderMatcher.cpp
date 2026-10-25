@@ -13,8 +13,8 @@ struct overload : Ts...
     using Ts::operator()...;
 };
 
-testing::Matcher<std::unordered_map<odxf::HeaderKey, odxf::HeaderValue>> AreHeaderEntries(
-    const std::unordered_map<odxf::HeaderKey, odxf::HeaderValue>& expected, double maxError)
+testing::Matcher<odxf::HeaderEntries>
+AreHeaderEntries(const odxf::HeaderEntries& expected, double maxError)
 {
     std::vector<testing::Matcher<std::pair<const odxf::HeaderKey, odxf::HeaderValue>>>
         elementMatchers;
