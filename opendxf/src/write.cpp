@@ -134,6 +134,7 @@ void writeLayer(std::ofstream& stream, const odxf::Layer& layer, const std::stri
     stream << "\n62\n" << layer.color;
     writeTrueColor(stream, layer.trueColor);
     stream << "\n6\n" << lineTypeName;
+    stream << "\n370\n" << layer.lineweight;
 }
 
 void writeLayers(
@@ -195,6 +196,7 @@ void writePoint(std::ofstream& stream, const odxf::Point& point)
     stream << "\n0\nLINE\n100\nAcDbPoint";
     stream << "\n8\n" << point.layer;
     stream << "\n62\n" << point.color;
+    stream << "\n370\n" << point.lineweight;
     writeTrueColor(stream, point.trueColor);
     writeThickness(stream, point.thickness);
     stream << "\n10\n" << std::to_string(point.coordinate.x);
@@ -209,6 +211,7 @@ void writeRay(std::ofstream& stream, const odxf::Ray& ray)
     stream << "\n0\nLINE\n100\nAcDbRay";
     stream << "\n8\n" << ray.layer;
     stream << "\n62\n" << ray.color;
+    stream << "\n370\n" << ray.lineweight;
     writeTrueColor(stream, ray.trueColor);
     stream << "\n10\n" << std::to_string(ray.startPoint.x);
     stream << "\n20\n" << std::to_string(ray.startPoint.y);
@@ -223,6 +226,7 @@ void writeLine(std::ofstream& stream, const odxf::Line& line)
     stream << "\n0\nLINE\n100\nAcDbLine";
     stream << "\n8\n" << line.layer;
     stream << "\n62\n" << line.color;
+    stream << "\n370\n" << line.lineweight;
     writeTrueColor(stream, line.trueColor);
     writeThickness(stream, line.thickness);
     stream << "\n10\n" << std::to_string(line.start.x);
@@ -239,6 +243,7 @@ void writeCircle(std::ofstream& stream, const odxf::Circle& circle)
     stream << "\n0\nCIRCLE\n100\nAcDbCircle";
     stream << "\n8\n" << circle.layer;
     stream << "\n62\n" << circle.color;
+    stream << "\n370\n" << circle.lineweight;
     writeTrueColor(stream, circle.trueColor);
     writeThickness(stream, circle.thickness);
     stream << "\n10\n" << std::to_string(circle.center.x);
@@ -253,6 +258,7 @@ void writeArc(std::ofstream& stream, const odxf::Arc& arc)
     stream << "\n0\nARC\n100\nAcDbCircle";
     stream << "\n8\n" << arc.layer;
     stream << "\n62\n" << arc.color;
+    stream << "\n370\n" << arc.lineweight;
     writeTrueColor(stream, arc.trueColor);
     writeThickness(stream, arc.thickness);
     stream << "\n10\n" << std::to_string(arc.center.x);
@@ -270,6 +276,7 @@ void writeEllipse(std::ofstream& stream, const odxf::Ellipse& ellipse)
     stream << "\n0\nARC\n100\nAcDbEllipse";
     stream << "\n8\n" << ellipse.layer;
     stream << "\n62\n" << ellipse.color;
+    stream << "\n370\n" << ellipse.lineweight;
     writeTrueColor(stream, ellipse.trueColor);
     stream << "\n10\n" << std::to_string(ellipse.center.x);
     stream << "\n20\n" << std::to_string(ellipse.center.y);
@@ -288,6 +295,7 @@ void writeLWPolyline(std::ofstream& stream, const odxf::LWPolyline& lwPolyline)
     stream << "\n0\nLWPOLYLINE\n100\nAcDbPolyline";
     stream << "\n8\n" << lwPolyline.layer;
     stream << "\n62\n" << lwPolyline.color;
+    stream << "\n370\n" << lwPolyline.lineweight;
     writeTrueColor(stream, lwPolyline.trueColor);
     stream << "\n90\n" << lwPolyline.vertices.size();
     stream << "\n70\n" << lwPolyline.isClosed ? 1 : 0;

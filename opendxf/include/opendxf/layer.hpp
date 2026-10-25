@@ -23,6 +23,8 @@ struct Layer final
     int color{ 7 };
     std::optional<int> trueColor{};   // 0x00RRGGBB, takes precedence over color
     Flags flags{ Flags::None };
+    // hundredths of a millimeter, or -3 DEFAULT
+    int lineweight{ -3 };
     int lineType{ 0 };
 };
 

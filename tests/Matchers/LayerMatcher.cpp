@@ -11,6 +11,7 @@ testing::Matcher<odxf::Layer> IsLayer(const odxf::Layer& expected)
         testing::Field("name", &odxf::Layer::name, expected.name),
         testing::Field("color", &odxf::Layer::color, expected.color),
         testing::Field("trueColor", &odxf::Layer::trueColor, expected.trueColor),
+        testing::Field("lineweight", &odxf::Layer::lineweight, expected.lineweight),
         testing::Field("flags", &odxf::Layer::flags, expected.flags));
 }
 
