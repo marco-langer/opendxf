@@ -519,6 +519,20 @@ std::expected<void, Error> Reader::readLayer()
             break;
         }
 
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                layer.trueColor = *maybeTrueColor;
+            } else {
+                return std::unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
+            }
+
+            break;
+        }
+
         case 70: {
             const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
             if (maybeFlags.has_value()) {
@@ -673,6 +687,20 @@ std::expected<void, Error> Reader::readLine()
             break;
         }
 
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                line.trueColor = *maybeTrueColor;
+            } else {
+                return std::unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
@@ -770,6 +798,20 @@ std::expected<void, Error> Reader::readCircle()
             break;
         }
 
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                circle.trueColor = *maybeTrueColor;
+            } else {
+                return std::unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
@@ -843,6 +885,20 @@ std::expected<void, Error> Reader::readArc()
             const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
             if (maybeColor.has_value()) {
                 arc.color = *maybeColor;
+            } else {
+                return std::unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
+            }
+
+            break;
+        }
+
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                arc.trueColor = *maybeTrueColor;
             } else {
                 return std::unexpected(
                     Error{
@@ -951,6 +1007,20 @@ std::expected<void, Error> Reader::readLWPolyline()
             const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
             if (maybeColor.has_value()) {
                 lwPolyline.color = *maybeColor;
+            } else {
+                return std::unexpected(
+                    Error{
+                        .lineNumber = m_currentLine,
+                    });
+            }
+
+            break;
+        }
+
+        case 420: {
+            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
+            if (maybeTrueColor.has_value()) {
+                lwPolyline.trueColor = *maybeTrueColor;
             } else {
                 return std::unexpected(
                     Error{

@@ -47,9 +47,12 @@ Unsupported tables and entities are skipped when reading.
 | Group code | Meaning     | LAYER read | Entities read | Write |
 |------------|-------------|:----------:|:-------------:|:-----:|
 | 62         | Color index | ✓          | ✓             | ✓     |
+| 420        | True color  | ✓          | ✓             | ✓     |
 
 Entities read colors for ARC, CIRCLE, LINE and LWPOLYLINE. A missing group code 62 means 256
 (BYLAYER) on entities and 7 on layers. A negative layer color means the layer is off.
+A true color (`0x00RRGGBB`) takes precedence over the color index, which files keep as a fallback
+for older readers. Color names (group code 430) are not supported.
 
 ## Known limitations
 

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 namespace odxf {
@@ -20,6 +21,7 @@ struct Layer final
     std::string name;
     // 7 is white or black, whichever contrasts with the background. Negative if the layer is off.
     int color{ 7 };
+    std::optional<int> trueColor;   // 0x00RRGGBB, takes precedence over color
     Flags flags{ Flags::None };
     int lineType{ 0 };
 };

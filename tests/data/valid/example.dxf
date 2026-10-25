@@ -217,7 +217,7 @@ TABLE
 2
 LAYER
 70
-3
+4
 0
 LAYER
 2
@@ -247,6 +247,18 @@ LW Polylines
 6
 CONTINUOUS
 0
+LAYER
+2
+True Color
+70
+0
+62
+5
+420
+3166368
+6
+CONTINUOUS
+0
 ENDTAB
 0
 ENDSEC
@@ -266,6 +278,8 @@ LINE
 AcDbLine
 8
 Lines
+420
+16744448
 10
 0.000000
 20
@@ -306,6 +320,8 @@ AcDbCircle
 Test Layer
 62
 2
+420
+65280
 10
 0.000000
 20
@@ -322,6 +338,8 @@ AcDbCircle
 Test Layer
 62
 5
+420
+255
 10
 0.000000
 20
@@ -344,6 +362,8 @@ AcDbPolyline
 LW Polylines
 62
 6
+420
+8421504
 90
 0
 70
