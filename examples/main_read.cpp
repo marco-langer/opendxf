@@ -3,11 +3,10 @@
 
 #include "opendxf/opendxf.hpp"
 
-#include <fmt/core.h>
-
 #include <expected>
 #include <filesystem>
 #include <iostream>
+#include <print>
 #include <string>
 
 struct DocumentStats final
@@ -22,7 +21,7 @@ struct DocumentStats final
 
 void printDocumentStats(const DocumentStats& stats)
 {
-    fmt::print(
+    std::print(
         "layers: {}\narcs: {}\ncircles: {}\nlines: {}\nlw polylines: {}\n",
         stats.layers,
         stats.arcs,
@@ -34,9 +33,9 @@ void printDocumentStats(const DocumentStats& stats)
 void printError(const odxf::Error& error)
 {
     if (error.lineNumber.has_value()) {
-        fmt::print("error reading file: line {}: {}\n", error.lineNumber.value(), error.what);
+        std::print("error reading file: line {}: {}\n", error.lineNumber.value(), error.what);
     } else {
-        fmt::print("error reading file: {}\n", error.what);
+        std::print("error reading file: {}\n", error.what);
     }
 }
 
@@ -49,7 +48,7 @@ std::expected<std::filesystem::path, std::string> parseFilePath(int argc, char**
     return reinterpret_cast<const char8_t*>(argv[1]);
 }
 
-void printUsage(const std::string& error) { fmt::print("error: {}\n", error); }
+void printUsage(const std::string& error) { std::print("error: {}\n", error); }
 
 class Reader final : public odxf::IReadStream
 {

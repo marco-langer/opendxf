@@ -1,7 +1,3 @@
-find_package(fmt CONFIG REQUIRED)
-
-message(STATUS "Using fmt v.${fmt_VERSION}")
-
 add_library(opendxf STATIC
     include/opendxf/coordinate.hpp
     include/opendxf/document.hpp
@@ -23,8 +19,3 @@ add_library(opendxf STATIC
 target_include_directories(opendxf PUBLIC include)
 
 target_compile_features(opendxf PUBLIC cxx_std_23)
-
-target_link_libraries(opendxf
-    PRIVATE
-        fmt::fmt
-)

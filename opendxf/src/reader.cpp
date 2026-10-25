@@ -6,9 +6,8 @@
 #include "opendxf/ireadstream.hpp"
 #include "opendxf/layer.hpp"
 
-#include <fmt/format.h>
-
 #include <charconv>
+#include <format>
 
 namespace {
 
@@ -77,7 +76,7 @@ bool Reader::open(const std::filesystem::path& filePath)
     if (!m_fileStream.is_open()) {
         m_error = Error{
             .type = Error::Type::FileOpenError,
-            .what = fmt::format(
+            .what = std::format(
                 "unable to open file {}",
                 reinterpret_cast<const char*>(filePath.u8string().c_str())),
         };
@@ -383,7 +382,7 @@ std::expected<HeaderEntry, Error> Reader::readHeaderEntry()
         return std::unexpected(
             Error{
                 .lineNumber = m_currentLine - 1,
-                .what = fmt::format(
+                .what = std::format(
                     "unexpected group code {} for header variable name", m_data.groupCode),
             });
     }

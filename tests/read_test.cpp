@@ -6,12 +6,11 @@
 #include "Matchers/DocumentMatcher.hpp"
 #include "TestUtils.hpp"
 
-#include <fmt/format.h>
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <filesystem>
+#include <format>
 
 TEST(read, example)
 {
@@ -27,7 +26,7 @@ TEST(read, example)
     // Assert
     if (!result) {
         const odxf::Error& error{ result.error() };
-        FAIL() << fmt::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
+        FAIL() << std::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
     }
 
     const odxf::Document& document{ istream.document() };
@@ -52,7 +51,7 @@ TEST(read, padded)
     EXPECT_TRUE(result.has_value());
     if (!result) {
         const odxf::Error& error{ result.error() };
-        FAIL() << fmt::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
+        FAIL() << std::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
     }
 }
 

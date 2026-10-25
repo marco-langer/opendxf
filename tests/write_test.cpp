@@ -7,12 +7,11 @@
 #include "Matchers/DocumentMatcher.hpp"
 #include "TestUtils.hpp"
 
-#include <fmt/format.h>
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -23,7 +22,7 @@ std::vector<std::string> readFile(const std::filesystem::path& filePath)
 {
     std::ifstream stream{ filePath };
     if (!stream.is_open()) {
-        throw std::runtime_error{ fmt::format(
+        throw std::runtime_error{ std::format(
             "unable to open file '{}'",
             reinterpret_cast<const char*>(filePath.u8string().c_str())) };
     }

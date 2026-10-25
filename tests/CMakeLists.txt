@@ -1,5 +1,4 @@
 find_package(GTest CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
 include(GoogleTest)
 
 message(STATUS "Using GTest v.${GTest_VERSION}")
@@ -30,7 +29,6 @@ target_compile_definitions(opendxf-tests PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_
 target_link_libraries(opendxf-tests
     PRIVATE
         opendxf
-        fmt::fmt
         GTest::gmock_main
 )
 
