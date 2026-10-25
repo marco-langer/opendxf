@@ -15,6 +15,7 @@ odxf::Document createExampleDocument()
     Document expectedDocument;
     auto& headerEntries{ expectedDocument.header.entries };
     headerEntries.try_emplace("$TEXTSIZE", 2.5);
+    headerEntries.try_emplace("$LTSCALE", 2.0);
     headerEntries.try_emplace("$REGENMODE", 1);
     headerEntries.try_emplace("$ORTHOMODE", 0);
     headerEntries.try_emplace("$LIMMAX", odxf::Coordinate2d{ 420, 297 });
@@ -71,11 +72,39 @@ odxf::Document createExampleDocument()
             .name = "CONTINUOUS",
             .displayName = "Solid Line",
         });
+    lineTypes.push_back(
+        LineType{
+            .name = "DASHED",
+            .displayName = "Dashed __ __ __",
+            .flags = 0,
+            .elements = { { .length = 0.5 }, { .length = -0.25 } },
+        });
+    lineTypes.push_back(
+        LineType{
+            .name = "DOT_DASH",
+            .displayName = "Dot dash _ . _ .",
+            .flags = 0,
+            .elements = { { .length = 0.5 },
+                          { .length = -0.25 },
+                          { .length = 0.0 },
+                          { .length = -0.25 } },
+        });
+    // The text element's details (75, 340, 46, 50, 44, 45, 9) are skipped.
+    lineTypes.push_back(
+        LineType{
+            .name = "GAS",
+            .displayName = "Gas line ---- GAS ----",
+            .flags = 0,
+            .elements = { { .length = 0.5 },
+                          { .length = -0.2, .complexFlags = 2 },
+                          { .length = -0.25 } },
+        });
 
     Layers& layers{ expectedDocument.tables.layers };
     // layerNameTest has no group code 370 and keeps the default lineweight
     layers.emplace_back(Layer{ .name = layerNameTest }).flags = Layer::Flags::Frozen;
-    layers.push_back(Layer{ .name = layerNameLines, .color = 1, .lineweight = 50 });
+    layers.push_back(
+        Layer{ .name = layerNameLines, .color = 1, .lineweight = 50, .lineType = "DASHED" });
     layers.push_back(Layer{ .name = layerNameLWPolylines, .color = -3, .lineweight = -3 });
     layers.push_back(
         Layer{ .name = layerNameTrueColor, .color = 5, .trueColor = 0x3050A0, .lineweight = 0 });
@@ -175,6 +204,15 @@ odxf::Document createExampleDocument()
     lwPolylines[0].lineweight = 211;
     lwPolylines[1].lineweight = -1;
     lwPolylines[2].lineweight = 13;
+
+    // lines[0] and lwPolylines[2] have no group codes 6 and 48 and keep the defaults
+    lines[1].lineType = "DOT_DASH";
+    lines[1].lineTypeScale = 2.5;
+    circles[0].lineType = "BYBLOCK";
+    arcs[0].lineType = "CONTINUOUS";
+    arcs[0].lineTypeScale = 0.5;
+    lwPolylines[0].lineType = "GAS";
+    lwPolylines[1].lineType = "BYLAYER";
 
     return expectedDocument;
 }

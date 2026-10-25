@@ -5,6 +5,7 @@
 
 #include "opendxf/ireadstream.hpp"
 #include "opendxf/layer.hpp"
+#include "opendxf/tables.hpp"
 
 #include <charconv>
 #include <format>
@@ -478,6 +479,11 @@ std::expected<void, Error> Reader::readTables()
             if (!maybeResult) {
                 return maybeResult;
             }
+        } else if (isLineType()) {
+            std::expected<void, Error> maybeResult{ readLineType() };
+            if (!maybeResult) {
+                return maybeResult;
+            }
         } else {
             readNext();
         }
@@ -488,6 +494,71 @@ std::expected<void, Error> Reader::readTables()
     }
 
     return {};
+}
+
+std::expected<void, Error> Reader::readLineType()
+{
+    if (!readNext()) {
+        return std::unexpected(m_error.value());
+    }
+
+    LineType lineType;
+    while (m_data.groupCode != 0) {
+        switch (m_data.groupCode) {
+        case 2: {
+            lineType.name = m_data.value;
+
+            break;
+        }
+
+        case 3: {
+            lineType.displayName = m_data.value;
+
+            break;
+        }
+
+        case 70: {
+            const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
+            if (maybeFlags.has_value()) {
+                lineType.flags = *maybeFlags;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 49: {
+            const std::optional<double> maybeLength{ parseAs<double>(m_data.value) };
+            if (maybeLength.has_value()) {
+                lineType.elements.push_back(LineTypeElement{ .length = *maybeLength });
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        // Follows the 49 of its element.
+        case 74: {
+            const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
+            if (!maybeFlags.has_value() || lineType.elements.empty()) {
+                return parseError();
+            }
+            lineType.elements.back().complexFlags = *maybeFlags;
+
+            break;
+        }
+        }
+
+        if (!readNext()) {
+            return makeError();
+        }
+    }
+
+    m_stream.lineType(lineType);
+
+    return std::expected<void, Error>();
 }
 
 std::expected<void, Error> Reader::readLayer()
@@ -534,6 +605,12 @@ std::expected<void, Error> Reader::readLayer()
             } else {
                 return parseError();
             }
+
+            break;
+        }
+
+        case 6: {
+            layer.lineType = m_data.value;
 
             break;
         }
@@ -708,6 +785,23 @@ std::expected<void, Error> Reader::readLine()
             break;
         }
 
+        case 6: {
+            line.lineType = m_data.value;
+
+            break;
+        }
+
+        case 48: {
+            const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
+            if (maybeScale.has_value()) {
+                line.lineTypeScale = *maybeScale;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
@@ -812,6 +906,23 @@ std::expected<void, Error> Reader::readCircle()
             break;
         }
 
+        case 6: {
+            circle.lineType = m_data.value;
+
+            break;
+        }
+
+        case 48: {
+            const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
+            if (maybeScale.has_value()) {
+                circle.lineTypeScale = *maybeScale;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
@@ -898,6 +1009,23 @@ std::expected<void, Error> Reader::readArc()
             const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
             if (maybeLineweight.has_value()) {
                 arc.lineweight = *maybeLineweight;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 6: {
+            arc.lineType = m_data.value;
+
+            break;
+        }
+
+        case 48: {
+            const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
+            if (maybeScale.has_value()) {
+                arc.lineTypeScale = *maybeScale;
             } else {
                 return parseError();
             }
@@ -1010,6 +1138,23 @@ std::expected<void, Error> Reader::readLWPolyline()
             const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
             if (maybeLineweight.has_value()) {
                 lwPolyline.lineweight = *maybeLineweight;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 6: {
+            lwPolyline.lineType = m_data.value;
+
+            break;
+        }
+
+        case 48: {
+            const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
+            if (maybeScale.has_value()) {
+                lwPolyline.lineTypeScale = *maybeScale;
             } else {
                 return parseError();
             }
@@ -1188,6 +1333,8 @@ bool Reader::isTableEnd() const { return m_data.groupCode == 0 && m_data.value =
 bool Reader::isLayerBegin() const { return m_data.groupCode == 2 && m_data.value == "LAYER"; }
 
 bool Reader::isLayer() const { return m_data.groupCode == 0 && m_data.value == "LAYER"; }
+
+bool Reader::isLineType() const { return m_data.groupCode == 0 && m_data.value == "LTYPE"; }
 
 bool Reader::isLine() const { return m_data.groupCode == 0 && m_data.value == "LINE"; }
 

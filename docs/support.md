@@ -20,13 +20,14 @@ All header variables are read into and written from a generic key/value map. Typ
 | Variable    | Accessor                                    |
 |-------------|---------------------------------------------|
 | `$INSUNITS` | `insertionUnits()` / `setInsertionUnits()`  |
+| `$LTSCALE`  | `lineTypeScale()` / `setLineTypeScale()`    |
 
 ## Tables
 
 | Table | Read | Write |
 |-------|:----:|:-----:|
 | LAYER | ✓    | ✓     |
-| LTYPE | –    | ✓     |
+| LTYPE | ✓    | ✓     |
 
 ## Entities
 
@@ -65,6 +66,25 @@ a millimeter. Entities can also be -1 (BYLAYER), -2 (BYBLOCK) or -3 (DEFAULT), l
 (DEFAULT). DEFAULT means the default lineweight of the application; DXF files don't store it. A
 missing group code 370 means -1 on entities and -3 on layers. Values are stored as read, without
 checking them against the lineweights DXF allows.
+
+## Line types
+
+| Group code | Meaning                       | LTYPE read | LAYER read | Entities read | Write |
+|------------|-------------------------------|:----------:|:----------:|:-------------:|:-----:|
+| 3          | Description                   | ✓          |            |               | ✓     |
+| 49         | Dash, gap or dot length       | ✓          |            |               | ✓     |
+| 74         | Complex element flags         | ✓          |            |               | ✓     |
+| 6          | Line type name                |            | ✓          | ✓             | ✓     |
+| 48         | Line type scale               |            |            | ✓             | ✓     |
+
+Entities read line types for ARC, CIRCLE, LINE and LWPOLYLINE. Lengths are in drawing units: a
+positive length is a dash, a negative one a gap and 0 a dot. The total pattern length (40) is
+computed when writing and not stored. A missing group code 6 means BYLAYER on entities and
+CONTINUOUS on layers; a missing 48 means 1.0.
+
+Complex elements, which embed a text or a shape, only keep their flags (74). Their details (75,
+340, 46, 50, 44, 45 and 9) are skipped when reading and not written, so a written complex line
+type is incomplete.
 
 ## Known limitations
 
