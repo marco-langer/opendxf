@@ -22,7 +22,7 @@ struct Vector3d final
 struct Entity
 {
     std::string layer;
-    int color{ 0 };
+    int color{ 256 };   // BYLAYER
 };
 
 struct Point final : Entity
