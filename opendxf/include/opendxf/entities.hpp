@@ -24,6 +24,8 @@ struct Entity
     std::string layer;
     int color{ 256 };                 // BYLAYER
     std::optional<int> trueColor{};   // 0x00RRGGBB, takes precedence over color
+    // hundredths of a millimeter, or -1 BYLAYER, -2 BYBLOCK, -3 DEFAULT
+    int lineweight{ -1 };
 };
 
 struct Point final : Entity

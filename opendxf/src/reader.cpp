@@ -527,6 +527,17 @@ std::expected<void, Error> Reader::readLayer()
             break;
         }
 
+        case 370: {
+            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
+            if (maybeLineweight.has_value()) {
+                layer.lineweight = *maybeLineweight;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 70: {
             const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
             if (maybeFlags.has_value()) {
@@ -686,6 +697,17 @@ std::expected<void, Error> Reader::readLine()
             break;
         }
 
+        case 370: {
+            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
+            if (maybeLineweight.has_value()) {
+                line.lineweight = *maybeLineweight;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
@@ -779,6 +801,17 @@ std::expected<void, Error> Reader::readCircle()
             break;
         }
 
+        case 370: {
+            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
+            if (maybeLineweight.has_value()) {
+                circle.lineweight = *maybeLineweight;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
@@ -854,6 +887,17 @@ std::expected<void, Error> Reader::readArc()
             const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
             if (maybeTrueColor.has_value()) {
                 arc.trueColor = *maybeTrueColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 370: {
+            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
+            if (maybeLineweight.has_value()) {
+                arc.lineweight = *maybeLineweight;
             } else {
                 return parseError();
             }
@@ -955,6 +999,17 @@ std::expected<void, Error> Reader::readLWPolyline()
             const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
             if (maybeTrueColor.has_value()) {
                 lwPolyline.trueColor = *maybeTrueColor;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 370: {
+            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
+            if (maybeLineweight.has_value()) {
+                lwPolyline.lineweight = *maybeLineweight;
             } else {
                 return parseError();
             }

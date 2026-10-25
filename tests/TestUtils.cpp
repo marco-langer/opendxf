@@ -73,10 +73,12 @@ odxf::Document createExampleDocument()
         });
 
     Layers& layers{ expectedDocument.tables.layers };
+    // layerNameTest has no group code 370 and keeps the default lineweight
     layers.emplace_back(Layer{ .name = layerNameTest }).flags = Layer::Flags::Frozen;
-    layers.push_back(Layer{ .name = layerNameLines, .color = 1 });
-    layers.push_back(Layer{ .name = layerNameLWPolylines, .color = -3 });
-    layers.push_back(Layer{ .name = layerNameTrueColor, .color = 5, .trueColor = 0x3050A0 });
+    layers.push_back(Layer{ .name = layerNameLines, .color = 1, .lineweight = 50 });
+    layers.push_back(Layer{ .name = layerNameLWPolylines, .color = -3, .lineweight = -3 });
+    layers.push_back(
+        Layer{ .name = layerNameTrueColor, .color = 5, .trueColor = 0x3050A0, .lineweight = 0 });
 
     Entities& entities{ expectedDocument.entities };
 
@@ -165,6 +167,14 @@ odxf::Document createExampleDocument()
     lwPolylines[0].trueColor = 0x808080;
     lwPolylines[1].color = 256;
     lwPolylines[2].color = 0;
+
+    // lines[0] has no group code 370 and keeps the default
+    lines[1].lineweight = 35;
+    circles[0].lineweight = -2;
+    arcs[0].lineweight = -3;
+    lwPolylines[0].lineweight = 211;
+    lwPolylines[1].lineweight = -1;
+    lwPolylines[2].lineweight = 13;
 
     return expectedDocument;
 }

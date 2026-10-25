@@ -54,6 +54,18 @@ Entities read colors for ARC, CIRCLE, LINE and LWPOLYLINE. A missing group code 
 A true color (`0x00RRGGBB`) takes precedence over the color index, which files keep as a fallback
 for older readers. Color names (group code 430) are not supported.
 
+## Lineweights
+
+| Group code | Meaning    | LAYER read | Entities read | Write |
+|------------|------------|:----------:|:-------------:|:-----:|
+| 370        | Lineweight | ✓          | ✓             | ✓     |
+
+Entities read lineweights for ARC, CIRCLE, LINE and LWPOLYLINE. Lineweights are in hundredths of
+a millimeter. Entities can also be -1 (BYLAYER), -2 (BYBLOCK) or -3 (DEFAULT), layers -3
+(DEFAULT). DEFAULT means the default lineweight of the application; DXF files don't store it. A
+missing group code 370 means -1 on entities and -3 on layers. Values are stored as read, without
+checking them against the lineweights DXF allows.
+
 ## Known limitations
 
 - Only ASCII DXF is supported, binary DXF is not.
