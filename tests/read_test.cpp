@@ -15,7 +15,7 @@
 TEST(read, example)
 {
     // Arrange
-    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "example.dxf" };
+    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "example.dxf" };
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     ReadStream istream;
@@ -39,7 +39,7 @@ TEST(read, example)
 TEST(read, padded)
 {
     // Arrange
-    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "padded.dxf" };
+    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "padded.dxf" };
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     ReadStream istream;
@@ -69,7 +69,7 @@ TEST_P(ParseErrorFixture, ParseError)
     // Arrange
     const auto& [filename, expectedErrorLine]{ GetParam() };
 
-    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / filename };
+    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "invalid" / filename };
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     ReadStream istream;

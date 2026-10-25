@@ -103,7 +103,7 @@ TEST(insertionUnits, roundTrip)
 TEST(insertionUnits, readFromFile)
 {
     // Arrange
-    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "example.dxf" };
+    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "example.dxf" };
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     ReadStream istream;
