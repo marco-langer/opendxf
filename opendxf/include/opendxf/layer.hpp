@@ -25,7 +25,7 @@ struct Layer final
     Flags flags{ Flags::None };
     // hundredths of a millimeter, or -3 DEFAULT
     int lineweight{ -3 };
-    int lineType{ 0 };
+    std::string lineType{ "CONTINUOUS" };
 };
 
 }   // namespace odxf

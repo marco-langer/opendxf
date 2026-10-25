@@ -3,12 +3,14 @@
 
 #include "opendxf/headervariables.hpp"
 
+#include <cmath>
 #include <string>
 #include <string_view>
 
 namespace {
 
 constexpr std::string_view insUnitsKey{ "$INSUNITS" };
+constexpr std::string_view ltScaleKey{ "$LTSCALE" };
 
 }   // namespace
 
@@ -37,6 +39,30 @@ std::expected<std::optional<LengthUnit>, HeaderError> insertionUnits(const Heade
 void setInsertionUnits(Header& header, LengthUnit unit)
 {
     header.entries.insert_or_assign(std::string{ insUnitsKey }, static_cast<int>(unit));
+}
+
+std::expected<std::optional<double>, HeaderError> lineTypeScale(const Header& header)
+{
+    const auto it{ header.entries.find(ltScaleKey) };
+    if (it == header.entries.end()) {
+        return std::nullopt;
+    }
+
+    const double* value{ std::get_if<double>(&it->second) };
+    if (value == nullptr) {
+        return std::unexpected(HeaderError::WrongType);
+    }
+
+    if (!std::isfinite(*value) || *value <= 0.0) {
+        return std::unexpected(HeaderError::InvalidValue);
+    }
+
+    return *value;
+}
+
+void setLineTypeScale(Header& header, double scale)
+{
+    header.entries.insert_or_assign(std::string{ ltScaleKey }, scale);
 }
 
 }   // namespace odxf

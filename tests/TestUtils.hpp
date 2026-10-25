@@ -8,6 +8,7 @@
 #include "opendxf/header.hpp"
 #include "opendxf/ireadstream.hpp"
 #include "opendxf/layer.hpp"
+#include "opendxf/tables.hpp"
 
 class ReadStream final : public odxf::IReadStream
 {
@@ -16,6 +17,10 @@ public:
 
 private:
     void header(const odxf::Header& header) override { m_document.header = header; }
+    void lineType(const odxf::LineType& lineType) override
+    {
+        m_document.tables.lineTypes.push_back(lineType);
+    }
     void layer(const odxf::Layer& layer) override { m_document.tables.layers.push_back(layer); }
 
     void arc(const odxf::Arc& arc) override { m_document.entities.arcs.push_back(arc); }

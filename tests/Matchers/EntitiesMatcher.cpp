@@ -33,6 +33,11 @@ testing::Matcher<odxf::LWPolyline> IsLWPolyline(const odxf::LWPolyline& expected
         testing::Field("color", &odxf::Entity::color, expected.color),
         testing::Field("trueColor", &odxf::Entity::trueColor, expected.trueColor),
         testing::Field("lineweight", &odxf::Entity::lineweight, expected.lineweight),
+        testing::Field("lineType", &odxf::Entity::lineType, expected.lineType),
+        testing::Field(
+            "lineTypeScale",
+            &odxf::Entity::lineTypeScale,
+            testing::DoubleNear(expected.lineTypeScale, maxError)),
         testing::Field("isClosed", &odxf::LWPolyline::isClosed, expected.isClosed),
         testing::Field(
             "vertices", &odxf::LWPolyline::vertices, AreVertices(expected.vertices, maxError)));
@@ -57,6 +62,11 @@ testing::Matcher<odxf::Line> IsLine(const odxf::Line& expected, double maxError)
         testing::Field("color", &odxf::Entity::color, expected.color),
         testing::Field("trueColor", &odxf::Entity::trueColor, expected.trueColor),
         testing::Field("lineweight", &odxf::Entity::lineweight, expected.lineweight),
+        testing::Field("lineType", &odxf::Entity::lineType, expected.lineType),
+        testing::Field(
+            "lineTypeScale",
+            &odxf::Entity::lineTypeScale,
+            testing::DoubleNear(expected.lineTypeScale, maxError)),
         testing::Field("start", &odxf::Line::start, IsCoordinate(expected.start, maxError)),
         testing::Field("end", &odxf::Line::end, IsCoordinate(expected.end, maxError)));
 }
@@ -68,6 +78,11 @@ testing::Matcher<odxf::Circle> IsCircle(const odxf::Circle& expected, double max
         testing::Field("color", &odxf::Entity::color, expected.color),
         testing::Field("trueColor", &odxf::Entity::trueColor, expected.trueColor),
         testing::Field("lineweight", &odxf::Entity::lineweight, expected.lineweight),
+        testing::Field("lineType", &odxf::Entity::lineType, expected.lineType),
+        testing::Field(
+            "lineTypeScale",
+            &odxf::Entity::lineTypeScale,
+            testing::DoubleNear(expected.lineTypeScale, maxError)),
         testing::Field("center", &odxf::Circle::center, IsCoordinate(expected.center, maxError)),
         testing::Field(
             "radius", &odxf::Circle::radius, testing::DoubleNear(expected.radius, maxError)));
@@ -80,6 +95,11 @@ testing::Matcher<odxf::Arc> IsArc(const odxf::Arc& expected, double maxError)
         testing::Field("color", &odxf::Entity::color, expected.color),
         testing::Field("trueColor", &odxf::Entity::trueColor, expected.trueColor),
         testing::Field("lineweight", &odxf::Entity::lineweight, expected.lineweight),
+        testing::Field("lineType", &odxf::Entity::lineType, expected.lineType),
+        testing::Field(
+            "lineTypeScale",
+            &odxf::Entity::lineTypeScale,
+            testing::DoubleNear(expected.lineTypeScale, maxError)),
         testing::Field("center", &odxf::Arc::center, IsCoordinate(expected.center, maxError)),
         testing::Field(
             "radius", &odxf::Arc::radius, testing::DoubleNear(expected.radius, maxError)),

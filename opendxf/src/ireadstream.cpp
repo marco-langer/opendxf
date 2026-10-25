@@ -4,12 +4,15 @@
 #include "opendxf/ireadstream.hpp"
 
 #include "opendxf/entities.hpp"
+#include "opendxf/tables.hpp"
 
 namespace odxf {
 
 IReadStream::~IReadStream() = default;
 
 void IReadStream::header(const Header& /* header */) {}
+
+void IReadStream::lineType(const LineType& /* lineType */) {}
 
 void IReadStream::layer(const Layer& /* layer */) {}
 

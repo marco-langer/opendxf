@@ -40,6 +40,7 @@ private:
     std::expected<std::variant<Coordinate2d, Coordinate3d>, Error> readHeaderCoordinate();
 
     std::expected<void, Error> readTables();
+    std::expected<void, Error> readLineType();
     std::expected<void, Error> readLayer();
 
     std::expected<void, Error> readBlocks();
@@ -67,6 +68,7 @@ private:
     bool isTableEnd() const;
     bool isLayerBegin() const;
     bool isLayer() const;
+    bool isLineType() const;
 
     bool isLine() const;
     bool isCircle() const;

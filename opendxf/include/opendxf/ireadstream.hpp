@@ -10,6 +10,7 @@ struct Circle;
 struct Header;
 struct Layer;
 struct Line;
+struct LineType;
 struct LWPolyline;
 
 class IReadStream
@@ -19,6 +20,7 @@ public:
     virtual ~IReadStream() = 0;
 
     virtual void header(const Header& header);
+    virtual void lineType(const LineType& lineType);
     virtual void layer(const Layer& layer);
 
     virtual void arc(const Arc& arc);

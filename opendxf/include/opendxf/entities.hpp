@@ -26,6 +26,9 @@ struct Entity
     std::optional<int> trueColor{};   // 0x00RRGGBB, takes precedence over color
     // hundredths of a millimeter, or -1 BYLAYER, -2 BYBLOCK, -3 DEFAULT
     int lineweight{ -1 };
+    // The name of an entry in the LTYPE table, or BYLAYER or BYBLOCK.
+    std::string lineType{ "BYLAYER" };
+    double lineTypeScale{ 1.0 };
 };
 
 struct Point final : Entity

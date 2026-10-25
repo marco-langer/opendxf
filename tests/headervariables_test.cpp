@@ -10,6 +10,7 @@
 
 #include <expected>
 #include <filesystem>
+#include <limits>
 #include <optional>
 
 TEST(insertionUnits, valid)
@@ -123,4 +124,100 @@ TEST(insertionUnits, readFromFile)
     // Assert
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(odxf::insertionUnits(istream.document().header), odxf::LengthUnit::Millimeters);
+}
+
+TEST(lineTypeScale, valid)
+{
+    // Arrange
+    const odxf::Header header{ .entries{ { "$LTSCALE", 2.5 } } };
+
+    // Act
+    const std::expected<std::optional<double>, odxf::HeaderError> result{ odxf::lineTypeScale(
+        header) };
+
+    // Assert
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result.value(), 2.5);
+}
+
+TEST(lineTypeScale, missing)
+{
+    // Arrange
+    const odxf::Header header{};
+
+    // Act
+    const std::expected<std::optional<double>, odxf::HeaderError> result{ odxf::lineTypeScale(
+        header) };
+
+    // Assert
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result.value(), std::nullopt);
+}
+
+TEST(lineTypeScale, wrongType)
+{
+    // Arrange
+    const odxf::Header header{ .entries{ { "$LTSCALE", 2 } } };
+
+    // Act
+    const std::expected<std::optional<double>, odxf::HeaderError> result{ odxf::lineTypeScale(
+        header) };
+
+    // Assert
+    ASSERT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), odxf::HeaderError::WrongType);
+}
+
+class LineTypeScaleInvalidValueTest : public testing::TestWithParam<double>
+{};
+
+TEST_P(LineTypeScaleInvalidValueTest, invalidValue)
+{
+    // Arrange
+    const odxf::Header header{ .entries{ { "$LTSCALE", GetParam() } } };
+
+    // Act
+    const std::expected<std::optional<double>, odxf::HeaderError> result{ odxf::lineTypeScale(
+        header) };
+
+    // Assert
+    ASSERT_FALSE(result.has_value());
+    EXPECT_EQ(result.error(), odxf::HeaderError::InvalidValue);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    lineTypeScale,
+    LineTypeScaleInvalidValueTest,
+    testing::Values(
+        0.0,
+        -1.0,
+        std::numeric_limits<double>::infinity(),
+        std::numeric_limits<double>::quiet_NaN()));
+
+TEST(setLineTypeScale, overwritesExistingValue)
+{
+    // Arrange
+    odxf::Header header{ .entries{ { "$LTSCALE", 1.0 } } };
+
+    // Act
+    odxf::setLineTypeScale(header, 4.0);
+
+    // Assert
+    EXPECT_EQ(odxf::lineTypeScale(header), 4.0);
+}
+
+TEST(lineTypeScale, readFromFile)
+{
+    // Arrange
+    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "example.dxf" };
+    ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
+
+    ReadStream istream;
+
+    // Act
+    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+
+    // Assert
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(odxf::lineTypeScale(istream.document().header), 2.0);
 }

@@ -52,4 +52,9 @@ std::expected<std::optional<LengthUnit>, HeaderError> insertionUnits(const Heade
 
 void setInsertionUnits(Header& header, LengthUnit unit);
 
+// $LTSCALE, the scale of all line type patterns. A scale that isn't positive is an InvalidValue.
+std::expected<std::optional<double>, HeaderError> lineTypeScale(const Header& header);
+
+void setLineTypeScale(Header& header, double scale);
+
 }   // namespace odxf
