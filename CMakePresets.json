@@ -9,10 +9,8 @@
       "name": "base",
       "hidden": true,
       "binaryDir": "${sourceDir}/build/${presetName}",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "VCPKG_INSTALL_OPTIONS": "--no-print-usage"
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
     {

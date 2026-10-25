@@ -9,7 +9,7 @@ opendxf is at an early stage and supports only a subset of DXF. See [DXF support
 - A C++23 compiler
 - CMake 4.3.4 or newer
 
-The library has no dependencies. The tests need [GoogleTest](https://github.com/google/googletest), which is installed through [vcpkg](https://vcpkg.io).
+The library has no dependencies. The tests use [GoogleTest](https://github.com/google/googletest): an installed GoogleTest is used if CMake can find it, otherwise it is downloaded during configuration.
 
 ## Integration
 
@@ -92,8 +92,6 @@ int main()
 More complete programs are in [examples](examples).
 
 ## Building and testing
-
-The presets expect the `VCPKG_ROOT` environment variable to point to a vcpkg installation.
 
 ```sh
 cmake --preset debug

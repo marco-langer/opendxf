@@ -1,7 +1,22 @@
-find_package(GTest CONFIG REQUIRED)
+include(FetchContent)
 include(GoogleTest)
 
-message(STATUS "Using GTest v.${GTest_VERSION}")
+# uses an installed GTest if available, otherwise downloads and builds it
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.18.0.tar.gz
+    URL_HASH SHA256=6e3191c1455468b3fc35a417fb565c1c5071aee1b7e7f85e30cf48a98d37d8b5
+    FIND_PACKAGE_ARGS NAMES GTest CONFIG
+)
+set(INSTALL_GTEST OFF)
+set(gtest_force_shared_crt ON)
+FetchContent_MakeAvailable(googletest)
+
+if(googletest_SOURCE_DIR)
+    message(STATUS "Using downloaded GTest from ${googletest_SOURCE_DIR}")
+else()
+    message(STATUS "Using installed GTest")
+endif()
 
 add_executable(opendxf-tests
     Matchers/CoordinateMatcher.cpp
