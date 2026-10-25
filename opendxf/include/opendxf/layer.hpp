@@ -18,7 +18,8 @@ struct Layer final
     };
 
     std::string name;
-    int color{ 7 };   // white
+    // 7 is white or black, whichever contrasts with the background. Negative if the layer is off.
+    int color{ 7 };
     Flags flags{ Flags::None };
     int lineType{ 0 };
 };

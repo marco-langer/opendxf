@@ -73,8 +73,8 @@ odxf::Document createExampleDocument()
 
     Layers& layers{ expectedDocument.tables.layers };
     layers.emplace_back(Layer{ .name = layerNameTest }).flags = Layer::Flags::Frozen;
-    layers.push_back(Layer{ .name = layerNameLines });
-    layers.push_back(Layer{ .name = layerNameLWPolylines });
+    layers.push_back(Layer{ .name = layerNameLines, .color = 1 });
+    layers.push_back(Layer{ .name = layerNameLWPolylines, .color = -3 });
 
     Entities& entities{ expectedDocument.entities };
 
@@ -151,6 +151,14 @@ odxf::Document createExampleDocument()
             },
         },
     }).layer = layerNameLWPolylines;
+
+    // lines[0] has no group code 62 and keeps the default
+    lines[1].color = 3;
+    circles[0].color = 2;
+    arcs[0].color = 5;
+    lwPolylines[0].color = 6;
+    lwPolylines[1].color = 256;
+    lwPolylines[2].color = 0;
 
     return expectedDocument;
 }

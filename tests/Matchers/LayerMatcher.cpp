@@ -9,6 +9,7 @@ testing::Matcher<odxf::Layer> IsLayer(const odxf::Layer& expected)
 {
     return testing::AllOf(
         testing::Field("name", &odxf::Layer::name, expected.name),
+        testing::Field("color", &odxf::Layer::color, expected.color),
         testing::Field("flags", &odxf::Layer::flags, expected.flags));
 }
 

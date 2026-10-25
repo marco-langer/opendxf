@@ -42,6 +42,15 @@ All header variables are read into and written from a generic key/value map. Typ
 
 Unsupported tables and entities are skipped when reading.
 
+## Colors
+
+| Group code | Meaning     | LAYER read | Entities read | Write |
+|------------|-------------|:----------:|:-------------:|:-----:|
+| 62         | Color index | ✓          | ✓             | ✓     |
+
+Entities read colors for ARC, CIRCLE, LINE and LWPOLYLINE. A missing group code 62 means 256
+(BYLAYER) on entities and 7 on layers. A negative layer color means the layer is off.
+
 ## Known limitations
 
 - Only ASCII DXF is supported, binary DXF is not.
