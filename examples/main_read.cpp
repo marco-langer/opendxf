@@ -21,8 +21,8 @@ struct DocumentStats final
 
 void printDocumentStats(const DocumentStats& stats)
 {
-    std::print(
-        "layers: {}\narcs: {}\ncircles: {}\nlines: {}\nlw polylines: {}\n",
+    std::println(
+        "layers: {}\narcs: {}\ncircles: {}\nlines: {}\nlw polylines: {}",
         stats.layers,
         stats.arcs,
         stats.circles,
@@ -33,9 +33,9 @@ void printDocumentStats(const DocumentStats& stats)
 void printError(const odxf::Error& error)
 {
     if (error.lineNumber.has_value()) {
-        std::print("error reading file: line {}: {}\n", error.lineNumber.value(), error.what);
+        std::println("error reading file: line {}: {}", error.lineNumber.value(), error.what);
     } else {
-        std::print("error reading file: {}\n", error.what);
+        std::println("error reading file: {}", error.what);
     }
 }
 
@@ -48,7 +48,7 @@ std::expected<std::filesystem::path, std::string> parseFilePath(int argc, char**
     return reinterpret_cast<const char8_t*>(argv[1]);
 }
 
-void printUsage(const std::string& error) { std::print("error: {}\n", error); }
+void printUsage(const std::string& error) { std::println("error: {}", error); }
 
 class Reader final : public odxf::IReadStream
 {
