@@ -10,6 +10,7 @@
 
 #include <expected>
 #include <filesystem>
+#include <optional>
 
 TEST(insertionUnits, valid)
 {
@@ -17,7 +18,9 @@ TEST(insertionUnits, valid)
     const odxf::Header header{ .entries{ { "$INSUNITS", 4 } } };
 
     // Act
-    const std::expected<odxf::LengthUnit, odxf::HeaderError> result{ odxf::insertionUnits(header) };
+    const std::expected<std::optional<odxf::LengthUnit>, odxf::HeaderError> result{
+        odxf::insertionUnits(header)
+    };
 
     // Assert
     ASSERT_TRUE(result.has_value());
@@ -30,11 +33,13 @@ TEST(insertionUnits, missing)
     const odxf::Header header{};
 
     // Act
-    const std::expected<odxf::LengthUnit, odxf::HeaderError> result{ odxf::insertionUnits(header) };
+    const std::expected<std::optional<odxf::LengthUnit>, odxf::HeaderError> result{
+        odxf::insertionUnits(header)
+    };
 
     // Assert
-    ASSERT_FALSE(result.has_value());
-    EXPECT_EQ(result.error(), odxf::HeaderError::MissingVariable);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result.value(), std::nullopt);
 }
 
 TEST(insertionUnits, wrongType)
@@ -43,7 +48,9 @@ TEST(insertionUnits, wrongType)
     const odxf::Header header{ .entries{ { "$INSUNITS", 4.0 } } };
 
     // Act
-    const std::expected<odxf::LengthUnit, odxf::HeaderError> result{ odxf::insertionUnits(header) };
+    const std::expected<std::optional<odxf::LengthUnit>, odxf::HeaderError> result{
+        odxf::insertionUnits(header)
+    };
 
     // Assert
     ASSERT_FALSE(result.has_value());
@@ -59,7 +66,9 @@ TEST_P(InsertionUnitsInvalidValueTest, invalidValue)
     const odxf::Header header{ .entries{ { "$INSUNITS", GetParam() } } };
 
     // Act
-    const std::expected<odxf::LengthUnit, odxf::HeaderError> result{ odxf::insertionUnits(header) };
+    const std::expected<std::optional<odxf::LengthUnit>, odxf::HeaderError> result{
+        odxf::insertionUnits(header)
+    };
 
     // Assert
     ASSERT_FALSE(result.has_value());

@@ -6,12 +6,14 @@
 #include "opendxf/header.hpp"
 
 #include <expected>
+#include <optional>
 
 namespace odxf {
 
+// errors for header variables that are present but malformed;
+// an absent optional variable is reported as std::nullopt instead
 enum class HeaderError
 {
-    MissingVariable,
     WrongType,
     InvalidValue
 };
@@ -46,7 +48,7 @@ enum class LengthUnit
     USSurveyMile = 24
 };
 
-std::expected<LengthUnit, HeaderError> insertionUnits(const Header& header);
+std::expected<std::optional<LengthUnit>, HeaderError> insertionUnits(const Header& header);
 
 void setInsertionUnits(Header& header, LengthUnit unit);
 

@@ -14,11 +14,11 @@ constexpr std::string_view insUnitsKey{ "$INSUNITS" };
 
 namespace odxf {
 
-std::expected<LengthUnit, HeaderError> insertionUnits(const Header& header)
+std::expected<std::optional<LengthUnit>, HeaderError> insertionUnits(const Header& header)
 {
     const auto it{ header.entries.find(insUnitsKey) };
     if (it == header.entries.end()) {
-        return std::unexpected(HeaderError::MissingVariable);
+        return std::nullopt;
     }
 
     const int* value{ std::get_if<int>(&it->second) };
