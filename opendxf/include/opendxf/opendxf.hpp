@@ -11,6 +11,7 @@
 #include "opendxf/headervariables.hpp"
 #include "opendxf/ireadstream.hpp"
 #include "opendxf/layer.hpp"
+#include "opendxf/properties.hpp"
 #include "opendxf/read.hpp"
 #include "opendxf/tables.hpp"
 #include "opendxf/write.hpp"

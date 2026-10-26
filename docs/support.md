@@ -26,6 +26,7 @@ All header variables are read into and written from a generic key/value map. Typ
 
 | Table | Read | Write |
 |-------|:----:|:-----:|
+| APPID | –    | ✓     |
 | LAYER | ✓    | ✓     |
 | LTYPE | ✓    | ✓     |
 
@@ -85,6 +86,24 @@ CONTINUOUS on layers; a missing 48 means 1.0.
 Complex elements, which embed a text or a shape, only keep their flags (74). Their details (75,
 340, 46, 50, 44, 45 and 9) are skipped when reading and not written, so a written complex line
 type is incomplete.
+
+## Transparency
+
+| Group code    | Meaning      | LAYER read | Entities read | Write |
+|---------------|--------------|:----------:|:-------------:|:-----:|
+| 440           | Transparency |            | ✓             | ✓     |
+| 1001 + 1071   | Transparency | ✓          |               | ✓     |
+
+Entities read transparency for ARC, CIRCLE, LINE and LWPOLYLINE into an `EntityTransparency`:
+`ByLayer`, `ByBlock` or a `Transparency` with an alpha from 0 (fully transparent) to 255
+(opaque). DXF stores it as `0x02000000 | alpha`, or `0x01000000` for BYBLOCK. A missing group
+code 440 and any other value mean `ByLayer`.
+
+Layers keep their transparency in xdata: a 1071 that follows the 1001 naming the transparency
+application. A 1071 of any other application is ignored, as is all other xdata. A layer without
+it, or with a value other than `0x02000000 | alpha`, is opaque (an empty `transparency`). The
+writer adds an APPID table that registers the transparency application when a layer has a
+transparency, and writes no APPID table otherwise.
 
 ## Known limitations
 

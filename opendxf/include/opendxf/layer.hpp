@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "opendxf/properties.hpp"
+
 #include <optional>
 #include <string>
 
@@ -26,6 +28,8 @@ struct Layer final
     // hundredths of a millimeter, or -3 DEFAULT
     int lineweight{ -3 };
     std::string lineType{ "CONTINUOUS" };
+    // Empty means opaque.
+    std::optional<Transparency> transparency{};
 };
 
 }   // namespace odxf

@@ -2,6 +2,7 @@
 // Copyright (c) 2024 Marco Langer
 
 #include "reader.hpp"
+#include "transparency.hpp"
 
 #include "opendxf/ireadstream.hpp"
 #include "opendxf/layer.hpp"
@@ -568,6 +569,8 @@ std::expected<void, Error> Reader::readLayer()
     }
 
     Layer layer;
+    // The application that owns the xdata read next, empty before the first group code 1001.
+    std::string xdataApp;
     while (m_data.groupCode != 0) {
         switch (m_data.groupCode) {
         case 2: {
@@ -619,6 +622,27 @@ std::expected<void, Error> Reader::readLayer()
             const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
             if (maybeFlags.has_value()) {
                 layer.flags = static_cast<odxf::Layer::Flags>(*maybeFlags);
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 1001: {
+            xdataApp = m_data.value;
+
+            break;
+        }
+
+        case 1071: {
+            if (xdataApp != layerTransparencyApp) {
+                break;
+            }
+
+            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
+            if (maybeTransparency.has_value()) {
+                layer.transparency = decodeLayerTransparency(*maybeTransparency);
             } else {
                 return parseError();
             }
@@ -802,6 +826,17 @@ std::expected<void, Error> Reader::readLine()
             break;
         }
 
+        case 440: {
+            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
+            if (maybeTransparency.has_value()) {
+                line.transparency = decodeEntityTransparency(*maybeTransparency);
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
@@ -923,6 +958,17 @@ std::expected<void, Error> Reader::readCircle()
             break;
         }
 
+        case 440: {
+            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
+            if (maybeTransparency.has_value()) {
+                circle.transparency = decodeEntityTransparency(*maybeTransparency);
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
         case 10: {
             const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
             if (maybeX.has_value()) {
@@ -1026,6 +1072,17 @@ std::expected<void, Error> Reader::readArc()
             const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
             if (maybeScale.has_value()) {
                 arc.lineTypeScale = *maybeScale;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 440: {
+            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
+            if (maybeTransparency.has_value()) {
+                arc.transparency = decodeEntityTransparency(*maybeTransparency);
             } else {
                 return parseError();
             }
@@ -1155,6 +1212,17 @@ std::expected<void, Error> Reader::readLWPolyline()
             const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
             if (maybeScale.has_value()) {
                 lwPolyline.lineTypeScale = *maybeScale;
+            } else {
+                return parseError();
+            }
+
+            break;
+        }
+
+        case 440: {
+            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
+            if (maybeTransparency.has_value()) {
+                lwPolyline.transparency = decodeEntityTransparency(*maybeTransparency);
             } else {
                 return parseError();
             }

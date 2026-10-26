@@ -10,6 +10,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <filesystem>
 #include <format>
 #include <fstream>
@@ -61,4 +62,44 @@ TEST(write, example)
     const odxf::Document& readDocument{ istream.document() };
 
     EXPECT_THAT(readDocument, IsDocument(document));
+}
+
+TEST(write, layerTransparencyRegistersApp)
+{
+    // Arrange
+    odxf::Document document;
+    document.tables.layers.push_back(
+        odxf::Layer{ .name = "0", .transparency = odxf::Transparency{ .alpha = 0x4C } });
+
+    const std::filesystem::path filePath{ "test_appid.dxf" };
+    std::filesystem::remove(filePath);
+    ASSERT_FALSE(std::filesystem::exists(filePath));
+
+    // Act
+    odxf::writeDxf(document, filePath);
+
+    // Assert
+    const std::vector<std::string> fileContent{ readFile(filePath) };
+    const std::vector<std::string> appIdRecord{ "0", "APPID", "2", "AcCmTransparency" };
+
+    EXPECT_FALSE(std::ranges::search(fileContent, appIdRecord).empty());
+}
+
+TEST(write, noAppIdsWithoutLayerTransparency)
+{
+    // Arrange
+    odxf::Document document;
+    document.tables.layers.push_back(odxf::Layer{ .name = "0" });
+
+    const std::filesystem::path filePath{ "test_no_appid.dxf" };
+    std::filesystem::remove(filePath);
+    ASSERT_FALSE(std::filesystem::exists(filePath));
+
+    // Act
+    odxf::writeDxf(document, filePath);
+
+    // Assert
+    const std::vector<std::string> fileContent{ readFile(filePath) };
+
+    EXPECT_THAT(fileContent, testing::Not(testing::Contains("APPID")));
 }
