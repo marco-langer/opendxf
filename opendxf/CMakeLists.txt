@@ -6,6 +6,7 @@ add_library(opendxf STATIC
     include/opendxf/header.hpp
     include/opendxf/headervariables.hpp
     include/opendxf/ireadstream.hpp
+    include/opendxf/layer.hpp
     include/opendxf/opendxf.hpp
     include/opendxf/properties.hpp
     include/opendxf/read.hpp
