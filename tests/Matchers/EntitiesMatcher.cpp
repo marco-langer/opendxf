@@ -30,6 +30,7 @@ AreVertices(const odxf::Vertices& expected, double maxError)
 testing::Matcher<odxf::LWPolyline> IsLWPolyline(const odxf::LWPolyline& expected, double maxError)
 {
     return testing::AllOf(
+        testing::Field("layer", &odxf::Entity::layer, expected.layer),
         testing::Field("color", &odxf::Entity::color, expected.color),
         testing::Field("trueColor", &odxf::Entity::trueColor, expected.trueColor),
         testing::Field("lineweight", &odxf::Entity::lineweight, expected.lineweight),

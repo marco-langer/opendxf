@@ -1104,6 +1104,12 @@ std::expected<void, Error> Reader::readLWPolyline()
 
     while (m_data.groupCode != 0) {
         switch (m_data.groupCode) {
+        case 8: {
+            lwPolyline.layer = m_data.value;
+
+            break;
+        }
+
         case 62: {
             if (!parseInto(lwPolyline.color)) {
                 return makeError();
