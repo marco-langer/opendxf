@@ -101,6 +101,10 @@ ctest --preset debug
 
 Replace `debug` with `release` for an optimized build.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). The reasons behind the library's design are recorded in [docs/adr](docs/adr).
+
 ## License
 
 opendxf is licensed under the [MIT License](LICENSE).
