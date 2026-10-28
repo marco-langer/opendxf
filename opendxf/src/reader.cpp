@@ -24,7 +24,7 @@ std::optional<T> parseAs(const std::string& value)
     }
 
     T result;
-    const auto [_, errorCode]{ std::from_chars(first, first + value.size(), result) };
+    const auto [_, errorCode]{ std::from_chars(first, value.c_str() + value.size(), result) };
 
     return errorCode == std::errc() ? result : std::optional<T>{};
 }
@@ -1350,7 +1350,7 @@ bool Reader::readNextSingle()
         }
     }
     const auto [_, errorCode]{ std::from_chars(
-        first, first + m_data.value.size(), m_data.groupCode) };
+        first, m_data.value.c_str() + m_data.value.size(), m_data.groupCode) };
     if (errorCode != std::errc()) {
         m_error = Error{
             .lineNumber = m_currentLine,
