@@ -33,6 +33,31 @@ std::optional<T> parseAs(const std::string& value)
 
 namespace odxf {
 
+template <typename T>
+bool Reader::parseInto(T& target)
+{
+    const std::optional<T> maybeValue{ parseAs<T>(m_data.value) };
+    if (!maybeValue) {
+        m_error = parseError().error();
+        return false;
+    }
+
+    target = *maybeValue;
+    return true;
+}
+
+template <typename T>
+bool Reader::parseInto(std::optional<T>& target)
+{
+    T value;
+    if (!parseInto(value)) {
+        return false;
+    }
+
+    target = value;
+    return true;
+}
+
 Reader::Reader(IReadStream& stream)
     : m_stream{ stream }
 {
@@ -402,31 +427,25 @@ std::expected<std::variant<Coordinate2d, Coordinate3d>, Error> Reader::readHeade
     while (m_data.groupCode == 10 || m_data.groupCode == 20 || m_data.groupCode == 30) {
         switch (m_data.groupCode) {
         case 10: {
-            const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
-            if (!maybeX) {
-                return parseError();
+            if (!parseInto(x)) {
+                return std::unexpected(m_error.value());
             }
-            x = *maybeX;
 
             break;
         }
 
         case 20: {
-            const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
-            if (!maybeY) {
-                return parseError();
+            if (!parseInto(y)) {
+                return std::unexpected(m_error.value());
             }
-            y = *maybeY;
 
             break;
         }
 
         case 30: {
-            const std::optional<double> maybeZ{ parseAs<double>(m_data.value) };
-            if (!maybeZ) {
-                return parseError();
+            if (!parseInto(z)) {
+                return std::unexpected(m_error.value());
             }
-            z = *maybeZ;
 
             break;
         }
@@ -519,11 +538,8 @@ std::expected<void, Error> Reader::readLineType()
         }
 
         case 70: {
-            const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
-            if (maybeFlags.has_value()) {
-                lineType.flags = *maybeFlags;
-            } else {
-                return parseError();
+            if (!parseInto(lineType.flags)) {
+                return makeError();
             }
 
             break;
@@ -580,33 +596,24 @@ std::expected<void, Error> Reader::readLayer()
         }
 
         case 62: {
-            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
-            if (maybeColor.has_value()) {
-                layer.color = *maybeColor;
-            } else {
-                return parseError();
+            if (!parseInto(layer.color)) {
+                return makeError();
             }
 
             break;
         }
 
         case 420: {
-            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
-            if (maybeTrueColor.has_value()) {
-                layer.trueColor = *maybeTrueColor;
-            } else {
-                return parseError();
+            if (!parseInto(layer.trueColor)) {
+                return makeError();
             }
 
             break;
         }
 
         case 370: {
-            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
-            if (maybeLineweight.has_value()) {
-                layer.lineweight = *maybeLineweight;
-            } else {
-                return parseError();
+            if (!parseInto(layer.lineweight)) {
+                return makeError();
             }
 
             break;
@@ -760,564 +767,167 @@ std::expected<void, Error> Reader::readEntities()
     return {};
 }
 
-std::expected<void, Error> Reader::readLine()
+template <std::derived_from<Entity> E, std::predicate<E&> F>
+std::expected<E, Error> Reader::readEntity(F readGroupCode)
 {
     if (!readNext()) {
         return std::unexpected(m_error.value());
     }
 
-    Line line;
-
+    E entity;
     while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
-        case 8: {
-            line.layer = m_data.value;
-
-            break;
-        }
-
-        case 62: {
-            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
-            if (maybeColor.has_value()) {
-                line.color = *maybeColor;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 420: {
-            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
-            if (maybeTrueColor.has_value()) {
-                line.trueColor = *maybeTrueColor;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 370: {
-            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
-            if (maybeLineweight.has_value()) {
-                line.lineweight = *maybeLineweight;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 6: {
-            line.lineType = m_data.value;
-
-            break;
-        }
-
-        case 48: {
-            const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
-            if (maybeScale.has_value()) {
-                line.lineTypeScale = *maybeScale;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 440: {
-            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
-            if (maybeTransparency.has_value()) {
-                line.transparency = decodeEntityTransparency(*maybeTransparency);
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 10: {
-            const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
-            if (maybeX.has_value()) {
-                line.start.x = *maybeX;
-            } else {
-                return parseError();
-            }
-
-            break;
-        };
-
-        case 20: {
-            const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
-            if (maybeY.has_value()) {
-                line.start.y = *maybeY;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 11: {
-            const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
-            if (maybeX.has_value()) {
-                line.end.x = *maybeX;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 21: {
-            const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
-            if (maybeY.has_value()) {
-                line.end.y = *maybeY;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-        }
-
-        if (!readNext()) {
+        if (!readGroupCode(entity) || !readNext()) {
             return std::unexpected(m_error.value());
         }
     }
 
-    m_stream.line(line);
+    return entity;
+}
 
-    return {};
+bool Reader::readEntityProperty(Entity& entity)
+{
+    switch (m_data.groupCode) {
+    case 8: entity.layer = m_data.value; return true;
+
+    case 62: return parseInto(entity.color);
+
+    case 420: return parseInto(entity.trueColor);
+
+    case 370: return parseInto(entity.lineweight);
+
+    case 6: entity.lineType = m_data.value; return true;
+
+    case 48: return parseInto(entity.lineTypeScale);
+
+    case 440: {
+        int transparency{ 0 };
+        if (!parseInto(transparency)) {
+            return false;
+        }
+        entity.transparency = decodeEntityTransparency(transparency);
+        return true;
+    }
+
+    default:
+        // unknown group codes are skipped
+        return true;
+    }
+}
+
+std::expected<void, Error> Reader::readLine()
+{
+    return readEntity<Line>([this](Line& line) -> bool {
+               switch (m_data.groupCode) {
+               case 10: return parseInto(line.start.x);
+               case 20: return parseInto(line.start.y);
+               case 11: return parseInto(line.end.x);
+               case 21: return parseInto(line.end.y);
+               default: return readEntityProperty(line);
+               }
+           })
+        .transform([this](const Line& line) { m_stream.line(line); });
 }
 
 std::expected<void, Error> Reader::readCircle()
 {
-    if (!readNext()) {
-        return std::unexpected(m_error.value());
-    }
-
-    Circle circle;
-
-    while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
-        case 8: {
-            circle.layer = m_data.value;
-
-            break;
-        }
-
-        case 62: {
-            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
-            if (maybeColor.has_value()) {
-                circle.color = *maybeColor;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 420: {
-            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
-            if (maybeTrueColor.has_value()) {
-                circle.trueColor = *maybeTrueColor;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 370: {
-            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
-            if (maybeLineweight.has_value()) {
-                circle.lineweight = *maybeLineweight;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 6: {
-            circle.lineType = m_data.value;
-
-            break;
-        }
-
-        case 48: {
-            const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
-            if (maybeScale.has_value()) {
-                circle.lineTypeScale = *maybeScale;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 440: {
-            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
-            if (maybeTransparency.has_value()) {
-                circle.transparency = decodeEntityTransparency(*maybeTransparency);
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 10: {
-            const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
-            if (maybeX.has_value()) {
-                circle.center.x = *maybeX;
-            } else {
-                return parseError();
-            }
-
-            break;
-        };
-
-        case 20: {
-            const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
-            if (maybeY.has_value()) {
-                circle.center.y = *maybeY;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 40: {
-            const std::optional<double> maybeRadius{ parseAs<double>(m_data.value) };
-            if (maybeRadius.has_value()) {
-                circle.radius = *maybeRadius;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-        }
-
-        if (!readNext()) {
-            return std::unexpected(m_error.value());
-        }
-    }
-
-    m_stream.circle(circle);
-
-    return std::expected<void, Error>();
+    return readEntity<Circle>([this](Circle& circle) -> bool {
+               switch (m_data.groupCode) {
+               case 10: return parseInto(circle.center.x);
+               case 20: return parseInto(circle.center.y);
+               case 40: return parseInto(circle.radius);
+               default: return readEntityProperty(circle);
+               }
+           })
+        .transform([this](const Circle& circle) { m_stream.circle(circle); });
 }
 
 std::expected<void, Error> Reader::readArc()
 {
-    if (!readNext()) {
-        return std::unexpected(m_error.value());
-    }
-
-    Arc arc;
-
-    while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
-        case 8: {
-            arc.layer = m_data.value;
-
-            break;
-        }
-
-        case 62: {
-            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
-            if (maybeColor.has_value()) {
-                arc.color = *maybeColor;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 420: {
-            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
-            if (maybeTrueColor.has_value()) {
-                arc.trueColor = *maybeTrueColor;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 370: {
-            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
-            if (maybeLineweight.has_value()) {
-                arc.lineweight = *maybeLineweight;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 6: {
-            arc.lineType = m_data.value;
-
-            break;
-        }
-
-        case 48: {
-            const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
-            if (maybeScale.has_value()) {
-                arc.lineTypeScale = *maybeScale;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 440: {
-            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
-            if (maybeTransparency.has_value()) {
-                arc.transparency = decodeEntityTransparency(*maybeTransparency);
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 10: {
-            const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
-            if (maybeX.has_value()) {
-                arc.center.x = *maybeX;
-            } else {
-                return parseError();
-            }
-
-            break;
-        };
-
-        case 20: {
-            const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
-            if (maybeY.has_value()) {
-                arc.center.y = *maybeY;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 40: {
-            const std::optional<double> maybeRadius{ parseAs<double>(m_data.value) };
-            if (maybeRadius.has_value()) {
-                arc.radius = *maybeRadius;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 50: {
-            const std::optional<double> maybeStartAngle{ parseAs<double>(m_data.value) };
-            if (maybeStartAngle.has_value()) {
-                arc.startAngle = *maybeStartAngle;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 51: {
-            const std::optional<double> maybeEndAngle{ parseAs<double>(m_data.value) };
-            if (maybeEndAngle.has_value()) {
-                arc.endAngle = *maybeEndAngle;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-        }
-
-        if (!readNext()) {
-            return std::unexpected(m_error.value());
-        }
-    }
-
-    m_stream.arc(arc);
-
-    return std::expected<void, Error>();
+    return readEntity<Arc>([this](Arc& arc) -> bool {
+               switch (m_data.groupCode) {
+               case 10: return parseInto(arc.center.x);
+               case 20: return parseInto(arc.center.y);
+               case 40: return parseInto(arc.radius);
+               case 50: return parseInto(arc.startAngle);
+               case 51: return parseInto(arc.endAngle);
+               default: return readEntityProperty(arc);
+               }
+           })
+        .transform([this](const Arc& arc) { m_stream.arc(arc); });
 }
 
 std::expected<void, Error> Reader::readLWPolyline()
 {
-    if (!readNext()) {
-        return std::unexpected(m_error.value());
-    }
-
-    LWPolyline lwPolyline;
-
     Vertex vertex;
     int numXY{ 0 };
 
-    while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
-        case 62: {
-            const std::optional<int> maybeColor{ parseAs<int>(m_data.value) };
-            if (maybeColor.has_value()) {
-                lwPolyline.color = *maybeColor;
-            } else {
-                return parseError();
-            }
-
-            break;
+    // A vertex is complete once it has x and y. Its bulge, if any, follows directly.
+    const auto pushCompleteVertex = [&](LWPolyline& lwPolyline) {
+        if (numXY == 2) {
+            lwPolyline.vertices.push_back(vertex);
+            numXY = 0;
+            vertex.bulge.reset();
         }
+    };
 
-        case 420: {
-            const std::optional<int> maybeTrueColor{ parseAs<int>(m_data.value) };
-            if (maybeTrueColor.has_value()) {
-                lwPolyline.trueColor = *maybeTrueColor;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 370: {
-            const std::optional<int> maybeLineweight{ parseAs<int>(m_data.value) };
-            if (maybeLineweight.has_value()) {
-                lwPolyline.lineweight = *maybeLineweight;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 6: {
-            lwPolyline.lineType = m_data.value;
-
-            break;
-        }
-
-        case 48: {
-            const std::optional<double> maybeScale{ parseAs<double>(m_data.value) };
-            if (maybeScale.has_value()) {
-                lwPolyline.lineTypeScale = *maybeScale;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 440: {
-            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
-            if (maybeTransparency.has_value()) {
-                lwPolyline.transparency = decodeEntityTransparency(*maybeTransparency);
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 90: {
-            const std::optional<int> maybeVerticesCount{ parseAs<int>(m_data.value) };
-            if (maybeVerticesCount.has_value()) {
-                if (*maybeVerticesCount >= 0) {
-                    lwPolyline.vertices.reserve(static_cast<std::size_t>(*maybeVerticesCount));
+    std::expected<LWPolyline, Error> maybeLWPolyline{ readEntity<LWPolyline>(
+        [&](LWPolyline& lwPolyline) -> bool {
+            switch (m_data.groupCode) {
+            case 90: {
+                int verticesCount{ 0 };
+                if (!parseInto(verticesCount)) {
+                    return false;
                 }
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 70: {
-            const std::optional<int> maybeFlag{ parseAs<int>(m_data.value) };
-            if (maybeFlag.has_value()) {
-                lwPolyline.isClosed = (*maybeFlag & 1 != 0);
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 10: {
-            const std::optional<double> maybeX{ parseAs<double>(m_data.value) };
-            if (numXY == 2) {
-                lwPolyline.vertices.push_back(vertex);
-                numXY = 0;
-                vertex.bulge.reset();
-            }
-            if (maybeX.has_value()) {
-                vertex.position.x = *maybeX;
-                numXY++;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 20: {
-            const std::optional<double> maybeY{ parseAs<double>(m_data.value) };
-            if (numXY == 2) {
-                lwPolyline.vertices.push_back(vertex);
-                numXY = 0;
-                vertex.bulge.reset();
-            }
-            if (maybeY.has_value()) {
-                vertex.position.y = *maybeY;
-                numXY++;
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 42: {
-            const std::optional<double> maybeBulge{ parseAs<double>(m_data.value) };
-            if (maybeBulge.has_value()) {
-                vertex.bulge = *maybeBulge;
-
-                if (numXY == 2) {
-                    lwPolyline.vertices.push_back(vertex);
-                    numXY = 0;
-                    vertex.bulge.reset();
+                if (verticesCount >= 0) {
+                    lwPolyline.vertices.reserve(static_cast<std::size_t>(verticesCount));
                 }
-            } else {
-                return parseError();
+                return true;
             }
 
-            break;
-        }
-        }
+            case 70: {
+                int flags{ 0 };
+                if (!parseInto(flags)) {
+                    return false;
+                }
+                lwPolyline.isClosed = (flags & 1) != 0;
+                return true;
+            }
 
-        if (!readNext()) {
-            return std::unexpected(m_error.value());
-        }
+            case 10:
+                pushCompleteVertex(lwPolyline);
+                if (!parseInto(vertex.position.x)) {
+                    return false;
+                }
+                numXY++;
+                return true;
+
+            case 20:
+                pushCompleteVertex(lwPolyline);
+                if (!parseInto(vertex.position.y)) {
+                    return false;
+                }
+                numXY++;
+                return true;
+
+            case 42:
+                if (!parseInto(vertex.bulge)) {
+                    return false;
+                }
+                pushCompleteVertex(lwPolyline);
+                return true;
+
+            default: return readEntityProperty(lwPolyline);
+            }
+        }) };
+
+    if (!maybeLWPolyline) {
+        return std::unexpected(maybeLWPolyline.error());
     }
 
-    if (numXY == 2) {
-        lwPolyline.vertices.push_back(vertex);
-    }
+    pushCompleteVertex(*maybeLWPolyline);
+    m_stream.lwPolyline(*maybeLWPolyline);
 
-    m_stream.lwPolyline(lwPolyline);
-
-    return std::expected<void, Error>();
+    return {};
 }
 
 bool Reader::readNext()

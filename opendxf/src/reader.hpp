@@ -8,6 +8,7 @@
 #include "opendxf/error.hpp"
 #include "opendxf/header.hpp"
 
+#include <concepts>
 #include <expected>
 #include <filesystem>
 #include <fstream>
@@ -51,8 +52,21 @@ private:
     std::expected<void, Error> readArc();
     std::expected<void, Error> readLWPolyline();
 
+    // Reads the group codes of one entity up to the next group code 0. readGroupCode is called for
+    // each group code and returns false on an error.
+    template <std::derived_from<Entity> E, std::predicate<E&> F>
+    std::expected<E, Error> readEntity(F readGroupCode);
+    // Reads the group codes all entities share, skips unknown ones. Returns false on an error.
+    bool readEntityProperty(Entity& entity);
+
     bool readNext();
     bool readNextSingle();
+
+    // parse the current value into target, on failure sets the error and returns false
+    template <typename T>
+    bool parseInto(T& target);
+    template <typename T>
+    bool parseInto(std::optional<T>& target);
 
     bool hasError() const;
     std::expected<void, Error> makeError() const;
