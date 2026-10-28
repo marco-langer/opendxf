@@ -1,5 +1,7 @@
 # Contributing
 
+Code conventions are in [docs/code-style.md](docs/code-style.md), test conventions in [docs/tests.md](docs/tests.md), and design decisions in [docs/adr](docs/adr).
+
 ## Definition of done
 
 A change is done when:
