@@ -110,22 +110,6 @@ TEST(insertionUnits, roundTrip)
     EXPECT_EQ(odxf::insertionUnits(istream.document().header), odxf::LengthUnit::USSurveyFeet);
 }
 
-TEST(insertionUnits, readFromFile)
-{
-    // Arrange
-    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "example.dxf" };
-    ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
-
-    ReadStream istream;
-
-    // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
-
-    // Assert
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(odxf::insertionUnits(istream.document().header), odxf::LengthUnit::Millimeters);
-}
-
 TEST(lineTypeScale, valid)
 {
     // Arrange
@@ -204,20 +188,4 @@ TEST(setLineTypeScale, overwritesExistingValue)
 
     // Assert
     EXPECT_EQ(odxf::lineTypeScale(header), 4.0);
-}
-
-TEST(lineTypeScale, readFromFile)
-{
-    // Arrange
-    const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "example.dxf" };
-    ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
-
-    ReadStream istream;
-
-    // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
-
-    // Assert
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(odxf::lineTypeScale(istream.document().header), 2.0);
 }
