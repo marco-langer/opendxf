@@ -767,7 +767,7 @@ std::expected<void, Error> Reader::readEntities()
     return {};
 }
 
-template <typename E, std::predicate<E&> F>
+template <std::derived_from<Entity> E, std::predicate<E&> F>
 std::expected<E, Error> Reader::readEntity(F readGroupCode)
 {
     if (!readNext()) {
