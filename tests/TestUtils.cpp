@@ -214,5 +214,17 @@ odxf::Document createExampleDocument()
     lwPolylines[0].lineType = "GAS";
     lwPolylines[1].lineType = "BYLAYER";
 
+    // layers[0] has a BYBLOCK transparency, which layers can't have, and stays opaque. layers[3]
+    // only has xdata of another application with a 1071.
+    layers[1].transparency = Transparency{ .alpha = 0x4C };
+    layers[2].transparency = Transparency{ .alpha = 0xFF };
+
+    // lines[0] and lwPolylines[2] have no group code 440 and keep the default. lwPolylines[1] has
+    // a 440 without the flag of a set value, which counts as BYLAYER.
+    lines[1].transparency = Transparency{ .alpha = 0x7F };
+    circles[0].transparency = ByBlock{};
+    arcs[0].transparency = Transparency{ .alpha = 0x00 };
+    lwPolylines[0].transparency = Transparency{ .alpha = 0xFF };
+
     return expectedDocument;
 }

@@ -3,6 +3,9 @@
 
 #include "opendxf/write.hpp"
 
+#include "transparency.hpp"
+
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iomanip>
@@ -136,6 +139,16 @@ void writeTrueColor(std::ofstream& stream, const std::optional<int>& maybeTrueCo
     }
 }
 
+// BYLAYER is written as no group code 440.
+void writeTransparency(std::ofstream& stream, const odxf::EntityTransparency& transparency)
+{
+    if (std::holds_alternative<odxf::ByBlock>(transparency)) {
+        stream << "\n440\n" << odxf::byBlockTransparencyValue;
+    } else if (const auto* byValue{ std::get_if<odxf::Transparency>(&transparency) }) {
+        stream << "\n440\n" << odxf::encodeTransparency(*byValue);
+    }
+}
+
 void writeLayer(std::ofstream& stream, const odxf::Layer& layer)
 {
     stream << "\n0\nLAYER";
@@ -145,6 +158,11 @@ void writeLayer(std::ofstream& stream, const odxf::Layer& layer)
     writeTrueColor(stream, layer.trueColor);
     stream << "\n6\n" << layer.lineType;
     stream << "\n370\n" << layer.lineweight;
+    // xdata comes last in a record
+    if (layer.transparency) {
+        stream << "\n1001\n" << odxf::layerTransparencyApp;
+        stream << "\n1071\n" << odxf::encodeTransparency(*layer.transparency);
+    }
 }
 
 void writeLayers(std::ofstream& stream, const std::vector<odxf::Layer>& layers)
@@ -158,12 +176,31 @@ void writeLayers(std::ofstream& stream, const std::vector<odxf::Layer>& layers)
     stream << "\n0\nENDTAB";
 }
 
+// Every application that owns xdata in the file needs an entry in the APPID table.
+void writeAppIds(std::ofstream& stream, const std::vector<odxf::Layer>& layers)
+{
+    const bool hasLayerTransparency{ std::ranges::any_of(
+        layers, [](const odxf::Layer& layer) { return layer.transparency.has_value(); }) };
+    if (!hasLayerTransparency) {
+        return;
+    }
+
+    stream << "\n0\nTABLE";
+    stream << "\n2\nAPPID";
+    stream << "\n70\n1";
+    stream << "\n0\nAPPID";
+    stream << "\n2\n" << odxf::layerTransparencyApp;
+    stream << "\n70\n0";
+    stream << "\n0\nENDTAB";
+}
+
 void writeTables(std::ofstream& stream, const odxf::Tables& tables)
 {
     stream << "\n0\nSECTION";
     stream << "\n2\nTABLES";
     writeLineTypes(stream, tables.lineTypes);
     writeLayers(stream, tables.layers);
+    writeAppIds(stream, tables.layers);
     stream << "\n0\nENDSEC";
 }
 
@@ -207,6 +244,7 @@ void writePoint(std::ofstream& stream, const odxf::Point& point)
     stream << "\n370\n" << point.lineweight;
     stream << "\n48\n" << point.lineTypeScale;
     writeTrueColor(stream, point.trueColor);
+    writeTransparency(stream, point.transparency);
     writeThickness(stream, point.thickness);
     stream << "\n10\n" << std::to_string(point.coordinate.x);
     stream << "\n20\n" << std::to_string(point.coordinate.y);
@@ -224,6 +262,7 @@ void writeRay(std::ofstream& stream, const odxf::Ray& ray)
     stream << "\n370\n" << ray.lineweight;
     stream << "\n48\n" << ray.lineTypeScale;
     writeTrueColor(stream, ray.trueColor);
+    writeTransparency(stream, ray.transparency);
     stream << "\n10\n" << std::to_string(ray.startPoint.x);
     stream << "\n20\n" << std::to_string(ray.startPoint.y);
     stream << "\n30\n" << std::to_string(ray.startPoint.z);
@@ -241,6 +280,7 @@ void writeLine(std::ofstream& stream, const odxf::Line& line)
     stream << "\n370\n" << line.lineweight;
     stream << "\n48\n" << line.lineTypeScale;
     writeTrueColor(stream, line.trueColor);
+    writeTransparency(stream, line.transparency);
     writeThickness(stream, line.thickness);
     stream << "\n10\n" << std::to_string(line.start.x);
     stream << "\n20\n" << std::to_string(line.start.y);
@@ -260,6 +300,7 @@ void writeCircle(std::ofstream& stream, const odxf::Circle& circle)
     stream << "\n370\n" << circle.lineweight;
     stream << "\n48\n" << circle.lineTypeScale;
     writeTrueColor(stream, circle.trueColor);
+    writeTransparency(stream, circle.transparency);
     writeThickness(stream, circle.thickness);
     stream << "\n10\n" << std::to_string(circle.center.x);
     stream << "\n20\n" << std::to_string(circle.center.y);
@@ -277,6 +318,7 @@ void writeArc(std::ofstream& stream, const odxf::Arc& arc)
     stream << "\n370\n" << arc.lineweight;
     stream << "\n48\n" << arc.lineTypeScale;
     writeTrueColor(stream, arc.trueColor);
+    writeTransparency(stream, arc.transparency);
     writeThickness(stream, arc.thickness);
     stream << "\n10\n" << std::to_string(arc.center.x);
     stream << "\n20\n" << std::to_string(arc.center.y);
@@ -297,6 +339,7 @@ void writeEllipse(std::ofstream& stream, const odxf::Ellipse& ellipse)
     stream << "\n370\n" << ellipse.lineweight;
     stream << "\n48\n" << ellipse.lineTypeScale;
     writeTrueColor(stream, ellipse.trueColor);
+    writeTransparency(stream, ellipse.transparency);
     stream << "\n10\n" << std::to_string(ellipse.center.x);
     stream << "\n20\n" << std::to_string(ellipse.center.y);
     stream << "\n30\n" << std::to_string(ellipse.center.z);
@@ -318,6 +361,7 @@ void writeLWPolyline(std::ofstream& stream, const odxf::LWPolyline& lwPolyline)
     stream << "\n370\n" << lwPolyline.lineweight;
     stream << "\n48\n" << lwPolyline.lineTypeScale;
     writeTrueColor(stream, lwPolyline.trueColor);
+    writeTransparency(stream, lwPolyline.transparency);
     stream << "\n90\n" << lwPolyline.vertices.size();
     stream << "\n70\n" << lwPolyline.isClosed ? 1 : 0;
 

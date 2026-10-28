@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opendxf/coordinate.hpp"
+#include "opendxf/properties.hpp"
 
 #include <numbers>
 #include <optional>
@@ -29,6 +30,7 @@ struct Entity
     // The name of an entry in the LTYPE table, or BYLAYER or BYBLOCK.
     std::string lineType{ "BYLAYER" };
     double lineTypeScale{ 1.0 };
+    EntityTransparency transparency{ ByLayer{} };
 };
 
 struct Point final : Entity
