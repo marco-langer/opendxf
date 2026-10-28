@@ -54,6 +54,12 @@ private:
     bool readNext();
     bool readNextSingle();
 
+    // parse the current value into target, on failure sets the error and returns false
+    template <typename T>
+    bool parseInto(T& target);
+    template <typename T>
+    bool parseInto(std::optional<T>& target);
+
     bool hasError() const;
     std::expected<void, Error> makeError() const;
     // an Error at the current line, without a description
