@@ -1175,7 +1175,7 @@ std::expected<void, Error> Reader::readLWPolyline()
         case 70: {
             const std::optional<int> maybeFlag{ parseAs<int>(m_data.value) };
             if (maybeFlag.has_value()) {
-                lwPolyline.isClosed = (*maybeFlag & 1 != 0);
+                lwPolyline.isClosed = (*maybeFlag & 1) != 0;
             } else {
                 return parseError();
             }
