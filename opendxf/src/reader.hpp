@@ -8,6 +8,7 @@
 #include "opendxf/error.hpp"
 #include "opendxf/header.hpp"
 
+#include <concepts>
 #include <expected>
 #include <filesystem>
 #include <fstream>
@@ -53,7 +54,7 @@ private:
 
     // Reads the group codes of one entity up to the next group code 0. readGroupCode is called for
     // each group code and returns false on an error.
-    template <typename E, typename F>
+    template <typename E, std::predicate<E&> F>
     std::expected<E, Error> readEntity(F readGroupCode);
     // Reads the group codes all entities share, skips unknown ones. Returns false on an error.
     bool readEntityProperty(Entity& entity);
