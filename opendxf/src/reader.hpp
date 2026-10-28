@@ -51,6 +51,13 @@ private:
     std::expected<void, Error> readArc();
     std::expected<void, Error> readLWPolyline();
 
+    // Reads the group codes of one entity up to the next group code 0. readGroupCode is called for
+    // each group code and returns false on an error.
+    template <typename E, typename F>
+    std::expected<E, Error> readEntity(F readGroupCode);
+    // Reads the group codes all entities share, skips unknown ones. Returns false on an error.
+    bool readEntityProperty(Entity& entity);
+
     bool readNext();
     bool readNextSingle();
 

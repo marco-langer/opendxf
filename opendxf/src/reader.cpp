@@ -767,477 +767,167 @@ std::expected<void, Error> Reader::readEntities()
     return {};
 }
 
-std::expected<void, Error> Reader::readLine()
+template <typename E, typename F>
+std::expected<E, Error> Reader::readEntity(F readGroupCode)
 {
     if (!readNext()) {
         return std::unexpected(m_error.value());
     }
 
-    Line line;
-
+    E entity;
     while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
-        case 8: {
-            line.layer = m_data.value;
-
-            break;
-        }
-
-        case 62: {
-            if (!parseInto(line.color)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 420: {
-            if (!parseInto(line.trueColor)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 370: {
-            if (!parseInto(line.lineweight)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 6: {
-            line.lineType = m_data.value;
-
-            break;
-        }
-
-        case 48: {
-            if (!parseInto(line.lineTypeScale)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 440: {
-            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
-            if (maybeTransparency.has_value()) {
-                line.transparency = decodeEntityTransparency(*maybeTransparency);
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 10: {
-            if (!parseInto(line.start.x)) {
-                return makeError();
-            }
-
-            break;
-        };
-
-        case 20: {
-            if (!parseInto(line.start.y)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 11: {
-            if (!parseInto(line.end.x)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 21: {
-            if (!parseInto(line.end.y)) {
-                return makeError();
-            }
-
-            break;
-        }
-        }
-
-        if (!readNext()) {
+        if (!readGroupCode(entity) || !readNext()) {
             return std::unexpected(m_error.value());
         }
     }
 
-    m_stream.line(line);
+    return entity;
+}
 
-    return {};
+bool Reader::readEntityProperty(Entity& entity)
+{
+    switch (m_data.groupCode) {
+    case 8: entity.layer = m_data.value; return true;
+
+    case 62: return parseInto(entity.color);
+
+    case 420: return parseInto(entity.trueColor);
+
+    case 370: return parseInto(entity.lineweight);
+
+    case 6: entity.lineType = m_data.value; return true;
+
+    case 48: return parseInto(entity.lineTypeScale);
+
+    case 440: {
+        int transparency{ 0 };
+        if (!parseInto(transparency)) {
+            return false;
+        }
+        entity.transparency = decodeEntityTransparency(transparency);
+        return true;
+    }
+
+    default:
+        // unknown group codes are skipped
+        return true;
+    }
+}
+
+std::expected<void, Error> Reader::readLine()
+{
+    return readEntity<Line>([this](Line& line) -> bool {
+               switch (m_data.groupCode) {
+               case 10: return parseInto(line.start.x);
+               case 20: return parseInto(line.start.y);
+               case 11: return parseInto(line.end.x);
+               case 21: return parseInto(line.end.y);
+               default: return readEntityProperty(line);
+               }
+           })
+        .transform([this](const Line& line) { m_stream.line(line); });
 }
 
 std::expected<void, Error> Reader::readCircle()
 {
-    if (!readNext()) {
-        return std::unexpected(m_error.value());
-    }
-
-    Circle circle;
-
-    while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
-        case 8: {
-            circle.layer = m_data.value;
-
-            break;
-        }
-
-        case 62: {
-            if (!parseInto(circle.color)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 420: {
-            if (!parseInto(circle.trueColor)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 370: {
-            if (!parseInto(circle.lineweight)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 6: {
-            circle.lineType = m_data.value;
-
-            break;
-        }
-
-        case 48: {
-            if (!parseInto(circle.lineTypeScale)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 440: {
-            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
-            if (maybeTransparency.has_value()) {
-                circle.transparency = decodeEntityTransparency(*maybeTransparency);
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 10: {
-            if (!parseInto(circle.center.x)) {
-                return makeError();
-            }
-
-            break;
-        };
-
-        case 20: {
-            if (!parseInto(circle.center.y)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 40: {
-            if (!parseInto(circle.radius)) {
-                return makeError();
-            }
-
-            break;
-        }
-        }
-
-        if (!readNext()) {
-            return std::unexpected(m_error.value());
-        }
-    }
-
-    m_stream.circle(circle);
-
-    return std::expected<void, Error>();
+    return readEntity<Circle>([this](Circle& circle) -> bool {
+               switch (m_data.groupCode) {
+               case 10: return parseInto(circle.center.x);
+               case 20: return parseInto(circle.center.y);
+               case 40: return parseInto(circle.radius);
+               default: return readEntityProperty(circle);
+               }
+           })
+        .transform([this](const Circle& circle) { m_stream.circle(circle); });
 }
 
 std::expected<void, Error> Reader::readArc()
 {
-    if (!readNext()) {
-        return std::unexpected(m_error.value());
-    }
-
-    Arc arc;
-
-    while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
-        case 8: {
-            arc.layer = m_data.value;
-
-            break;
-        }
-
-        case 62: {
-            if (!parseInto(arc.color)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 420: {
-            if (!parseInto(arc.trueColor)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 370: {
-            if (!parseInto(arc.lineweight)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 6: {
-            arc.lineType = m_data.value;
-
-            break;
-        }
-
-        case 48: {
-            if (!parseInto(arc.lineTypeScale)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 440: {
-            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
-            if (maybeTransparency.has_value()) {
-                arc.transparency = decodeEntityTransparency(*maybeTransparency);
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 10: {
-            if (!parseInto(arc.center.x)) {
-                return makeError();
-            }
-
-            break;
-        };
-
-        case 20: {
-            if (!parseInto(arc.center.y)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 40: {
-            if (!parseInto(arc.radius)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 50: {
-            if (!parseInto(arc.startAngle)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 51: {
-            if (!parseInto(arc.endAngle)) {
-                return makeError();
-            }
-
-            break;
-        }
-        }
-
-        if (!readNext()) {
-            return std::unexpected(m_error.value());
-        }
-    }
-
-    m_stream.arc(arc);
-
-    return std::expected<void, Error>();
+    return readEntity<Arc>([this](Arc& arc) -> bool {
+               switch (m_data.groupCode) {
+               case 10: return parseInto(arc.center.x);
+               case 20: return parseInto(arc.center.y);
+               case 40: return parseInto(arc.radius);
+               case 50: return parseInto(arc.startAngle);
+               case 51: return parseInto(arc.endAngle);
+               default: return readEntityProperty(arc);
+               }
+           })
+        .transform([this](const Arc& arc) { m_stream.arc(arc); });
 }
 
 std::expected<void, Error> Reader::readLWPolyline()
 {
-    if (!readNext()) {
-        return std::unexpected(m_error.value());
-    }
-
-    LWPolyline lwPolyline;
-
     Vertex vertex;
     int numXY{ 0 };
 
-    while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
-        case 8: {
-            lwPolyline.layer = m_data.value;
-
-            break;
+    // A vertex is complete once it has x and y. Its bulge, if any, follows directly.
+    const auto pushCompleteVertex = [&](LWPolyline& lwPolyline) {
+        if (numXY == 2) {
+            lwPolyline.vertices.push_back(vertex);
+            numXY = 0;
+            vertex.bulge.reset();
         }
+    };
 
-        case 62: {
-            if (!parseInto(lwPolyline.color)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 420: {
-            if (!parseInto(lwPolyline.trueColor)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 370: {
-            if (!parseInto(lwPolyline.lineweight)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 6: {
-            lwPolyline.lineType = m_data.value;
-
-            break;
-        }
-
-        case 48: {
-            if (!parseInto(lwPolyline.lineTypeScale)) {
-                return makeError();
-            }
-
-            break;
-        }
-
-        case 440: {
-            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
-            if (maybeTransparency.has_value()) {
-                lwPolyline.transparency = decodeEntityTransparency(*maybeTransparency);
-            } else {
-                return parseError();
-            }
-
-            break;
-        }
-
-        case 90: {
-            const std::optional<int> maybeVerticesCount{ parseAs<int>(m_data.value) };
-            if (maybeVerticesCount.has_value()) {
-                if (*maybeVerticesCount >= 0) {
-                    lwPolyline.vertices.reserve(static_cast<std::size_t>(*maybeVerticesCount));
+    std::expected<LWPolyline, Error> maybeLWPolyline{ readEntity<LWPolyline>(
+        [&](LWPolyline& lwPolyline) -> bool {
+            switch (m_data.groupCode) {
+            case 90: {
+                int verticesCount{ 0 };
+                if (!parseInto(verticesCount)) {
+                    return false;
                 }
-            } else {
-                return parseError();
+                if (verticesCount >= 0) {
+                    lwPolyline.vertices.reserve(static_cast<std::size_t>(verticesCount));
+                }
+                return true;
             }
 
-            break;
-        }
-
-        case 70: {
-            const std::optional<int> maybeFlag{ parseAs<int>(m_data.value) };
-            if (maybeFlag.has_value()) {
-                lwPolyline.isClosed = (*maybeFlag & 1) != 0;
-            } else {
-                return parseError();
+            case 70: {
+                int flags{ 0 };
+                if (!parseInto(flags)) {
+                    return false;
+                }
+                lwPolyline.isClosed = (flags & 1) != 0;
+                return true;
             }
 
-            break;
-        }
+            case 10:
+                pushCompleteVertex(lwPolyline);
+                if (!parseInto(vertex.position.x)) {
+                    return false;
+                }
+                numXY++;
+                return true;
 
-        case 10: {
-            if (numXY == 2) {
-                lwPolyline.vertices.push_back(vertex);
-                numXY = 0;
-                vertex.bulge.reset();
+            case 20:
+                pushCompleteVertex(lwPolyline);
+                if (!parseInto(vertex.position.y)) {
+                    return false;
+                }
+                numXY++;
+                return true;
+
+            case 42:
+                if (!parseInto(vertex.bulge)) {
+                    return false;
+                }
+                pushCompleteVertex(lwPolyline);
+                return true;
+
+            default: return readEntityProperty(lwPolyline);
             }
-            if (!parseInto(vertex.position.x)) {
-                return makeError();
-            }
-            numXY++;
+        }) };
 
-            break;
-        }
-
-        case 20: {
-            if (numXY == 2) {
-                lwPolyline.vertices.push_back(vertex);
-                numXY = 0;
-                vertex.bulge.reset();
-            }
-            if (!parseInto(vertex.position.y)) {
-                return makeError();
-            }
-            numXY++;
-
-            break;
-        }
-
-        case 42: {
-            if (!parseInto(vertex.bulge)) {
-                return makeError();
-            }
-
-            if (numXY == 2) {
-                lwPolyline.vertices.push_back(vertex);
-                numXY = 0;
-                vertex.bulge.reset();
-            }
-
-            break;
-        }
-        }
-
-        if (!readNext()) {
-            return std::unexpected(m_error.value());
-        }
+    if (!maybeLWPolyline) {
+        return std::unexpected(maybeLWPolyline.error());
     }
 
-    if (numXY == 2) {
-        lwPolyline.vertices.push_back(vertex);
-    }
+    pushCompleteVertex(*maybeLWPolyline);
+    m_stream.lwPolyline(*maybeLWPolyline);
 
-    m_stream.lwPolyline(lwPolyline);
-
-    return std::expected<void, Error>();
+    return {};
 }
 
 bool Reader::readNext()
