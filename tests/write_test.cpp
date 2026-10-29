@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024 Marco Langer
 
-#include "opendxf/read.hpp"
-#include "opendxf/write.hpp"
+#include "opendxf/io/read.hpp"
+#include "opendxf/io/write.hpp"
 
 #include "Matchers/DocumentMatcher.hpp"
 #include "TestUtils.hpp"

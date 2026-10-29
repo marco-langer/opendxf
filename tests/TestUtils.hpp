@@ -6,7 +6,7 @@
 #include "opendxf/document.hpp"
 #include "opendxf/entities.hpp"
 #include "opendxf/header.hpp"
-#include "opendxf/ireadstream.hpp"
+#include "opendxf/io/ireadstream.hpp"
 #include "opendxf/layer.hpp"
 #include "opendxf/tables.hpp"
 

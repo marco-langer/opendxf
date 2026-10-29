@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opendxf/error.hpp"
+#include "opendxf/io/error.hpp"
 
 #include <expected>
 #include <filesystem>

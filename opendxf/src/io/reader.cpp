@@ -4,7 +4,7 @@
 #include "reader.hpp"
 #include "transparency.hpp"
 
-#include "opendxf/ireadstream.hpp"
+#include "opendxf/io/ireadstream.hpp"
 #include "opendxf/layer.hpp"
 #include "opendxf/tables.hpp"
 

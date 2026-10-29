@@ -5,8 +5,8 @@
 
 #include "opendxf/document.hpp"
 #include "opendxf/entities.hpp"
-#include "opendxf/error.hpp"
 #include "opendxf/header.hpp"
+#include "opendxf/io/error.hpp"
 #include "opendxf/tables.hpp"
 
 #include <expected>
