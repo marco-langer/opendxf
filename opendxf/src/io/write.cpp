@@ -243,7 +243,7 @@ void write_entity_properties(std::ofstream& stream, const odxf::entity_propertie
 
 void write_entity(std::ofstream& stream, const odxf::point& point)
 {
-    stream << "\n0\nLINE\n100\nAcDbPoint";
+    stream << "\n0\nPOINT\n100\nAcDbPoint";
     write_entity_properties(stream, point.properties);
     write_thickness(stream, point.thickness);
     stream << "\n10\n" << std::to_string(point.coordinate.x);
@@ -255,7 +255,7 @@ void write_entity(std::ofstream& stream, const odxf::point& point)
 
 void write_entity(std::ofstream& stream, const odxf::ray& ray)
 {
-    stream << "\n0\nLINE\n100\nAcDbRay";
+    stream << "\n0\nRAY\n100\nAcDbRay";
     write_entity_properties(stream, ray.properties);
     stream << "\n10\n" << std::to_string(ray.start_point.x);
     stream << "\n20\n" << std::to_string(ray.start_point.y);
@@ -308,7 +308,7 @@ void write_entity(std::ofstream& stream, const odxf::arc& arc)
 
 void write_entity(std::ofstream& stream, const odxf::ellipse& ellipse)
 {
-    stream << "\n0\nARC\n100\nAcDbEllipse";
+    stream << "\n0\nELLIPSE\n100\nAcDbEllipse";
     write_entity_properties(stream, ellipse.properties);
     stream << "\n10\n" << std::to_string(ellipse.center.x);
     stream << "\n20\n" << std::to_string(ellipse.center.y);
@@ -327,7 +327,7 @@ void write_entity(std::ofstream& stream, const odxf::lw_polyline& lw_polyline)
     stream << "\n0\nLWPOLYLINE\n100\nAcDbPolyline";
     write_entity_properties(stream, lw_polyline.properties);
     stream << "\n90\n" << lw_polyline.vertices.size();
-    stream << "\n70\n" << lw_polyline.is_closed ? 1 : 0;
+    stream << "\n70\n" << (lw_polyline.is_closed ? 1 : 0);
 
     for (const odxf::vertex& vertex : lw_polyline.vertices) {
         stream << "\n10\n" << std::to_string(vertex.position.x);

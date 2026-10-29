@@ -128,6 +128,56 @@ TEST(Write, NoAppIdsWithoutLayerTransparency)
     EXPECT_THAT(file_content, testing::Not(testing::Contains("APPID")));
 }
 
+struct entity_type_param final
+{
+    odxf::entity entity;
+    std::string type;
+    std::string subclass;
+};
+
+struct EntityTypeFixture : testing::TestWithParam<entity_type_param>
+{};
+
+TEST_P(EntityTypeFixture, EntityType)
+{
+    // Arrange
+    const auto& [entity, type, subclass]{ GetParam() };
+
+    odxf::document document;
+    document.entities = { entity };
+
+    const std::filesystem::path file_path{ std::format("test_entity_type_{}.dxf", type) };
+    std::filesystem::remove(file_path);
+    ASSERT_FALSE(std::filesystem::exists(file_path));
+
+    // Act
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+
+    // Assert
+    ASSERT_TRUE(write_result.has_value());
+    const std::vector<std::string> file_content{ read_file(file_path) };
+    const std::vector<std::string> entity_begin{ "0", type, "100", subclass };
+
+    EXPECT_FALSE(std::ranges::search(file_content, entity_begin).empty());
+}
+
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(
+    EntityTypeTest,
+    EntityTypeFixture,
+    testing::Values(
+        entity_type_param{ .entity = odxf::arc{}, .type = "ARC", .subclass = "AcDbCircle" },
+        entity_type_param{ .entity = odxf::circle{}, .type = "CIRCLE", .subclass = "AcDbCircle" },
+        entity_type_param{ .entity = odxf::ellipse{}, .type = "ELLIPSE", .subclass = "AcDbEllipse" },
+        entity_type_param{ .entity = odxf::line{}, .type = "LINE", .subclass = "AcDbLine" },
+        entity_type_param{ .entity = odxf::lw_polyline{}, .type = "LWPOLYLINE", .subclass = "AcDbPolyline" },
+        entity_type_param{ .entity = odxf::point{}, .type = "POINT", .subclass = "AcDbPoint" },
+        entity_type_param{ .entity = odxf::ray{}, .type = "RAY", .subclass = "AcDbRay" }
+    ),
+    [](const testing::TestParamInfo<entity_type_param>& info) { return info.param.type; }
+);
+// clang-format on
+
 TEST(Write, FileOpenError)
 {
     // Arrange
