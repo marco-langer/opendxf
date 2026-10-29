@@ -3,6 +3,8 @@
 
 #include "opendxf/opendxf.hpp"
 
+#include <print>
+
 int main()
 {
     odxf::Document document{
@@ -21,7 +23,13 @@ int main()
             odxf::Line{ .end{ 1.0, 1.0, 0.0 } },
         },
     };
-    odxf::writeDxf(document, "test.dxf");
+
+    const std::expected<void, odxf::Error> result{ odxf::write("test.dxf", document) };
+    if (!result) {
+        std::println("error: {}", result.error().what);
+
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }

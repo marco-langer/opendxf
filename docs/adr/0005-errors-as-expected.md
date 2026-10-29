@@ -20,7 +20,6 @@ This deviates from Core Guidelines [E.2](https://isocpp.github.io/CppCoreGuideli
 ## Consequences
 
 - Every function inside the reader that can fail has to pass errors on to its caller. This makes the reader code noisy. Helpers like `parseInto` and `readEntity` reduce it, but do not remove it.
-- `writeDxf()` does not report errors at all yet.
 
 ## Open questions
 

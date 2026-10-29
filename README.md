@@ -71,6 +71,8 @@ Fill an `odxf::Document` and write it:
 ```cpp
 #include <opendxf/opendxf.hpp>
 
+#include <print>
+
 int main()
 {
     const odxf::Document document{
@@ -80,12 +82,35 @@ int main()
             .layers{ { .name{ "Layer 1" } } },
         },
         .entities{
-            .circles{ { .center{}, .radius{ 1.0 } } },
-            .lines{ { .start{ 0.0, 0.0, 0.0 }, .end{ 1.0, 1.0, 0.0 } } },
+            odxf::Circle{ .center{}, .radius{ 1.0 } },
+            odxf::Line{ .start{ 0.0, 0.0, 0.0 }, .end{ 1.0, 1.0, 0.0 } },
         },
     };
 
-    odxf::writeDxf(document, "drawing.dxf");
+    const std::expected<void, odxf::Error> result{ odxf::write("drawing.dxf", document) };
+    if (!result) {
+        std::println("error: {}", result.error().what);
+        return EXIT_FAILURE;
+    }
+}
+```
+
+To write entities without holding them all in memory, pass the header and tables first and stream the entities. `close()` completes the file and reports errors; if it isn't called, the destructor completes the file and the error is lost:
+
+```cpp
+std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::write("drawing.dxf", header, tables) };
+if (!stream) {
+    // handle stream.error()
+}
+
+for (const odxf::Line& line : computeLines()) {
+    if (!stream->entity(line)) {
+        // handle the error
+    }
+}
+
+if (!stream->close()) {
+    // handle the error
 }
 ```
 

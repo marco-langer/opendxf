@@ -100,12 +100,13 @@ TEST(insertionUnits, roundTrip)
     std::filesystem::remove(filePath);
 
     // Act
-    odxf::writeDxf(document, filePath);
+    const std::expected<void, odxf::Error> writeResult{ odxf::write(filePath, document) };
 
     ReadStream istream;
     const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
 
     // Assert
+    ASSERT_TRUE(writeResult.has_value());
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(odxf::insertionUnits(istream.document().header), odxf::LengthUnit::USSurveyFeet);
 }
