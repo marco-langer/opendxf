@@ -18,6 +18,8 @@ A type encapsulates only its invariants. Everything else is a free function that
 
 Common properties of entities are in an `EntityProperties` struct that each entity holds as its `properties` member. Entities share no base class.
 
+`Entity` is a `std::variant` of all entity types, and a document keeps its entities in one vector in file order, which is the default draw order in DXF. Operations on any entity use `std::visit`.
+
 ## Rationale
 
 - This applies Core Guidelines [C.2](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#rc-struct) (a class for an invariant, a struct for independent data) and [C.4](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#rc-member) (a member function only if it needs access to the representation), see [ADR 1](0001-follow-cpp-core-guidelines.md).

@@ -42,7 +42,8 @@ All header variables are read into and written from a generic key/value map. Typ
 | POINT      | –    | ✓     |
 | RAY        | –    | ✓     |
 
-Unsupported tables and entities are skipped when reading.
+Unsupported tables and entities are skipped when reading. Entities are read and written in file
+order, which is the default draw order.
 
 ## Colors
 

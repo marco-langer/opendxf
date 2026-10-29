@@ -116,15 +116,14 @@ odxf::Document createExampleDocument()
 
     Entities& entities{ expectedDocument.entities };
 
-    Lines& lines{ entities.lines };
     // no group codes 62, 370, 6, 48 and 440, keeps the defaults
-    lines.push_back(
+    entities.push_back(
         Line{
             .properties = { .layer = layerNameLines, .trueColor = 0xFF8000 },
             .start = Coordinate3d{ 0.0, 0.5, 0.0 },
             .end = Coordinate3d{ 1.0, 1.5, 0.0 },
         });
-    lines.push_back(Line{
+    entities.push_back(Line{
         .properties = {
             .layer = layerNameLines,
             .color = 3,
@@ -137,8 +136,7 @@ odxf::Document createExampleDocument()
         .end = Coordinate3d{ 1.0, 1.0, 0.0 },
     });
 
-    Circles& circles{ entities.circles };
-    circles.push_back(Circle{
+    entities.push_back(Circle{
         .properties = {
             .layer = layerNameTest,
             .color = 2,
@@ -151,8 +149,7 @@ odxf::Document createExampleDocument()
         .radius = 1.0,
     });
 
-    Arcs& arcs{ entities.arcs };
-    arcs.push_back(Arc{
+    entities.push_back(Arc{
         .properties = {
             .layer = layerNameTest,
             .color = 5,
@@ -168,8 +165,7 @@ odxf::Document createExampleDocument()
         .endAngle = 180.0,
     });
 
-    LWPolylines& lwPolylines{ entities.lwPolylines };
-    lwPolylines.push_back(LWPolyline{
+    entities.push_back(LWPolyline{
         .properties = {
             .layer = layerNameLWPolylines,
             .color = 6,
@@ -180,7 +176,7 @@ odxf::Document createExampleDocument()
         },
     });
     // has a 440 without the flag of a set value, which counts as BYLAYER
-    lwPolylines.push_back(LWPolyline{
+    entities.push_back(LWPolyline{
         .properties = {
             .layer = layerNameLWPolylines,
             .color = 256,
@@ -190,7 +186,7 @@ odxf::Document createExampleDocument()
         .vertices = { Vertex{ .position = { 200.0, 200.0 } } },
     });
     // no group codes 6, 48 and 440, keeps the defaults
-    lwPolylines.push_back(LWPolyline{
+    entities.push_back(LWPolyline{
         .properties = { .layer = layerNameLWPolylines, .color = 0, .lineweight = 13 },
         .isClosed = true,
         .vertices = {

@@ -348,32 +348,20 @@ void writeEntities(
 {
     stream << "\n0\nSECTION\n2\nENTITIES";
 
-    for (const odxf::Point& point : entities.points) {
-        writePoint(stream, point);
-    }
-
-    for (const odxf::Ray& ray : entities.rays) {
-        writeRay(stream, ray);
-    }
-
-    for (const odxf::Line& line : entities.lines) {
-        writeLine(stream, line);
-    }
-
-    for (const odxf::Circle& circle : entities.circles) {
-        writeCircle(stream, circle);
-    }
-
-    for (const odxf::Arc& arc : entities.arcs) {
-        writeArc(stream, arc);
-    }
-
-    for (const odxf::Ellipse& ellipse : entities.ellipses) {
-        writeEllipse(stream, ellipse);
-    }
-
-    for (const odxf::LWPolyline& lwPolyline : entities.lwPolylines) {
-        writeLWPolyline(stream, lwPolyline);
+    for (const odxf::Entity& entity : entities) {
+        std::visit(
+            overload{
+                [&stream](const odxf::Arc& arc) { writeArc(stream, arc); },
+                [&stream](const odxf::Circle& circle) { writeCircle(stream, circle); },
+                [&stream](const odxf::Ellipse& ellipse) { writeEllipse(stream, ellipse); },
+                [&stream](const odxf::Line& line) { writeLine(stream, line); },
+                [&stream](const odxf::LWPolyline& lwPolyline) {
+                    writeLWPolyline(stream, lwPolyline);
+                },
+                [&stream](const odxf::Point& point) { writePoint(stream, point); },
+                [&stream](const odxf::Ray& ray) { writeRay(stream, ray); },
+            },
+            entity);
     }
 
     stream << "\n0\nENDSEC";

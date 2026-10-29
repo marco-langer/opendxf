@@ -9,6 +9,7 @@
 #include <numbers>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace odxf {
@@ -117,23 +118,9 @@ struct LWPolyline final
     Vertices vertices;
 };
 
-using Arcs = std::vector<Arc>;
-using Circles = std::vector<Circle>;
-using Ellipses = std::vector<Ellipse>;
-using Lines = std::vector<Line>;
-using Points = std::vector<Point>;
-using LWPolylines = std::vector<LWPolyline>;
-using Rays = std::vector<Ray>;
+using Entity = std::variant<Arc, Circle, Ellipse, Line, LWPolyline, Point, Ray>;
 
-struct Entities final
-{
-    Arcs arcs;
-    Circles circles;
-    Ellipses ellipses;
-    Lines lines;
-    Points points;
-    LWPolylines lwPolylines;
-    Rays rays;
-};
+// in file order, which is the default draw order
+using Entities = std::vector<Entity>;
 
 }   // namespace odxf
