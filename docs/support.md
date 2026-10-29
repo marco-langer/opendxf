@@ -112,3 +112,4 @@ transparency, and writes no APPID table otherwise.
 - Files without a HEADER section are rejected.
 - The BLOCKS section is skipped when reading and written empty.
 - `writeDxf()` does not report errors.
+- POINT and ELLIPSE are written with the wrong entity type (LINE and ARC), so other readers misread them.
