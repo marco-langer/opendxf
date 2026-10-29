@@ -246,7 +246,7 @@ void writeEntityProperties(std::ofstream& stream, const odxf::EntityProperties& 
     writeTransparency(stream, properties.transparency);
 }
 
-void writePoint(std::ofstream& stream, const odxf::Point& point)
+void writeEntity(std::ofstream& stream, const odxf::Point& point)
 {
     stream << "\n0\nLINE\n100\nAcDbPoint";
     writeEntityProperties(stream, point.properties);
@@ -258,7 +258,7 @@ void writePoint(std::ofstream& stream, const odxf::Point& point)
 }
 
 
-void writeRay(std::ofstream& stream, const odxf::Ray& ray)
+void writeEntity(std::ofstream& stream, const odxf::Ray& ray)
 {
     stream << "\n0\nLINE\n100\nAcDbRay";
     writeEntityProperties(stream, ray.properties);
@@ -270,7 +270,7 @@ void writeRay(std::ofstream& stream, const odxf::Ray& ray)
     stream << "\n31\n" << std::to_string(ray.direction.z);
 }
 
-void writeLine(std::ofstream& stream, const odxf::Line& line)
+void writeEntity(std::ofstream& stream, const odxf::Line& line)
 {
     stream << "\n0\nLINE\n100\nAcDbLine";
     writeEntityProperties(stream, line.properties);
@@ -284,7 +284,7 @@ void writeLine(std::ofstream& stream, const odxf::Line& line)
     writeExtrusion(stream, line.extrusion);
 }
 
-void writeCircle(std::ofstream& stream, const odxf::Circle& circle)
+void writeEntity(std::ofstream& stream, const odxf::Circle& circle)
 {
     stream << "\n0\nCIRCLE\n100\nAcDbCircle";
     writeEntityProperties(stream, circle.properties);
@@ -296,7 +296,7 @@ void writeCircle(std::ofstream& stream, const odxf::Circle& circle)
     writeExtrusion(stream, circle.extrusion);
 }
 
-void writeArc(std::ofstream& stream, const odxf::Arc& arc)
+void writeEntity(std::ofstream& stream, const odxf::Arc& arc)
 {
     stream << "\n0\nARC\n100\nAcDbCircle";
     writeEntityProperties(stream, arc.properties);
@@ -311,7 +311,7 @@ void writeArc(std::ofstream& stream, const odxf::Arc& arc)
     writeExtrusion(stream, arc.extrusion);
 }
 
-void writeEllipse(std::ofstream& stream, const odxf::Ellipse& ellipse)
+void writeEntity(std::ofstream& stream, const odxf::Ellipse& ellipse)
 {
     stream << "\n0\nARC\n100\nAcDbEllipse";
     writeEntityProperties(stream, ellipse.properties);
@@ -327,7 +327,7 @@ void writeEllipse(std::ofstream& stream, const odxf::Ellipse& ellipse)
     writeExtrusion(stream, ellipse.extrusion);
 }
 
-void writeLWPolyline(std::ofstream& stream, const odxf::LWPolyline& lwPolyline)
+void writeEntity(std::ofstream& stream, const odxf::LWPolyline& lwPolyline)
 {
     stream << "\n0\nLWPOLYLINE\n100\nAcDbPolyline";
     writeEntityProperties(stream, lwPolyline.properties);
@@ -349,19 +349,7 @@ void writeEntities(
     stream << "\n0\nSECTION\n2\nENTITIES";
 
     for (const odxf::Entity& entity : entities) {
-        std::visit(
-            overload{
-                [&stream](const odxf::Arc& arc) { writeArc(stream, arc); },
-                [&stream](const odxf::Circle& circle) { writeCircle(stream, circle); },
-                [&stream](const odxf::Ellipse& ellipse) { writeEllipse(stream, ellipse); },
-                [&stream](const odxf::Line& line) { writeLine(stream, line); },
-                [&stream](const odxf::LWPolyline& lwPolyline) {
-                    writeLWPolyline(stream, lwPolyline);
-                },
-                [&stream](const odxf::Point& point) { writePoint(stream, point); },
-                [&stream](const odxf::Ray& ray) { writeRay(stream, ray); },
-            },
-            entity);
+        std::visit([&stream](const auto& e) { writeEntity(stream, e); }, entity);
     }
 
     stream << "\n0\nENDSEC";
