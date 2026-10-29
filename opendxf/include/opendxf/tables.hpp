@@ -10,33 +10,33 @@
 
 namespace odxf {
 
-struct LineTypeElement final
+struct line_type_element final
 {
     // In drawing units: a dash if positive, a gap if negative, a dot if 0.
     double length{ 0.0 };
     // Group code 74: 0 for a plain element. Otherwise the element embeds a text (2) or a shape (4),
     // whose details are skipped when reading and not written.
-    int complexFlags{ 0 };
+    int complex_flags{ 0 };
 };
 
-using LineTypeElements = std::vector<LineTypeElement>;
+using line_type_elements = std::vector<line_type_element>;
 
-struct LineType final
+struct line_type final
 {
     std::string name;
-    std::string displayName;
+    std::string display_name;
     int flags{ 64 };
     // Empty for a continuous line.
-    LineTypeElements elements{};
+    line_type_elements elements{};
 };
 
-using Layers = std::vector<Layer>;
-using LineTypes = std::vector<LineType>;
+using layers = std::vector<layer>;
+using line_types = std::vector<line_type>;
 
-struct Tables final
+struct tables final
 {
-    LineTypes lineTypes;
-    Layers layers;
+    odxf::line_types line_types;
+    odxf::layers layers;
 };
 
 }   // namespace odxf

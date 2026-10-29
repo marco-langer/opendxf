@@ -7,4 +7,4 @@
 
 #include <gmock/gmock.h>
 
-testing::Matcher<odxf::Header> IsHeader(const odxf::Header& expected, double maxError = 1.0e-5);
+testing::Matcher<odxf::header> is_header(const odxf::header& expected, double max_error = 1.0e-5);

@@ -14,11 +14,11 @@ A type encapsulates only its invariants. Everything else is a free function that
 
 - A type without invariants, like most of the model, is plain data with public fields.
 - A type with an invariant keeps its data private and offers only the member functions that maintain the invariant.
-- All other operations, such as reading and writing DXF or the typed header accessors (`insertionUnits(header)`), are free functions.
+- All other operations, such as reading and writing DXF or the typed header accessors (`insertion_units(header)`), are free functions.
 
-Common properties of entities are in an `EntityProperties` struct that each entity holds as its `properties` member. Entities share no base class.
+Common properties of entities are in an `entity_properties` struct that each entity holds as its `properties` member. Entities share no base class.
 
-`Entity` is a `std::variant` of all entity types, and a document keeps its entities in one vector in file order, which is the default draw order in DXF. Operations on any entity use `std::visit`.
+`entity` is a `std::variant` of all entity types, and a document keeps its entities in one vector in file order, which is the default draw order in DXF. Operations on any entity use `std::visit`.
 
 ## Rationale
 
@@ -29,6 +29,6 @@ Common properties of entities are in an `EntityProperties` struct that each enti
 
 ## Consequences
 
-- Code shared by all entities has to be written once explicitly, e.g. `readEntityProperty` and `readEntity` in the reader. Without that, it is duplicated per entity type.
-- Common properties are accessed through the member, e.g. `line.properties.layer`. The member also lets an entity including its common properties be built in one designated initializer, which C++23 doesn't allow for base classes. C++29 adds this for base classes (P2287); the member stays because the `Entity` variant needs no common base.
-- Adding an entity type touches the model, the reader, the writer, `IReadStream`, the test matchers and the test data.
+- Code shared by all entities has to be written once explicitly, e.g. `read_entity_property` and `read_entity` in the reader. Without that, it is duplicated per entity type.
+- Common properties are accessed through the member, e.g. `line.properties.layer`. The member also lets an entity including its common properties be built in one designated initializer, which C++23 doesn't allow for base classes. C++29 adds this for base classes (P2287); the member stays because the `entity` variant needs no common base.
+- Adding an entity type touches the model, the reader, the writer, `read_stream_base`, the test matchers and the test data.

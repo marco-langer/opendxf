@@ -11,10 +11,10 @@
 
 namespace odxf {
 
-class IReadStream;
+class read_stream_base;
 
-std::expected<Document, Error> read(const std::filesystem::path& filePath);
+std::expected<document, error> read(const std::filesystem::path& file_path);
 
-std::expected<void, Error> read(const std::filesystem::path& filePath, IReadStream& stream);
+std::expected<void, error> read(const std::filesystem::path& file_path, read_stream_base& stream);
 
 }   // namespace odxf

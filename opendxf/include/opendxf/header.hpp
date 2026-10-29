@@ -14,12 +14,12 @@
 
 namespace odxf {
 
-using HeaderKey = std::string;
-using HeaderValue = std::variant<bool, int, double, std::string, Coordinate2d, Coordinate3d>;
-using HeaderEntry = std::pair<HeaderKey, HeaderValue>;
+using header_key = std::string;
+using header_value = std::variant<bool, int, double, std::string, coordinate2d, coordinate3d>;
+using header_entry = std::pair<header_key, header_value>;
 
-// transparent hash, enables lookups by std::string_view without constructing a HeaderKey
-struct HeaderKeyHash final
+// transparent hash, enables lookups by std::string_view without constructing a header_key
+struct header_key_hash final
 {
     using is_transparent = void;
 
@@ -29,11 +29,12 @@ struct HeaderKeyHash final
     }
 };
 
-using HeaderEntries = std::unordered_map<HeaderKey, HeaderValue, HeaderKeyHash, std::equal_to<>>;
+using header_entries =
+    std::unordered_map<header_key, header_value, header_key_hash, std::equal_to<>>;
 
-struct Header final
+struct header final
 {
-    HeaderEntries entries;
+    header_entries entries;
 };
 
 }   // namespace odxf

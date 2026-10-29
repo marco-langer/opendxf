@@ -9,17 +9,17 @@
 #include <print>
 #include <string>
 
-struct DocumentStats final
+struct document_stats final
 {
     int layers{ 0 };
 
     int arcs{ 0 };
     int circles{ 0 };
     int lines{ 0 };
-    int lwPolylines{ 0 };
+    int lw_polylines{ 0 };
 };
 
-void printDocumentStats(const DocumentStats& stats)
+void print_document_stats(const document_stats& stats)
 {
     std::println(
         "layers: {}\narcs: {}\ncircles: {}\nlines: {}\nlw polylines: {}",
@@ -27,19 +27,19 @@ void printDocumentStats(const DocumentStats& stats)
         stats.arcs,
         stats.circles,
         stats.lines,
-        stats.lwPolylines);
+        stats.lw_polylines);
 }
 
-void printError(const odxf::Error& error)
+void print_error(const odxf::error& error)
 {
-    if (error.lineNumber.has_value()) {
-        std::println("error reading file: line {}: {}", error.lineNumber.value(), error.what);
+    if (error.line_number.has_value()) {
+        std::println("error reading file: line {}: {}", error.line_number.value(), error.what);
     } else {
         std::println("error reading file: {}", error.what);
     }
 }
 
-std::expected<std::filesystem::path, std::string> parseFilePath(int argc, char** argv)
+std::expected<std::filesystem::path, std::string> parse_file_path(int argc, char** argv)
 {
     if (argc != 2) {
         return std::unexpected("invalid number of arguments");
@@ -48,49 +48,50 @@ std::expected<std::filesystem::path, std::string> parseFilePath(int argc, char**
     return reinterpret_cast<const char8_t*>(argv[1]);
 }
 
-void printUsage(const std::string& error) { std::println("error: {}", error); }
+void print_usage(const std::string& error) { std::println("error: {}", error); }
 
-class Reader final : public odxf::IReadStream
+class reader final : public odxf::read_stream_base
 {
 public:
-    const DocumentStats& stats() const& { return m_docStats; }
+    const document_stats& stats() const& { return m_doc_stats; }
 
 private:
-    void layer(const odxf::Layer& /* layer */) override { m_docStats.layers += 1; }
+    void layer(const odxf::layer& /* layer */) override { m_doc_stats.layers += 1; }
 
-    void arc(const odxf::Arc& /* arc */) override { m_docStats.arcs += 1; }
+    void arc(const odxf::arc& /* arc */) override { m_doc_stats.arcs += 1; }
 
-    void circle(const odxf::Circle& /* circle */) override { m_docStats.circles += 1; }
+    void circle(const odxf::circle& /* circle */) override { m_doc_stats.circles += 1; }
 
-    void line(const odxf::Line& /* line */) override { m_docStats.lines += 1; }
+    void line(const odxf::line& /* line */) override { m_doc_stats.lines += 1; }
 
-    void lwPolyline(const odxf::LWPolyline& /* lwPolyline */) override
+    void lw_polyline(const odxf::lw_polyline& /* lw_polyline */) override
     {
-        m_docStats.lwPolylines += 1;
+        m_doc_stats.lw_polylines += 1;
     }
 
-    DocumentStats m_docStats;
+    document_stats m_doc_stats;
 };
 
 int main(int argc, char** argv)
 {
-    Reader reader;
+    reader reader;
 
-    const std::expected<std::filesystem::path, std::string> filePath{ parseFilePath(argc, argv) };
-    if (!filePath.has_value()) {
-        printUsage(filePath.error());
+    const std::expected<std::filesystem::path, std::string> file_path{ parse_file_path(
+        argc, argv) };
+    if (!file_path.has_value()) {
+        print_usage(file_path.error());
 
         return EXIT_FAILURE;
     }
 
-    const std::expected<void, odxf::Error> result{ odxf::read(filePath.value(), reader) };
+    const std::expected<void, odxf::error> result{ odxf::read(file_path.value(), reader) };
     if (!result.has_value()) {
-        printError(result.error());
+        print_error(result.error());
 
         return EXIT_FAILURE;
     }
 
-    printDocumentStats(reader.stats());
+    print_document_stats(reader.stats());
 
     return EXIT_SUCCESS;
 }

@@ -19,22 +19,22 @@ else()
 endif()
 
 add_executable(opendxf-tests
-    Matchers/CoordinateMatcher.cpp
-    Matchers/CoordinateMatcher.hpp
-    Matchers/DocumentMatcher.cpp
-    Matchers/DocumentMatcher.hpp
-    Matchers/EntitiesMatcher.cpp
-    Matchers/EntitiesMatcher.hpp
-    Matchers/HeaderMatcher.cpp
-    Matchers/HeaderMatcher.hpp
-    Matchers/LayerMatcher.cpp
-    Matchers/LayerMatcher.hpp
-    Matchers/TablesMatcher.cpp
-    Matchers/TablesMatcher.hpp
-    headervariables_test.cpp
+    matchers/coordinate_matcher.cpp
+    matchers/coordinate_matcher.hpp
+    matchers/document_matcher.cpp
+    matchers/document_matcher.hpp
+    matchers/entities_matcher.cpp
+    matchers/entities_matcher.hpp
+    matchers/header_matcher.cpp
+    matchers/header_matcher.hpp
+    matchers/layer_matcher.cpp
+    matchers/layer_matcher.hpp
+    matchers/tables_matcher.cpp
+    matchers/tables_matcher.hpp
+    header_variables_test.cpp
     read_test.cpp
-    TestUtils.cpp
-    TestUtils.hpp
+    test_utils.cpp
+    test_utils.hpp
     write_test.cpp
 )
 

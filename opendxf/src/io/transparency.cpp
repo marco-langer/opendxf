@@ -5,33 +5,33 @@
 
 namespace odxf {
 
-std::optional<Transparency> decodeLayerTransparency(int value)
+std::optional<transparency> decode_layer_transparency(int value)
 {
-    if ((value & ~0xFF) != byValueTransparencyFlag) {
+    if ((value & ~0xFF) != by_value_transparency_flag) {
         // TODO: warn about the ignored value once opendxf can report warnings.
         return std::nullopt;
     }
 
-    return Transparency{ .alpha = static_cast<std::uint8_t>(value & 0xFF) };
+    return transparency{ .alpha = static_cast<std::uint8_t>(value & 0xFF) };
 }
 
-EntityTransparency decodeEntityTransparency(int value)
+entity_transparency decode_entity_transparency(int value)
 {
-    if (value == byBlockTransparencyValue) {
-        return ByBlock{};
+    if (value == by_block_transparency_value) {
+        return by_block{};
     }
 
-    if ((value & ~0xFF) != byValueTransparencyFlag) {
+    if ((value & ~0xFF) != by_value_transparency_flag) {
         // TODO: warn about the ignored value once opendxf can report warnings.
-        return ByLayer{};
+        return by_layer{};
     }
 
-    return Transparency{ .alpha = static_cast<std::uint8_t>(value & 0xFF) };
+    return transparency{ .alpha = static_cast<std::uint8_t>(value & 0xFF) };
 }
 
-int encodeTransparency(const Transparency& transparency)
+int encode_transparency(const odxf::transparency& transparency)
 {
-    return byValueTransparencyFlag | transparency.alpha;
+    return by_value_transparency_flag | transparency.alpha;
 }
 
 }   // namespace odxf

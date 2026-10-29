@@ -7,4 +7,4 @@
 
 #include <gmock/gmock.h>
 
-testing::Matcher<odxf::Tables> AreTables(const odxf::Tables& expected);
+testing::Matcher<odxf::tables> are_tables(const odxf::tables& expected);

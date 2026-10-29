@@ -4,8 +4,8 @@
 #include "opendxf/io/read.hpp"
 #include "opendxf/io/write.hpp"
 
-#include "Matchers/DocumentMatcher.hpp"
-#include "TestUtils.hpp"
+#include "matchers/document_matcher.hpp"
+#include "test_utils.hpp"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -19,182 +19,182 @@
 
 namespace {
 
-std::vector<std::string> readFile(const std::filesystem::path& filePath)
+std::vector<std::string> read_file(const std::filesystem::path& file_path)
 {
-    std::ifstream stream{ filePath };
+    std::ifstream stream{ file_path };
     if (!stream.is_open()) {
         throw std::runtime_error{ std::format(
             "unable to open file '{}'",
-            reinterpret_cast<const char*>(filePath.u8string().c_str())) };
+            reinterpret_cast<const char*>(file_path.u8string().c_str())) };
     }
 
-    std::vector<std::string> fileContent;
+    std::vector<std::string> file_content;
     std::string line;
     while (std::getline(stream, line)) {
-        fileContent.push_back(line);
+        file_content.push_back(line);
     }
 
-    return fileContent;
+    return file_content;
 }
 
 }   // namespace
 
-TEST(write, example)
+TEST(Write, Example)
 {
     // Arrange
-    const odxf::Document document{ createExampleDocument() };
+    const odxf::document document{ create_example_document() };
 
-    const std::filesystem::path filePath{ "test.dxf" };
-    std::filesystem::remove(filePath);
-    ASSERT_FALSE(std::filesystem::exists(filePath));
+    const std::filesystem::path file_path{ "test.dxf" };
+    std::filesystem::remove(file_path);
+    ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::Error> writeResult{ odxf::write(filePath, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
 
     // Assert
-    ASSERT_TRUE(writeResult.has_value());
-    ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
+    ASSERT_TRUE(write_result.has_value());
+    ASSERT_TRUE(std::filesystem::is_regular_file(file_path));
 
-    const std::expected<odxf::Document, odxf::Error> readDocument{ odxf::read(filePath) };
+    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
 
-    ASSERT_TRUE(readDocument.has_value());
-    EXPECT_THAT(*readDocument, IsDocument(document));
+    ASSERT_TRUE(read_document.has_value());
+    EXPECT_THAT(*read_document, is_document(document));
 }
 
-TEST(write, keepsEntityOrder)
+TEST(Write, KeepsEntityOrder)
 {
     // Arrange
-    odxf::Document document;
+    odxf::document document;
     document.entities = {
-        odxf::Circle{ .radius = 1.0 },          odxf::Line{ .end = { 1.0, 0.0, 0.0 } },
-        odxf::Circle{ .radius = 2.0 },          odxf::Arc{ .radius = 3.0, .endAngle = 90.0 },
-        odxf::Line{ .end = { 2.0, 0.0, 0.0 } },
+        odxf::circle{ .radius = 1.0 },          odxf::line{ .end = { 1.0, 0.0, 0.0 } },
+        odxf::circle{ .radius = 2.0 },          odxf::arc{ .radius = 3.0, .end_angle = 90.0 },
+        odxf::line{ .end = { 2.0, 0.0, 0.0 } },
     };
 
-    const std::filesystem::path filePath{ "test_entity_order.dxf" };
-    std::filesystem::remove(filePath);
-    ASSERT_FALSE(std::filesystem::exists(filePath));
+    const std::filesystem::path file_path{ "test_entity_order.dxf" };
+    std::filesystem::remove(file_path);
+    ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::Error> writeResult{ odxf::write(filePath, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
 
     // Assert
-    ASSERT_TRUE(writeResult.has_value());
-    const std::expected<odxf::Document, odxf::Error> readDocument{ odxf::read(filePath) };
+    ASSERT_TRUE(write_result.has_value());
+    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
 
-    ASSERT_TRUE(readDocument.has_value());
-    EXPECT_THAT(*readDocument, IsDocument(document));
+    ASSERT_TRUE(read_document.has_value());
+    EXPECT_THAT(*read_document, is_document(document));
 }
 
-TEST(write, layerTransparencyRegistersApp)
+TEST(Write, LayerTransparencyRegistersApp)
 {
     // Arrange
-    odxf::Document document;
+    odxf::document document;
     document.tables.layers.push_back(
-        odxf::Layer{ .name = "0", .transparency = odxf::Transparency{ .alpha = 0x4C } });
+        odxf::layer{ .name = "0", .transparency = odxf::transparency{ .alpha = 0x4C } });
 
-    const std::filesystem::path filePath{ "test_appid.dxf" };
-    std::filesystem::remove(filePath);
-    ASSERT_FALSE(std::filesystem::exists(filePath));
+    const std::filesystem::path file_path{ "test_appid.dxf" };
+    std::filesystem::remove(file_path);
+    ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::Error> writeResult{ odxf::write(filePath, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
 
     // Assert
-    ASSERT_TRUE(writeResult.has_value());
-    const std::vector<std::string> fileContent{ readFile(filePath) };
-    const std::vector<std::string> appIdRecord{ "0", "APPID", "2", "AcCmTransparency" };
+    ASSERT_TRUE(write_result.has_value());
+    const std::vector<std::string> file_content{ read_file(file_path) };
+    const std::vector<std::string> app_id_record{ "0", "APPID", "2", "AcCmTransparency" };
 
-    EXPECT_FALSE(std::ranges::search(fileContent, appIdRecord).empty());
+    EXPECT_FALSE(std::ranges::search(file_content, app_id_record).empty());
 }
 
-TEST(write, noAppIdsWithoutLayerTransparency)
+TEST(Write, NoAppIdsWithoutLayerTransparency)
 {
     // Arrange
-    odxf::Document document;
-    document.tables.layers.push_back(odxf::Layer{ .name = "0" });
+    odxf::document document;
+    document.tables.layers.push_back(odxf::layer{ .name = "0" });
 
-    const std::filesystem::path filePath{ "test_no_appid.dxf" };
-    std::filesystem::remove(filePath);
-    ASSERT_FALSE(std::filesystem::exists(filePath));
+    const std::filesystem::path file_path{ "test_no_appid.dxf" };
+    std::filesystem::remove(file_path);
+    ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::Error> writeResult{ odxf::write(filePath, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
 
     // Assert
-    ASSERT_TRUE(writeResult.has_value());
-    const std::vector<std::string> fileContent{ readFile(filePath) };
+    ASSERT_TRUE(write_result.has_value());
+    const std::vector<std::string> file_content{ read_file(file_path) };
 
-    EXPECT_THAT(fileContent, testing::Not(testing::Contains("APPID")));
+    EXPECT_THAT(file_content, testing::Not(testing::Contains("APPID")));
 }
 
-TEST(write, fileOpenError)
+TEST(Write, FileOpenError)
 {
     // Arrange
-    const std::filesystem::path filePath{ "missing_directory/test.dxf" };
-    ASSERT_FALSE(std::filesystem::exists(filePath.parent_path()));
+    const std::filesystem::path file_path{ "missing_directory/test.dxf" };
+    ASSERT_FALSE(std::filesystem::exists(file_path.parent_path()));
 
     // Act
-    const std::expected<void, odxf::Error> result{ odxf::write(filePath, odxf::Document{}) };
+    const std::expected<void, odxf::error> result{ odxf::write(file_path, odxf::document{}) };
 
     // Assert
     ASSERT_FALSE(result.has_value());
-    EXPECT_EQ(result.error().type, odxf::Error::Type::FileOpenError);
+    EXPECT_EQ(result.error().type, odxf::error_type::file_open_error);
 }
 
-TEST(writeStream, entityAfterClose)
+TEST(WriteStream, EntityAfterClose)
 {
     // Arrange
-    std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::WriteStream::open(
-        "test_entity_after_close.dxf", odxf::Header{}, odxf::Tables{}) };
+    std::expected<odxf::write_stream, odxf::error> stream{ odxf::write_stream::open(
+        "test_entity_after_close.dxf", odxf::header{}, odxf::tables{}) };
     ASSERT_TRUE(stream.has_value());
     ASSERT_TRUE(stream->close().has_value());
 
     // Act
-    const std::expected<void, odxf::Error> result{ stream->entity(odxf::Line{}) };
+    const std::expected<void, odxf::error> result{ stream->entity(odxf::line{}) };
 
     // Assert
     ASSERT_FALSE(result.has_value());
-    EXPECT_EQ(result.error().type, odxf::Error::Type::WriteError);
+    EXPECT_EQ(result.error().type, odxf::error_type::write_error);
 }
 
-TEST(writeStream, closeTwice)
+TEST(WriteStream, CloseTwice)
 {
     // Arrange
-    std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::WriteStream::open(
-        "test_close_twice.dxf", odxf::Header{}, odxf::Tables{}) };
+    std::expected<odxf::write_stream, odxf::error> stream{ odxf::write_stream::open(
+        "test_close_twice.dxf", odxf::header{}, odxf::tables{}) };
     ASSERT_TRUE(stream.has_value());
     ASSERT_TRUE(stream->close().has_value());
 
     // Act
-    const std::expected<void, odxf::Error> result{ stream->close() };
+    const std::expected<void, odxf::error> result{ stream->close() };
 
     // Assert
     ASSERT_FALSE(result.has_value());
-    EXPECT_EQ(result.error().type, odxf::Error::Type::WriteError);
+    EXPECT_EQ(result.error().type, odxf::error_type::write_error);
 }
 
-TEST(writeStream, destructorCloses)
+TEST(WriteStream, DestructorCloses)
 {
     // Arrange
-    const std::filesystem::path filePath{ "test_destructor_closes.dxf" };
-    std::filesystem::remove(filePath);
-    ASSERT_FALSE(std::filesystem::exists(filePath));
+    const std::filesystem::path file_path{ "test_destructor_closes.dxf" };
+    std::filesystem::remove(file_path);
+    ASSERT_FALSE(std::filesystem::exists(file_path));
 
-    odxf::Document document;
-    document.entities = { odxf::Line{ .end = { 1.0, 0.0, 0.0 } } };
+    odxf::document document;
+    document.entities = { odxf::line{ .end = { 1.0, 0.0, 0.0 } } };
 
     // Act
     {
-        std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::WriteStream::open(
-            filePath, document.header, document.tables) };
+        std::expected<odxf::write_stream, odxf::error> stream{ odxf::write_stream::open(
+            file_path, document.header, document.tables) };
         ASSERT_TRUE(stream.has_value());
         ASSERT_TRUE(stream->entity(document.entities.front()).has_value());
     }
 
     // Assert
-    const std::expected<odxf::Document, odxf::Error> readDocument{ odxf::read(filePath) };
+    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
 
-    ASSERT_TRUE(readDocument.has_value());
-    EXPECT_THAT(*readDocument, IsDocument(document));
+    ASSERT_TRUE(read_document.has_value());
+    EXPECT_THAT(*read_document, is_document(document));
 }

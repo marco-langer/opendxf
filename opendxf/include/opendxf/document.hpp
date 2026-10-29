@@ -9,11 +9,11 @@
 
 namespace odxf {
 
-struct Document final
+struct document final
 {
-    Header header;
-    Tables tables;
-    Entities entities;
+    odxf::header header;
+    odxf::tables tables;
+    odxf::entities entities;
 };
 
 }   // namespace odxf

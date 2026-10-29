@@ -10,26 +10,26 @@
 
 namespace odxf {
 
-struct Layer final
+struct layer final
 {
-    enum Flags
+    enum flag
     {
-        None = 0,
-        Frozen = 1,
-        DefaultFrozen = 2,
-        Locked = 4
+        none = 0,
+        frozen = 1,
+        default_frozen = 2,
+        locked = 4
     };
 
     std::string name;
     // 7 is white or black, whichever contrasts with the background. Negative if the layer is off.
     int color{ 7 };
-    std::optional<int> trueColor{};   // 0x00RRGGBB, takes precedence over color
-    Flags flags{ Flags::None };
+    std::optional<int> true_color{};   // 0x00RRGGBB, takes precedence over color
+    flag flags{ flag::none };
     // hundredths of a millimeter, or -3 DEFAULT
     int lineweight{ -3 };
-    std::string lineType{ "CONTINUOUS" };
+    std::string line_type{ "CONTINUOUS" };
     // Empty means opaque.
-    std::optional<Transparency> transparency{};
+    std::optional<odxf::transparency> transparency{};
 };
 
 }   // namespace odxf

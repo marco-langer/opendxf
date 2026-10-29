@@ -14,7 +14,7 @@
 
 namespace odxf {
 
-struct Vector3d final
+struct vector3d final
 {
     double x{ 0.0 };
     double y{ 0.0 };
@@ -22,105 +22,105 @@ struct Vector3d final
 };
 
 // The properties all entities share.
-struct EntityProperties final
+struct entity_properties final
 {
     std::string layer;
-    int color{ 256 };                 // BYLAYER
-    std::optional<int> trueColor{};   // 0x00RRGGBB, takes precedence over color
+    int color{ 256 };                  // BYLAYER
+    std::optional<int> true_color{};   // 0x00RRGGBB, takes precedence over color
     // hundredths of a millimeter, or -1 BYLAYER, -2 BYBLOCK, -3 DEFAULT
     int lineweight{ -1 };
     // The name of an entry in the LTYPE table, or BYLAYER or BYBLOCK.
-    std::string lineType{ "BYLAYER" };
-    double lineTypeScale{ 1.0 };
-    EntityTransparency transparency{ ByLayer{} };
+    std::string line_type{ "BYLAYER" };
+    double line_type_scale{ 1.0 };
+    entity_transparency transparency{ by_layer{} };
 };
 
-struct Point final
+struct point final
 {
-    EntityProperties properties;
+    entity_properties properties;
 
-    Coordinate3d coordinate;
+    coordinate3d coordinate;
 
-    std::optional<Vector3d> extrusion;
+    std::optional<vector3d> extrusion;
     std::optional<double> thickness;
 };
 
-struct Ray final
+struct ray final
 {
-    EntityProperties properties;
+    entity_properties properties;
 
-    Coordinate3d startPoint;
-    Vector3d direction;
+    coordinate3d start_point;
+    vector3d direction;
 };
 
-struct Line final
+struct line final
 {
-    EntityProperties properties;
+    entity_properties properties;
 
-    Coordinate3d start;
-    Coordinate3d end;
+    coordinate3d start;
+    coordinate3d end;
 
-    std::optional<Vector3d> extrusion;
+    std::optional<vector3d> extrusion;
     std::optional<double> thickness;
 };
 
-struct Circle final
+struct circle final
 {
-    EntityProperties properties;
+    entity_properties properties;
 
-    Coordinate3d center;
+    coordinate3d center;
     double radius{ 0.0 };
 
-    std::optional<Vector3d> extrusion;
+    std::optional<vector3d> extrusion;
     std::optional<double> thickness;
 };
 
-struct Arc final
+struct arc final
 {
-    EntityProperties properties;
+    entity_properties properties;
 
-    Coordinate3d center;
+    coordinate3d center;
     double radius{ 0.0 };
-    double startAngle{ 0.0 };
-    double endAngle{ 0.0 };
+    double start_angle{ 0.0 };
+    double end_angle{ 0.0 };
 
-    std::optional<Vector3d> extrusion;
+    std::optional<vector3d> extrusion;
     std::optional<double> thickness;
 };
 
-struct Ellipse final
+struct ellipse final
 {
-    EntityProperties properties;
+    entity_properties properties;
 
-    Coordinate3d center;
-    Coordinate3d endPointMajor;
-    double axisRatio{ 1.0 };
-    double startParameter{ 0.0 };
-    double endParameter{ 2 * std::numbers::pi };
+    coordinate3d center;
+    coordinate3d end_point_major;
+    double axis_ratio{ 1.0 };
+    double start_parameter{ 0.0 };
+    double end_parameter{ 2 * std::numbers::pi };
 
-    std::optional<Vector3d> extrusion;
+    std::optional<vector3d> extrusion;
 };
 
-struct Vertex final
+struct vertex final
 {
-    Coordinate2d position;
+    coordinate2d position;
     std::optional<double> bulge;
 };
 
-using Vertices = std::vector<Vertex>;
+using vertices = std::vector<vertex>;
 
-struct LWPolyline final
+struct lw_polyline final
 {
-    EntityProperties properties;
+    entity_properties properties;
 
     std::optional<double> elevation;
-    bool isClosed{ false };
-    Vertices vertices;
+    bool is_closed{ false };
+    odxf::vertices vertices;
 };
 
-using Entity = std::variant<Arc, Circle, Ellipse, Line, LWPolyline, Point, Ray>;
+using entity = std::variant<arc, circle, ellipse, line, lw_polyline, point, ray>;
 
 // in file order, which is the default draw order
-using Entities = std::vector<Entity>;
+using entities = std::vector<entity>;
 
 }   // namespace odxf

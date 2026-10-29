@@ -9,25 +9,25 @@
 namespace odxf {
 
 // The entity takes the property from its layer.
-struct ByLayer final
+struct by_layer final
 {
-    bool operator==(const ByLayer&) const = default;
+    bool operator==(const by_layer&) const = default;
 };
 
 // The entity takes the property from the block reference it's part of.
-struct ByBlock final
+struct by_block final
 {
-    bool operator==(const ByBlock&) const = default;
+    bool operator==(const by_block&) const = default;
 };
 
-struct Transparency final
+struct transparency final
 {
     // 0 is fully transparent, 255 opaque.
     std::uint8_t alpha{ 255 };
 
-    bool operator==(const Transparency&) const = default;
+    bool operator==(const transparency&) const = default;
 };
 
-using EntityTransparency = std::variant<ByLayer, ByBlock, Transparency>;
+using entity_transparency = std::variant<by_layer, by_block, transparency>;
 
 }   // namespace odxf
