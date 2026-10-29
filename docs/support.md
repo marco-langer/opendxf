@@ -42,7 +42,8 @@ All header variables are read into and written from a generic key/value map. Typ
 | POINT      | –    | ✓     |
 | RAY        | –    | ✓     |
 
-Unsupported tables and entities are skipped when reading.
+Unsupported tables and entities are skipped when reading. Entities are read and written in file
+order, which is the default draw order.
 
 ## Colors
 
@@ -112,3 +113,4 @@ transparency, and writes no APPID table otherwise.
 - Files without a HEADER section are rejected.
 - The BLOCKS section is skipped when reading and written empty.
 - `writeDxf()` does not report errors.
+- POINT and ELLIPSE are written with the wrong entity type (LINE and ARC), so other readers misread them.

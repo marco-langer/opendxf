@@ -64,6 +64,31 @@ TEST(write, example)
     EXPECT_THAT(readDocument, IsDocument(document));
 }
 
+TEST(write, keepsEntityOrder)
+{
+    // Arrange
+    odxf::Document document;
+    document.entities = {
+        odxf::Circle{ .radius = 1.0 },          odxf::Line{ .end = { 1.0, 0.0, 0.0 } },
+        odxf::Circle{ .radius = 2.0 },          odxf::Arc{ .radius = 3.0, .endAngle = 90.0 },
+        odxf::Line{ .end = { 2.0, 0.0, 0.0 } },
+    };
+
+    const std::filesystem::path filePath{ "test_entity_order.dxf" };
+    std::filesystem::remove(filePath);
+    ASSERT_FALSE(std::filesystem::exists(filePath));
+
+    // Act
+    odxf::writeDxf(document, filePath);
+
+    // Assert
+    ReadStream istream;
+    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+
+    ASSERT_TRUE(result.has_value());
+    EXPECT_THAT(istream.document(), IsDocument(document));
+}
+
 TEST(write, layerTransparencyRegistersApp)
 {
     // Arrange

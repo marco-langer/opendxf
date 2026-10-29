@@ -767,7 +767,7 @@ std::expected<void, Error> Reader::readEntities()
     return {};
 }
 
-template <std::derived_from<Entity> E, std::predicate<E&> F>
+template <EntityType E, std::predicate<E&> F>
 std::expected<E, Error> Reader::readEntity(F readGroupCode)
 {
     if (!readNext()) {
@@ -784,27 +784,27 @@ std::expected<E, Error> Reader::readEntity(F readGroupCode)
     return entity;
 }
 
-bool Reader::readEntityProperty(Entity& entity)
+bool Reader::readEntityProperty(EntityProperties& properties)
 {
     switch (m_data.groupCode) {
-    case 8: entity.layer = m_data.value; return true;
+    case 8: properties.layer = m_data.value; return true;
 
-    case 62: return parseInto(entity.color);
+    case 62: return parseInto(properties.color);
 
-    case 420: return parseInto(entity.trueColor);
+    case 420: return parseInto(properties.trueColor);
 
-    case 370: return parseInto(entity.lineweight);
+    case 370: return parseInto(properties.lineweight);
 
-    case 6: entity.lineType = m_data.value; return true;
+    case 6: properties.lineType = m_data.value; return true;
 
-    case 48: return parseInto(entity.lineTypeScale);
+    case 48: return parseInto(properties.lineTypeScale);
 
     case 440: {
         int transparency{ 0 };
         if (!parseInto(transparency)) {
             return false;
         }
-        entity.transparency = decodeEntityTransparency(transparency);
+        properties.transparency = decodeEntityTransparency(transparency);
         return true;
     }
 
@@ -822,7 +822,7 @@ std::expected<void, Error> Reader::readLine()
                case 20: return parseInto(line.start.y);
                case 11: return parseInto(line.end.x);
                case 21: return parseInto(line.end.y);
-               default: return readEntityProperty(line);
+               default: return readEntityProperty(line.properties);
                }
            })
         .transform([this](const Line& line) { m_stream.line(line); });
@@ -835,7 +835,7 @@ std::expected<void, Error> Reader::readCircle()
                case 10: return parseInto(circle.center.x);
                case 20: return parseInto(circle.center.y);
                case 40: return parseInto(circle.radius);
-               default: return readEntityProperty(circle);
+               default: return readEntityProperty(circle.properties);
                }
            })
         .transform([this](const Circle& circle) { m_stream.circle(circle); });
@@ -850,7 +850,7 @@ std::expected<void, Error> Reader::readArc()
                case 40: return parseInto(arc.radius);
                case 50: return parseInto(arc.startAngle);
                case 51: return parseInto(arc.endAngle);
-               default: return readEntityProperty(arc);
+               default: return readEntityProperty(arc.properties);
                }
            })
         .transform([this](const Arc& arc) { m_stream.arc(arc); });
@@ -916,7 +916,7 @@ std::expected<void, Error> Reader::readLWPolyline()
                 pushCompleteVertex(lwPolyline);
                 return true;
 
-            default: return readEntityProperty(lwPolyline);
+            default: return readEntityProperty(lwPolyline.properties);
             }
         }) };
 

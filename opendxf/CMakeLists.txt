@@ -14,6 +14,7 @@ add_library(opendxf STATIC
     include/opendxf/write.hpp
     src/headervariables.cpp
     src/ireadstream.cpp
+    src/overload.hpp
     src/read.cpp
     src/reader.cpp
     src/reader.hpp

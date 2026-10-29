@@ -23,15 +23,12 @@ private:
     }
     void layer(const odxf::Layer& layer) override { m_document.tables.layers.push_back(layer); }
 
-    void arc(const odxf::Arc& arc) override { m_document.entities.arcs.push_back(arc); }
-    void circle(const odxf::Circle& circle) override
-    {
-        m_document.entities.circles.push_back(circle);
-    }
-    void line(const odxf::Line& line) override { m_document.entities.lines.push_back(line); }
+    void arc(const odxf::Arc& arc) override { m_document.entities.push_back(arc); }
+    void circle(const odxf::Circle& circle) override { m_document.entities.push_back(circle); }
+    void line(const odxf::Line& line) override { m_document.entities.push_back(line); }
     void lwPolyline(const odxf::LWPolyline& lwPolyline) override
     {
-        m_document.entities.lwPolylines.push_back(lwPolyline);
+        m_document.entities.push_back(lwPolyline);
     }
 
     odxf::Document m_document;
