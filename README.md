@@ -122,7 +122,7 @@ if (!stream->close()) {
 }
 ```
 
-More complete programs are in [examples](examples).
+More complete programs are in [examples](examples), including one that copies the entities of one layer to a new file by combining both streams.
 
 ## Building and testing
 
