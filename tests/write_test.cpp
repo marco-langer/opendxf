@@ -56,7 +56,7 @@ TEST(write, example)
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     ReadStream istream;
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
 
     ASSERT_TRUE(result.has_value());
 
@@ -85,7 +85,7 @@ TEST(write, keepsEntityOrder)
     // Assert
     ASSERT_TRUE(writeResult.has_value());
     ReadStream istream;
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
 
     ASSERT_TRUE(result.has_value());
     EXPECT_THAT(istream.document(), IsDocument(document));
@@ -199,7 +199,7 @@ TEST(writeStream, destructorCloses)
 
     // Assert
     ReadStream istream;
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
 
     ASSERT_TRUE(result.has_value());
     EXPECT_THAT(istream.document(), IsDocument(document));

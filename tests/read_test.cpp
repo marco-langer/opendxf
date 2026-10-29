@@ -21,7 +21,7 @@ TEST(read, example)
     ReadStream istream;
 
     // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
 
     // Assert
     if (!result) {
@@ -45,7 +45,7 @@ TEST(read, padded)
     ReadStream istream;
 
     // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
 
     // Assert
     EXPECT_TRUE(result.has_value());
@@ -66,7 +66,7 @@ TEST(read, minimalExample)
     ReadStream istream;
 
     // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
 
     // Assert
     if (!result) {
@@ -95,7 +95,7 @@ TEST_P(ParseErrorFixture, ParseError)
     ReadStream istream;
 
     // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
 
     // Assert
     ASSERT_FALSE(result.has_value());

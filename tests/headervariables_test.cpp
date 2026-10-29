@@ -103,7 +103,7 @@ TEST(insertionUnits, roundTrip)
     const std::expected<void, odxf::Error> writeResult{ odxf::write(filePath, document) };
 
     ReadStream istream;
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
 
     // Assert
     ASSERT_TRUE(writeResult.has_value());

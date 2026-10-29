@@ -8,7 +8,7 @@
 
 namespace odxf {
 
-std::expected<void, Error> read(IReadStream& stream, const std::filesystem::path& filePath)
+std::expected<void, Error> read(const std::filesystem::path& filePath, IReadStream& stream)
 {
     Reader reader{ stream };
 

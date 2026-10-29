@@ -54,7 +54,7 @@ int main()
 {
     LineCounter counter;
 
-    const std::expected<void, odxf::Error> result{ odxf::read(counter, "drawing.dxf") };
+    const std::expected<void, odxf::Error> result{ odxf::read("drawing.dxf", counter) };
     if (!result) {
         std::println("error: {}", result.error().what);
         return EXIT_FAILURE;
