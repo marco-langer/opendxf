@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opendxf/document.hpp"
 #include "opendxf/io/error.hpp"
 
 #include <expected>
@@ -11,6 +12,8 @@
 namespace odxf {
 
 class IReadStream;
+
+std::expected<Document, Error> read(const std::filesystem::path& filePath);
 
 std::expected<void, Error> read(const std::filesystem::path& filePath, IReadStream& stream);
 

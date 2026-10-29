@@ -55,14 +55,10 @@ TEST(write, example)
     ASSERT_TRUE(writeResult.has_value());
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
-    ReadStream istream;
-    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
+    const std::expected<odxf::Document, odxf::Error> readDocument{ odxf::read(filePath) };
 
-    ASSERT_TRUE(result.has_value());
-
-    const odxf::Document& readDocument{ istream.document() };
-
-    EXPECT_THAT(readDocument, IsDocument(document));
+    ASSERT_TRUE(readDocument.has_value());
+    EXPECT_THAT(*readDocument, IsDocument(document));
 }
 
 TEST(write, keepsEntityOrder)
@@ -84,11 +80,10 @@ TEST(write, keepsEntityOrder)
 
     // Assert
     ASSERT_TRUE(writeResult.has_value());
-    ReadStream istream;
-    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
+    const std::expected<odxf::Document, odxf::Error> readDocument{ odxf::read(filePath) };
 
-    ASSERT_TRUE(result.has_value());
-    EXPECT_THAT(istream.document(), IsDocument(document));
+    ASSERT_TRUE(readDocument.has_value());
+    EXPECT_THAT(*readDocument, IsDocument(document));
 }
 
 TEST(write, layerTransparencyRegistersApp)
@@ -198,9 +193,8 @@ TEST(writeStream, destructorCloses)
     }
 
     // Assert
-    ReadStream istream;
-    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
+    const std::expected<odxf::Document, odxf::Error> readDocument{ odxf::read(filePath) };
 
-    ASSERT_TRUE(result.has_value());
-    EXPECT_THAT(istream.document(), IsDocument(document));
+    ASSERT_TRUE(readDocument.has_value());
+    EXPECT_THAT(*readDocument, IsDocument(document));
 }

@@ -9,7 +9,7 @@ ctest --preset release
 
 ## Layout
 
-- `tests/TestUtils.hpp` has `ReadStream`, which collects everything read into a `Document`, and `createExampleDocument()`, the expected content of `tests/data/valid/example.dxf`.
+- `tests/TestUtils.hpp` has `createExampleDocument()`, the expected content of `tests/data/valid/example.dxf`. Tests read files into a `Document` with `odxf::read(path)`.
 - Test data is in `tests/data/valid/` (files the reader must accept) and `tests/data/invalid/` (files it must reject).
 - New test files and matchers must be added to `tests/CMakeLists.txt`.
 - Tests can include the library's private headers in `opendxf/src/`, e.g. `overload.hpp`.

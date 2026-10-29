@@ -102,13 +102,12 @@ TEST(insertionUnits, roundTrip)
     // Act
     const std::expected<void, odxf::Error> writeResult{ odxf::write(filePath, document) };
 
-    ReadStream istream;
-    const std::expected<void, odxf::Error> result{ odxf::read(filePath, istream) };
+    const std::expected<odxf::Document, odxf::Error> readDocument{ odxf::read(filePath) };
 
     // Assert
     ASSERT_TRUE(writeResult.has_value());
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(odxf::insertionUnits(istream.document().header), odxf::LengthUnit::USSurveyFeet);
+    ASSERT_TRUE(readDocument.has_value());
+    EXPECT_EQ(odxf::insertionUnits(readDocument->header), odxf::LengthUnit::USSurveyFeet);
 }
 
 TEST(lineTypeScale, valid)

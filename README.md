@@ -34,7 +34,13 @@ Tests and examples are only built when opendxf is the top-level project. Use `OP
 
 ### Reading
 
-Derive from `odxf::IReadStream` and override the callbacks you are interested in:
+Read a whole file into an `odxf::Document`:
+
+```cpp
+const std::expected<odxf::Document, odxf::Error> document{ odxf::read("drawing.dxf") };
+```
+
+To process a file without holding it in memory, derive from `odxf::IReadStream` and override the callbacks you are interested in:
 
 ```cpp
 #include <opendxf/opendxf.hpp>
