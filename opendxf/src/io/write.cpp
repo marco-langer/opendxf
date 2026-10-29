@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024 Marco Langer
 
-#include "opendxf/write.hpp"
+#include "opendxf/io/write.hpp"
 
 #include "overload.hpp"
 #include "transparency.hpp"
 
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <fstream>
 #include <iomanip>
+#include <utility>
 
 namespace {
 
@@ -336,38 +338,130 @@ void writeEntity(std::ofstream& stream, const odxf::LWPolyline& lwPolyline)
     }
 }
 
-void writeEntities(
-    std::ofstream& stream, const odxf::Entities& entities, const odxf::Tables& tables)
+std::expected<void, odxf::Error> checkStream(const std::ofstream& stream)
 {
-    stream << "\n0\nSECTION\n2\nENTITIES";
-
-    for (const odxf::Entity& entity : entities) {
-        std::visit([&stream](const auto& e) { writeEntity(stream, e); }, entity);
+    if (!stream) {
+        return std::unexpected(
+            odxf::Error{
+                .type = odxf::Error::Type::WriteError,
+                .what = "unable to write the file",
+            });
     }
 
-    stream << "\n0\nENDSEC";
+    return {};
 }
-
-void writeEof(std::ofstream& stream) { stream << "\n0\nEOF"; }
 
 }   // namespace
 
 namespace odxf {
 
-void writeDxf(const Document& document, const std::filesystem::path& file_path)
+std::expected<void, Error> write(const std::filesystem::path& filePath, const Document& document)
 {
-    std::ofstream stream{ file_path };
+    std::expected<WriteStream, Error> maybeStream{ WriteStream::open(
+        filePath, document.header, document.tables) };
+    if (!maybeStream) {
+        return std::unexpected(maybeStream.error());
+    }
+
+    for (const Entity& entity : document.entities) {
+        if (std::expected<void, Error> maybeError = maybeStream->entity(entity); !maybeError) {
+            return maybeError;
+        }
+    }
+
+    return maybeStream->close();
+}
+
+std::expected<WriteStream, Error>
+WriteStream::open(const std::filesystem::path& filePath, const Header& header, const Tables& tables)
+{
+    std::ofstream stream{ filePath };
     if (!stream.is_open()) {
-        return;
+        return std::unexpected(
+            Error{
+                .type = Error::Type::FileOpenError,
+                .what = std::format(
+                    "unable to open file {}",
+                    reinterpret_cast<const char*>(filePath.u8string().c_str())),
+            });
     }
 
     stream << std::setprecision(16);
 
-    writeHeader(stream, document.header);
-    writeTables(stream, document.tables);
+    writeHeader(stream, header);
+    writeTables(stream, tables);
     writeBlocks(stream);
-    writeEntities(stream, document.entities, document.tables);
-    writeEof(stream);
+    stream << "\n0\nSECTION\n2\nENTITIES";
+
+    if (std::expected<void, Error> maybeError = checkStream(stream); !maybeError) {
+        return std::unexpected(maybeError.error());
+    }
+
+    return WriteStream{ std::move(stream) };
+}
+
+WriteStream::WriteStream(std::ofstream stream)
+    : m_stream{ std::move(stream) }
+{
+}
+
+WriteStream::WriteStream(WriteStream&& other) noexcept
+    : m_stream{ std::move(other.m_stream) }
+    , m_isClosed{ std::exchange(other.m_isClosed, true) }
+{
+}
+
+WriteStream& WriteStream::operator=(WriteStream&& other) noexcept
+{
+    if (this != &other) {
+        if (!m_isClosed) {
+            static_cast<void>(close());
+        }
+        m_stream = std::move(other.m_stream);
+        m_isClosed = std::exchange(other.m_isClosed, true);
+    }
+
+    return *this;
+}
+
+WriteStream::~WriteStream()
+{
+    if (!m_isClosed) {
+        static_cast<void>(close());
+    }
+}
+
+std::expected<void, Error> WriteStream::entity(const Entity& entity)
+{
+    if (m_isClosed) {
+        return std::unexpected(
+            Error{
+                .type = Error::Type::WriteError,
+                .what = "entity written after close",
+            });
+    }
+
+    std::visit([this](const auto& e) { writeEntity(m_stream, e); }, entity);
+
+    return checkStream(m_stream);
+}
+
+std::expected<void, Error> WriteStream::close()
+{
+    if (m_isClosed) {
+        return std::unexpected(
+            Error{
+                .type = Error::Type::WriteError,
+                .what = "close called twice",
+            });
+    }
+
+    m_isClosed = true;
+    m_stream << "\n0\nENDSEC";
+    m_stream << "\n0\nEOF";
+    m_stream.close();
+
+    return checkStream(m_stream);
 }
 
 }   // namespace odxf

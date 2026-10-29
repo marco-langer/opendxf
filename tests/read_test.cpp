@@ -18,10 +18,8 @@ TEST(read, example)
     const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "example.dxf" };
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
-    ReadStream istream;
-
     // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<odxf::Document, odxf::Error> result{ odxf::read(filePath) };
 
     // Assert
     if (!result) {
@@ -29,11 +27,9 @@ TEST(read, example)
         FAIL() << std::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
     }
 
-    const odxf::Document& document{ istream.document() };
-
     const odxf::Document expectedDocument{ createExampleDocument() };
 
-    EXPECT_THAT(document, IsDocument(expectedDocument));
+    EXPECT_THAT(*result, IsDocument(expectedDocument));
 }
 
 TEST(read, padded)
@@ -42,10 +38,8 @@ TEST(read, padded)
     const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "padded.dxf" };
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
-    ReadStream istream;
-
     // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<odxf::Document, odxf::Error> result{ odxf::read(filePath) };
 
     // Assert
     EXPECT_TRUE(result.has_value());
@@ -63,10 +57,8 @@ TEST(read, minimalExample)
     const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "minimal_example.dxf" };
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
-    ReadStream istream;
-
     // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<odxf::Document, odxf::Error> result{ odxf::read(filePath) };
 
     // Assert
     if (!result) {
@@ -92,10 +84,8 @@ TEST_P(ParseErrorFixture, ParseError)
     const auto filePath{ std::filesystem::path{ TEST_DATA_DIR } / "invalid" / filename };
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
-    ReadStream istream;
-
     // Act
-    const std::expected<void, odxf::Error> result{ odxf::read(istream, filePath) };
+    const std::expected<odxf::Document, odxf::Error> result{ odxf::read(filePath) };
 
     // Assert
     ASSERT_FALSE(result.has_value());

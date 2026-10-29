@@ -13,7 +13,8 @@ struct Error final
     enum class Type
     {
         FileOpenError,
-        InvalidFile
+        InvalidFile,
+        WriteError
     };
 
     Type type{ Type::InvalidFile };

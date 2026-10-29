@@ -112,5 +112,4 @@ transparency, and writes no APPID table otherwise.
 - The reader expects the sections in the order HEADER, TABLES, BLOCKS, ENTITIES. Files with CLASSES or OBJECTS sections are rejected.
 - Files without a HEADER section are rejected.
 - The BLOCKS section is skipped when reading and written empty.
-- `writeDxf()` does not report errors.
 - POINT and ELLIPSE are written with the wrong entity type (LINE and ARC), so other readers misread them.

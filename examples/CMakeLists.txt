@@ -9,3 +9,9 @@ add_executable(opendxf_example_read main_read.cpp)
 target_link_libraries(opendxf_example_read PRIVATE opendxf)
 
 target_compile_features(opendxf_example_read PRIVATE cxx_std_23)
+
+add_executable(opendxf_example_copy main_copy.cpp)
+
+target_link_libraries(opendxf_example_copy PRIVATE opendxf)
+
+target_compile_features(opendxf_example_copy PRIVATE cxx_std_23)

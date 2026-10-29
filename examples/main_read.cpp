@@ -83,7 +83,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    const std::expected<void, odxf::Error> result{ odxf::read(reader, filePath.value()) };
+    const std::expected<void, odxf::Error> result{ odxf::read(filePath.value(), reader) };
     if (!result.has_value()) {
         printError(result.error());
 
