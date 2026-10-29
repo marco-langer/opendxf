@@ -21,6 +21,12 @@ namespace odxf {
 
 class IReadStream;
 
+// A type that holds the properties all entities share, e.g. Line.
+template <typename E>
+concept EntityType = requires(E& entity) {
+    { entity.properties } -> std::same_as<EntityProperties&>;
+};
+
 class Reader
 {
 public:
@@ -54,10 +60,10 @@ private:
 
     // Reads the group codes of one entity up to the next group code 0. readGroupCode is called for
     // each group code and returns false on an error.
-    template <std::derived_from<Entity> E, std::predicate<E&> F>
+    template <EntityType E, std::predicate<E&> F>
     std::expected<E, Error> readEntity(F readGroupCode);
     // Reads the group codes all entities share, skips unknown ones. Returns false on an error.
-    bool readEntityProperty(Entity& entity);
+    bool readEntityProperty(EntityProperties& properties);
 
     bool readNext();
     bool readNextSingle();

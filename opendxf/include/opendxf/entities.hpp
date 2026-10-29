@@ -20,7 +20,8 @@ struct Vector3d final
     double z{ 0.0 };
 };
 
-struct Entity
+// The properties all entities share.
+struct EntityProperties final
 {
     std::string layer;
     int color{ 256 };                 // BYLAYER
@@ -33,22 +34,28 @@ struct Entity
     EntityTransparency transparency{ ByLayer{} };
 };
 
-struct Point final : Entity
+struct Point final
 {
+    EntityProperties properties;
+
     Coordinate3d coordinate;
 
     std::optional<Vector3d> extrusion;
     std::optional<double> thickness;
 };
 
-struct Ray final : Entity
+struct Ray final
 {
+    EntityProperties properties;
+
     Coordinate3d startPoint;
     Vector3d direction;
 };
 
-struct Line final : Entity
+struct Line final
 {
+    EntityProperties properties;
+
     Coordinate3d start;
     Coordinate3d end;
 
@@ -56,8 +63,10 @@ struct Line final : Entity
     std::optional<double> thickness;
 };
 
-struct Circle final : Entity
+struct Circle final
 {
+    EntityProperties properties;
+
     Coordinate3d center;
     double radius{ 0.0 };
 
@@ -65,8 +74,10 @@ struct Circle final : Entity
     std::optional<double> thickness;
 };
 
-struct Arc final : Entity
+struct Arc final
 {
+    EntityProperties properties;
+
     Coordinate3d center;
     double radius{ 0.0 };
     double startAngle{ 0.0 };
@@ -76,8 +87,10 @@ struct Arc final : Entity
     std::optional<double> thickness;
 };
 
-struct Ellipse final : Entity
+struct Ellipse final
 {
+    EntityProperties properties;
+
     Coordinate3d center;
     Coordinate3d endPointMajor;
     double axisRatio{ 1.0 };
@@ -95,8 +108,10 @@ struct Vertex final
 
 using Vertices = std::vector<Vertex>;
 
-struct LWPolyline final : Entity
+struct LWPolyline final
 {
+    EntityProperties properties;
+
     std::optional<double> elevation;
     bool isClosed{ false };
     Vertices vertices;

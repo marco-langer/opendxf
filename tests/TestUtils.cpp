@@ -109,53 +109,89 @@ odxf::Document createExampleDocument()
     layers.push_back(
         Layer{ .name = layerNameTrueColor, .color = 5, .trueColor = 0x3050A0, .lineweight = 0 });
 
+    // layers[0] has a BYBLOCK transparency, which layers can't have, and stays opaque. layers[3]
+    // only has xdata of another application with a 1071.
+    layers[1].transparency = Transparency{ .alpha = 0x4C };
+    layers[2].transparency = Transparency{ .alpha = 0xFF };
+
     Entities& entities{ expectedDocument.entities };
 
     Lines& lines{ entities.lines };
-    lines
-        .emplace_back(
-            Line{
-                .start = Coordinate3d{ 0.0, 0.5, 0.0 },
-                .end = Coordinate3d{ 1.0, 1.5, 0.0 },
-            })
-        .layer = layerNameLines;
-
-    lines
-        .emplace_back(
-            Line{
-                .start = Coordinate3d{ 0.0, 0.0, 0.0 },
-                .end = Coordinate3d{ 1.0, 1.0, 0.0 },
-            })
-        .layer = layerNameLines;
+    // no group codes 62, 370, 6, 48 and 440, keeps the defaults
+    lines.push_back(
+        Line{
+            .properties = { .layer = layerNameLines, .trueColor = 0xFF8000 },
+            .start = Coordinate3d{ 0.0, 0.5, 0.0 },
+            .end = Coordinate3d{ 1.0, 1.5, 0.0 },
+        });
+    lines.push_back(Line{
+        .properties = {
+            .layer = layerNameLines,
+            .color = 3,
+            .lineweight = 35,
+            .lineType = "DOT_DASH",
+            .lineTypeScale = 2.5,
+            .transparency = Transparency{ .alpha = 0x7F },
+        },
+        .start = Coordinate3d{ 0.0, 0.0, 0.0 },
+        .end = Coordinate3d{ 1.0, 1.0, 0.0 },
+    });
 
     Circles& circles{ entities.circles };
-    circles
-        .emplace_back(
-            Circle{
-                .center = Coordinate3d{ 0.0, 0.0, 0.0 },
-                .radius = 1.0,
-            })
-        .layer = layerNameTest;
+    circles.push_back(Circle{
+        .properties = {
+            .layer = layerNameTest,
+            .color = 2,
+            .trueColor = 0x00FF00,
+            .lineweight = -2,
+            .lineType = "BYBLOCK",
+            .transparency = ByBlock{},
+        },
+        .center = Coordinate3d{ 0.0, 0.0, 0.0 },
+        .radius = 1.0,
+    });
 
     Arcs& arcs{ entities.arcs };
-    arcs.emplace_back(
-            Arc{
-                .center = Coordinate3d{ 0.0, 2.0, 0.0 },
-                .radius = 0.5,
-                .startAngle = 0.0,
-                .endAngle = 180.0,
-            })
-        .layer = layerNameTest;
+    arcs.push_back(Arc{
+        .properties = {
+            .layer = layerNameTest,
+            .color = 5,
+            .trueColor = 0x0000FF,
+            .lineweight = -3,
+            .lineType = "CONTINUOUS",
+            .lineTypeScale = 0.5,
+            .transparency = Transparency{ .alpha = 0x00 },
+        },
+        .center = Coordinate3d{ 0.0, 2.0, 0.0 },
+        .radius = 0.5,
+        .startAngle = 0.0,
+        .endAngle = 180.0,
+    });
 
     LWPolylines& lwPolylines{ entities.lwPolylines };
-    lwPolylines.emplace_back(LWPolyline{}).layer = layerNameLWPolylines;
-    lwPolylines
-        .emplace_back(
-            LWPolyline{
-                .vertices = { Vertex{ .position = { 200.0, 200.0 } } },
-            })
-        .layer = layerNameLWPolylines;
-    lwPolylines.emplace_back(LWPolyline{
+    lwPolylines.push_back(LWPolyline{
+        .properties = {
+            .layer = layerNameLWPolylines,
+            .color = 6,
+            .trueColor = 0x808080,
+            .lineweight = 211,
+            .lineType = "GAS",
+            .transparency = Transparency{ .alpha = 0xFF },
+        },
+    });
+    // has a 440 without the flag of a set value, which counts as BYLAYER
+    lwPolylines.push_back(LWPolyline{
+        .properties = {
+            .layer = layerNameLWPolylines,
+            .color = 256,
+            .lineweight = -1,
+            .lineType = "BYLAYER",
+        },
+        .vertices = { Vertex{ .position = { 200.0, 200.0 } } },
+    });
+    // no group codes 6, 48 and 440, keeps the defaults
+    lwPolylines.push_back(LWPolyline{
+        .properties = { .layer = layerNameLWPolylines, .color = 0, .lineweight = 13 },
         .isClosed = true,
         .vertices = {
             Vertex{
@@ -183,48 +219,7 @@ odxf::Document createExampleDocument()
                 .position = { 60.0, 10.0 },
             },
         },
-    }).layer = layerNameLWPolylines;
-
-    // lines[0] has no group code 62 and keeps the default
-    lines[0].trueColor = 0xFF8000;
-    lines[1].color = 3;
-    circles[0].color = 2;
-    circles[0].trueColor = 0x00FF00;
-    arcs[0].color = 5;
-    arcs[0].trueColor = 0x0000FF;
-    lwPolylines[0].color = 6;
-    lwPolylines[0].trueColor = 0x808080;
-    lwPolylines[1].color = 256;
-    lwPolylines[2].color = 0;
-
-    // lines[0] has no group code 370 and keeps the default
-    lines[1].lineweight = 35;
-    circles[0].lineweight = -2;
-    arcs[0].lineweight = -3;
-    lwPolylines[0].lineweight = 211;
-    lwPolylines[1].lineweight = -1;
-    lwPolylines[2].lineweight = 13;
-
-    // lines[0] and lwPolylines[2] have no group codes 6 and 48 and keep the defaults
-    lines[1].lineType = "DOT_DASH";
-    lines[1].lineTypeScale = 2.5;
-    circles[0].lineType = "BYBLOCK";
-    arcs[0].lineType = "CONTINUOUS";
-    arcs[0].lineTypeScale = 0.5;
-    lwPolylines[0].lineType = "GAS";
-    lwPolylines[1].lineType = "BYLAYER";
-
-    // layers[0] has a BYBLOCK transparency, which layers can't have, and stays opaque. layers[3]
-    // only has xdata of another application with a 1071.
-    layers[1].transparency = Transparency{ .alpha = 0x4C };
-    layers[2].transparency = Transparency{ .alpha = 0xFF };
-
-    // lines[0] and lwPolylines[2] have no group code 440 and keep the default. lwPolylines[1] has
-    // a 440 without the flag of a set value, which counts as BYLAYER.
-    lines[1].transparency = Transparency{ .alpha = 0x7F };
-    circles[0].transparency = ByBlock{};
-    arcs[0].transparency = Transparency{ .alpha = 0x00 };
-    lwPolylines[0].transparency = Transparency{ .alpha = 0xFF };
+    });
 
     return expectedDocument;
 }

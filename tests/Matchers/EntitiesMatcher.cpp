@@ -7,6 +7,23 @@
 
 namespace {
 
+testing::Matcher<odxf::EntityProperties>
+IsEntityProperties(const odxf::EntityProperties& expected, double maxError)
+{
+    return testing::AllOf(
+        testing::Field("layer", &odxf::EntityProperties::layer, expected.layer),
+        testing::Field("color", &odxf::EntityProperties::color, expected.color),
+        testing::Field("trueColor", &odxf::EntityProperties::trueColor, expected.trueColor),
+        testing::Field("lineweight", &odxf::EntityProperties::lineweight, expected.lineweight),
+        testing::Field("lineType", &odxf::EntityProperties::lineType, expected.lineType),
+        testing::Field(
+            "lineTypeScale",
+            &odxf::EntityProperties::lineTypeScale,
+            testing::DoubleNear(expected.lineTypeScale, maxError)),
+        testing::Field(
+            "transparency", &odxf::EntityProperties::transparency, expected.transparency));
+}
+
 testing::Matcher<odxf::Vertex> IsVertex(const odxf::Vertex& expected, double maxError)
 {
     return testing::AllOf(
@@ -30,16 +47,10 @@ AreVertices(const odxf::Vertices& expected, double maxError)
 testing::Matcher<odxf::LWPolyline> IsLWPolyline(const odxf::LWPolyline& expected, double maxError)
 {
     return testing::AllOf(
-        testing::Field("layer", &odxf::Entity::layer, expected.layer),
-        testing::Field("color", &odxf::Entity::color, expected.color),
-        testing::Field("trueColor", &odxf::Entity::trueColor, expected.trueColor),
-        testing::Field("lineweight", &odxf::Entity::lineweight, expected.lineweight),
-        testing::Field("lineType", &odxf::Entity::lineType, expected.lineType),
         testing::Field(
-            "lineTypeScale",
-            &odxf::Entity::lineTypeScale,
-            testing::DoubleNear(expected.lineTypeScale, maxError)),
-        testing::Field("transparency", &odxf::Entity::transparency, expected.transparency),
+            "properties",
+            &odxf::LWPolyline::properties,
+            IsEntityProperties(expected.properties, maxError)),
         testing::Field("isClosed", &odxf::LWPolyline::isClosed, expected.isClosed),
         testing::Field(
             "vertices", &odxf::LWPolyline::vertices, AreVertices(expected.vertices, maxError)));
@@ -60,16 +71,10 @@ AreLWPolylines(const odxf::LWPolylines& expected, double maxError)
 testing::Matcher<odxf::Line> IsLine(const odxf::Line& expected, double maxError)
 {
     return testing::AllOf(
-        testing::Field("layer", &odxf::Entity::layer, expected.layer),
-        testing::Field("color", &odxf::Entity::color, expected.color),
-        testing::Field("trueColor", &odxf::Entity::trueColor, expected.trueColor),
-        testing::Field("lineweight", &odxf::Entity::lineweight, expected.lineweight),
-        testing::Field("lineType", &odxf::Entity::lineType, expected.lineType),
         testing::Field(
-            "lineTypeScale",
-            &odxf::Entity::lineTypeScale,
-            testing::DoubleNear(expected.lineTypeScale, maxError)),
-        testing::Field("transparency", &odxf::Entity::transparency, expected.transparency),
+            "properties",
+            &odxf::Line::properties,
+            IsEntityProperties(expected.properties, maxError)),
         testing::Field("start", &odxf::Line::start, IsCoordinate(expected.start, maxError)),
         testing::Field("end", &odxf::Line::end, IsCoordinate(expected.end, maxError)));
 }
@@ -77,16 +82,10 @@ testing::Matcher<odxf::Line> IsLine(const odxf::Line& expected, double maxError)
 testing::Matcher<odxf::Circle> IsCircle(const odxf::Circle& expected, double maxError)
 {
     return testing::AllOf(
-        testing::Field("layer", &odxf::Entity::layer, expected.layer),
-        testing::Field("color", &odxf::Entity::color, expected.color),
-        testing::Field("trueColor", &odxf::Entity::trueColor, expected.trueColor),
-        testing::Field("lineweight", &odxf::Entity::lineweight, expected.lineweight),
-        testing::Field("lineType", &odxf::Entity::lineType, expected.lineType),
         testing::Field(
-            "lineTypeScale",
-            &odxf::Entity::lineTypeScale,
-            testing::DoubleNear(expected.lineTypeScale, maxError)),
-        testing::Field("transparency", &odxf::Entity::transparency, expected.transparency),
+            "properties",
+            &odxf::Circle::properties,
+            IsEntityProperties(expected.properties, maxError)),
         testing::Field("center", &odxf::Circle::center, IsCoordinate(expected.center, maxError)),
         testing::Field(
             "radius", &odxf::Circle::radius, testing::DoubleNear(expected.radius, maxError)));
@@ -95,16 +94,10 @@ testing::Matcher<odxf::Circle> IsCircle(const odxf::Circle& expected, double max
 testing::Matcher<odxf::Arc> IsArc(const odxf::Arc& expected, double maxError)
 {
     return testing::AllOf(
-        testing::Field("layer", &odxf::Entity::layer, expected.layer),
-        testing::Field("color", &odxf::Entity::color, expected.color),
-        testing::Field("trueColor", &odxf::Entity::trueColor, expected.trueColor),
-        testing::Field("lineweight", &odxf::Entity::lineweight, expected.lineweight),
-        testing::Field("lineType", &odxf::Entity::lineType, expected.lineType),
         testing::Field(
-            "lineTypeScale",
-            &odxf::Entity::lineTypeScale,
-            testing::DoubleNear(expected.lineTypeScale, maxError)),
-        testing::Field("transparency", &odxf::Entity::transparency, expected.transparency),
+            "properties",
+            &odxf::Arc::properties,
+            IsEntityProperties(expected.properties, maxError)),
         testing::Field("center", &odxf::Arc::center, IsCoordinate(expected.center, maxError)),
         testing::Field(
             "radius", &odxf::Arc::radius, testing::DoubleNear(expected.radius, maxError)),

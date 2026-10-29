@@ -16,7 +16,7 @@ A type encapsulates only its invariants. Everything else is a free function that
 - A type with an invariant keeps its data private and offers only the member functions that maintain the invariant.
 - All other operations, such as reading and writing DXF or the typed header accessors (`insertionUnits(header)`), are free functions.
 
-Common properties of entities are in an `Entity` base that holds only data.
+Common properties of entities are in an `EntityProperties` struct that each entity holds as its `properties` member. Entities share no base class.
 
 ## Rationale
 
@@ -28,5 +28,5 @@ Common properties of entities are in an `Entity` base that holds only data.
 ## Consequences
 
 - Code shared by all entities has to be written once explicitly, e.g. `readEntityProperty` and `readEntity` in the reader. Without that, it is duplicated per entity type.
-- Fields of the `Entity` base cannot be set in the same expression as the entity's own fields, so tests set `layer`, `color` etc. after construction.
+- Common properties are accessed through the member, e.g. `line.properties.layer`. The member also lets an entity including its common properties be built in one designated initializer, which C++23 doesn't allow for base classes. C++29 adds this for base classes (P2287); the member stays because the `Entity` variant needs no common base.
 - Adding an entity type touches the model, the reader, the writer, `IReadStream`, the test matchers and the test data.
