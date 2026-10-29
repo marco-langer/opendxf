@@ -2,7 +2,7 @@
 
 Formatting is handled by `clang-format` with the repo's `.clang-format`. This page covers what it does not, and why. Design decisions are in [docs/adr](adr). Where a rule applies a [C++ Core Guideline](adr/0001-follow-cpp-core-guidelines.md), it links it instead of repeating its reasoning.
 
-**Names are snake_case like the standard library's,** including types and enumerators, see [ADR 6](adr/0006-standard-library-naming.md). Private data members start with `m_`. Qualify a type with `odxf::` where a variable has its name (`odxf::layer layer;`).
+**Names are snake_case like the standard library's,** including types and enumerators; GoogleTest test names are PascalCase, see [ADR 6](adr/0006-standard-library-naming.md). Private data members start with `m_`. Qualify a type with `odxf::` where a variable has its name (`odxf::layer layer;`).
 
 **Brace initialization** (`const int count{ 0 };`), see [ES.23](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#res-list).
 

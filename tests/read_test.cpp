@@ -12,7 +12,7 @@
 #include <filesystem>
 #include <format>
 
-TEST(read, example)
+TEST(Read, Example)
 {
     // Arrange
     const auto file_path{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "example.dxf" };
@@ -32,7 +32,7 @@ TEST(read, example)
     EXPECT_THAT(*result, is_document(expected_document));
 }
 
-TEST(read, padded)
+TEST(Read, Padded)
 {
     // Arrange
     const auto file_path{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "padded.dxf" };
@@ -49,7 +49,7 @@ TEST(read, padded)
     }
 }
 
-TEST(read, minimal_example)
+TEST(Read, MinimalExample)
 {
     GTEST_SKIP() << "reader requires a HEADER section";
 
@@ -74,10 +74,10 @@ struct parse_error_param final
     int error_line;
 };
 
-struct parse_error_fixture : testing::TestWithParam<parse_error_param>
+struct ParseErrorFixture : testing::TestWithParam<parse_error_param>
 {};
 
-TEST_P(parse_error_fixture, parse_error)
+TEST_P(ParseErrorFixture, ParseError)
 {
     // Arrange
     const auto& [filename, expected_error_line]{ GetParam() };
@@ -95,8 +95,8 @@ TEST_P(parse_error_fixture, parse_error)
 
 // clang-format off
 INSTANTIATE_TEST_SUITE_P(
-    parse_error_test,
-    parse_error_fixture,
+    ParseErrorTest,
+    ParseErrorFixture,
     testing::Values(
         parse_error_param{
             .filename = "missing_group_code.dxf",

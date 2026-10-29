@@ -39,7 +39,7 @@ std::vector<std::string> read_file(const std::filesystem::path& file_path)
 
 }   // namespace
 
-TEST(write, example)
+TEST(Write, Example)
 {
     // Arrange
     const odxf::document document{ create_example_document() };
@@ -61,7 +61,7 @@ TEST(write, example)
     EXPECT_THAT(*read_document, is_document(document));
 }
 
-TEST(write, keeps_entity_order)
+TEST(Write, KeepsEntityOrder)
 {
     // Arrange
     odxf::document document;
@@ -86,7 +86,7 @@ TEST(write, keeps_entity_order)
     EXPECT_THAT(*read_document, is_document(document));
 }
 
-TEST(write, layer_transparency_registers_app)
+TEST(Write, LayerTransparencyRegistersApp)
 {
     // Arrange
     odxf::document document;
@@ -108,7 +108,7 @@ TEST(write, layer_transparency_registers_app)
     EXPECT_FALSE(std::ranges::search(file_content, app_id_record).empty());
 }
 
-TEST(write, no_app_ids_without_layer_transparency)
+TEST(Write, NoAppIdsWithoutLayerTransparency)
 {
     // Arrange
     odxf::document document;
@@ -128,7 +128,7 @@ TEST(write, no_app_ids_without_layer_transparency)
     EXPECT_THAT(file_content, testing::Not(testing::Contains("APPID")));
 }
 
-TEST(write, file_open_error)
+TEST(Write, FileOpenError)
 {
     // Arrange
     const std::filesystem::path file_path{ "missing_directory/test.dxf" };
@@ -142,7 +142,7 @@ TEST(write, file_open_error)
     EXPECT_EQ(result.error().type, odxf::error_type::file_open_error);
 }
 
-TEST(write_stream, entity_after_close)
+TEST(WriteStream, EntityAfterClose)
 {
     // Arrange
     std::expected<odxf::write_stream, odxf::error> stream{ odxf::write_stream::open(
@@ -158,7 +158,7 @@ TEST(write_stream, entity_after_close)
     EXPECT_EQ(result.error().type, odxf::error_type::write_error);
 }
 
-TEST(write_stream, close_twice)
+TEST(WriteStream, CloseTwice)
 {
     // Arrange
     std::expected<odxf::write_stream, odxf::error> stream{ odxf::write_stream::open(
@@ -174,7 +174,7 @@ TEST(write_stream, close_twice)
     EXPECT_EQ(result.error().type, odxf::error_type::write_error);
 }
 
-TEST(write_stream, destructor_closes)
+TEST(WriteStream, DestructorCloses)
 {
     // Arrange
     const std::filesystem::path file_path{ "test_destructor_closes.dxf" };

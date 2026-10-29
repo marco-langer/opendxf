@@ -13,7 +13,7 @@
 #include <limits>
 #include <optional>
 
-TEST(insertion_units, valid)
+TEST(InsertionUnits, Valid)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$INSUNITS", 4 } } };
@@ -28,7 +28,7 @@ TEST(insertion_units, valid)
     EXPECT_EQ(result.value(), odxf::length_unit::millimeters);
 }
 
-TEST(insertion_units, missing)
+TEST(InsertionUnits, Missing)
 {
     // Arrange
     const odxf::header header{};
@@ -43,7 +43,7 @@ TEST(insertion_units, missing)
     EXPECT_EQ(result.value(), std::nullopt);
 }
 
-TEST(insertion_units, wrong_type)
+TEST(InsertionUnits, WrongType)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$INSUNITS", 4.0 } } };
@@ -58,10 +58,10 @@ TEST(insertion_units, wrong_type)
     EXPECT_EQ(result.error(), odxf::header_error::wrong_type);
 }
 
-class insertion_units_invalid_value_test : public testing::TestWithParam<int>
+class InsertionUnitsInvalidValueTest : public testing::TestWithParam<int>
 {};
 
-TEST_P(insertion_units_invalid_value_test, invalid_value)
+TEST_P(InsertionUnitsInvalidValueTest, InvalidValue)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$INSUNITS", GetParam() } } };
@@ -76,10 +76,9 @@ TEST_P(insertion_units_invalid_value_test, invalid_value)
     EXPECT_EQ(result.error(), odxf::header_error::invalid_value);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    insertion_units, insertion_units_invalid_value_test, testing::Values(-1, 25));
+INSTANTIATE_TEST_SUITE_P(InsertionUnits, InsertionUnitsInvalidValueTest, testing::Values(-1, 25));
 
-TEST(set_insertion_units, overwrites_existing_value)
+TEST(SetInsertionUnits, OverwritesExistingValue)
 {
     // Arrange
     odxf::header header{ .entries{ { "$INSUNITS", 4.0 } } };
@@ -91,7 +90,7 @@ TEST(set_insertion_units, overwrites_existing_value)
     EXPECT_EQ(odxf::insertion_units(header), odxf::length_unit::inches);
 }
 
-TEST(insertion_units, round_trip)
+TEST(InsertionUnits, RoundTrip)
 {
     // Arrange
     odxf::document document{ create_example_document() };
@@ -111,7 +110,7 @@ TEST(insertion_units, round_trip)
     EXPECT_EQ(odxf::insertion_units(read_document->header), odxf::length_unit::us_survey_feet);
 }
 
-TEST(line_type_scale, valid)
+TEST(LineTypeScale, Valid)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$LTSCALE", 2.5 } } };
@@ -125,7 +124,7 @@ TEST(line_type_scale, valid)
     EXPECT_EQ(result.value(), 2.5);
 }
 
-TEST(line_type_scale, missing)
+TEST(LineTypeScale, Missing)
 {
     // Arrange
     const odxf::header header{};
@@ -139,7 +138,7 @@ TEST(line_type_scale, missing)
     EXPECT_EQ(result.value(), std::nullopt);
 }
 
-TEST(line_type_scale, wrong_type)
+TEST(LineTypeScale, WrongType)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$LTSCALE", 2 } } };
@@ -153,10 +152,10 @@ TEST(line_type_scale, wrong_type)
     EXPECT_EQ(result.error(), odxf::header_error::wrong_type);
 }
 
-class line_type_scale_invalid_value_test : public testing::TestWithParam<double>
+class LineTypeScaleInvalidValueTest : public testing::TestWithParam<double>
 {};
 
-TEST_P(line_type_scale_invalid_value_test, invalid_value)
+TEST_P(LineTypeScaleInvalidValueTest, InvalidValue)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$LTSCALE", GetParam() } } };
@@ -171,15 +170,15 @@ TEST_P(line_type_scale_invalid_value_test, invalid_value)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    line_type_scale,
-    line_type_scale_invalid_value_test,
+    LineTypeScale,
+    LineTypeScaleInvalidValueTest,
     testing::Values(
         0.0,
         -1.0,
         std::numeric_limits<double>::infinity(),
         std::numeric_limits<double>::quiet_NaN()));
 
-TEST(set_line_type_scale, overwrites_existing_value)
+TEST(SetLineTypeScale, OverwritesExistingValue)
 {
     // Arrange
     odxf::header header{ .entries{ { "$LTSCALE", 1.0 } } };
