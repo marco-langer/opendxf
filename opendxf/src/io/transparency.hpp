@@ -19,11 +19,11 @@ inline constexpr int byBlockTransparencyValue{ 0x01000000 };
 inline constexpr int byValueTransparencyFlag{ 0x02000000 };
 
 // For a layer: empty, i.e. opaque, for anything but 0x02000000 | alpha.
-std::optional<Transparency> decodeLayerTransparency(int value);
+std::optional<transparency> decodeLayerTransparency(int value);
 
 // BYLAYER for anything but 0x01000000 or 0x02000000 | alpha.
-EntityTransparency decodeEntityTransparency(int value);
+entity_transparency decodeEntityTransparency(int value);
 
-int encodeTransparency(const Transparency& transparency);
+int encodeTransparency(const odxf::transparency& transparency);
 
 }   // namespace odxf

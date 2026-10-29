@@ -7,4 +7,4 @@
 
 #include <gmock/gmock.h>
 
-testing::Matcher<std::vector<odxf::Layer>> AreLayers(const std::vector<odxf::Layer>& expected);
+testing::Matcher<std::vector<odxf::layer>> are_layers(const std::vector<odxf::layer>& expected);

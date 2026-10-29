@@ -19,17 +19,17 @@ TEST(read, example)
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     // Act
-    const std::expected<odxf::Document, odxf::Error> result{ odxf::read(filePath) };
+    const std::expected<odxf::document, odxf::error> result{ odxf::read(filePath) };
 
     // Assert
     if (!result) {
-        const odxf::Error& error{ result.error() };
+        const odxf::error& error{ result.error() };
         FAIL() << std::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
     }
 
-    const odxf::Document expectedDocument{ createExampleDocument() };
+    const odxf::document expectedDocument{ createExampleDocument() };
 
-    EXPECT_THAT(*result, IsDocument(expectedDocument));
+    EXPECT_THAT(*result, is_document(expectedDocument));
 }
 
 TEST(read, padded)
@@ -39,12 +39,12 @@ TEST(read, padded)
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     // Act
-    const std::expected<odxf::Document, odxf::Error> result{ odxf::read(filePath) };
+    const std::expected<odxf::document, odxf::error> result{ odxf::read(filePath) };
 
     // Assert
     EXPECT_TRUE(result.has_value());
     if (!result) {
-        const odxf::Error& error{ result.error() };
+        const odxf::error& error{ result.error() };
         FAIL() << std::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
     }
 }
@@ -58,25 +58,25 @@ TEST(read, minimalExample)
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     // Act
-    const std::expected<odxf::Document, odxf::Error> result{ odxf::read(filePath) };
+    const std::expected<odxf::document, odxf::error> result{ odxf::read(filePath) };
 
     // Assert
     if (!result) {
-        const odxf::Error& error{ result.error() };
+        const odxf::error& error{ result.error() };
         FAIL() << std::format("Line ({}): {}", error.lineNumber.value_or(-1), error.what);
     }
 }
 
-struct ParseErrorParam final
+struct parse_error_param final
 {
     std::string filename;
     int errorLine;
 };
 
-struct ParseErrorFixture : testing::TestWithParam<ParseErrorParam>
+struct parse_error_fixture : testing::TestWithParam<parse_error_param>
 {};
 
-TEST_P(ParseErrorFixture, ParseError)
+TEST_P(parse_error_fixture, parse_error)
 {
     // Arrange
     const auto& [filename, expectedErrorLine]{ GetParam() };
@@ -85,7 +85,7 @@ TEST_P(ParseErrorFixture, ParseError)
     ASSERT_TRUE(std::filesystem::is_regular_file(filePath));
 
     // Act
-    const std::expected<odxf::Document, odxf::Error> result{ odxf::read(filePath) };
+    const std::expected<odxf::document, odxf::error> result{ odxf::read(filePath) };
 
     // Assert
     ASSERT_FALSE(result.has_value());
@@ -94,18 +94,18 @@ TEST_P(ParseErrorFixture, ParseError)
 
 // clang-format off
 INSTANTIATE_TEST_SUITE_P(
-    ParseErrorTest,
-    ParseErrorFixture,
+    parse_error_test,
+    parse_error_fixture,
     testing::Values(
-        ParseErrorParam{
+        parse_error_param{
             .filename = "missing_group_code.dxf",
             .errorLine = 5,
         },
-        ParseErrorParam{
+        parse_error_param{
             .filename = "empty_group_code.dxf",
             .errorLine = 5,
         },
-        ParseErrorParam{
+        parse_error_param{
             .filename = "empty_group_code_padded.dxf",
             .errorLine = 5,
         }

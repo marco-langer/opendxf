@@ -5,13 +5,13 @@
 
 namespace odxf {
 
-struct Coordinate2d final
+struct coordinate2d final
 {
     double x{ 0.0 };
     double y{ 0.0 };
 };
 
-struct Coordinate3d final
+struct coordinate3d final
 {
     double x{ 0.0 };
     double y{ 0.0 };

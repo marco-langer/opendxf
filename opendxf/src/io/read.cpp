@@ -10,44 +10,44 @@
 
 namespace {
 
-class DocumentStream final : public odxf::IReadStream
+class document_stream final : public odxf::read_stream_base
 {
 public:
-    odxf::Document document() && { return std::move(m_document); }
+    odxf::document document() && { return std::move(m_document); }
 
 private:
-    void header(const odxf::Header& header) override { m_document.header = header; }
-    void lineType(const odxf::LineType& lineType) override
+    void header(const odxf::header& header) override { m_document.header = header; }
+    void lineType(const odxf::line_type& lineType) override
     {
         m_document.tables.lineTypes.push_back(lineType);
     }
-    void layer(const odxf::Layer& layer) override { m_document.tables.layers.push_back(layer); }
+    void layer(const odxf::layer& layer) override { m_document.tables.layers.push_back(layer); }
 
-    void arc(const odxf::Arc& arc) override { m_document.entities.push_back(arc); }
-    void circle(const odxf::Circle& circle) override { m_document.entities.push_back(circle); }
-    void line(const odxf::Line& line) override { m_document.entities.push_back(line); }
-    void lwPolyline(const odxf::LWPolyline& lwPolyline) override
+    void arc(const odxf::arc& arc) override { m_document.entities.push_back(arc); }
+    void circle(const odxf::circle& circle) override { m_document.entities.push_back(circle); }
+    void line(const odxf::line& line) override { m_document.entities.push_back(line); }
+    void lwPolyline(const odxf::lw_polyline& lwPolyline) override
     {
         m_document.entities.push_back(lwPolyline);
     }
 
-    odxf::Document m_document;
+    odxf::document m_document;
 };
 
 }   // namespace
 
 namespace odxf {
 
-std::expected<Document, Error> read(const std::filesystem::path& filePath)
+std::expected<document, error> read(const std::filesystem::path& filePath)
 {
-    DocumentStream stream;
+    document_stream stream;
 
     return read(filePath, stream).transform([&stream] { return std::move(stream).document(); });
 }
 
-std::expected<void, Error> read(const std::filesystem::path& filePath, IReadStream& stream)
+std::expected<void, error> read(const std::filesystem::path& filePath, read_stream_base& stream)
 {
-    Reader reader{ stream };
+    reader reader{ stream };
 
     return reader.readAll(filePath);
 }

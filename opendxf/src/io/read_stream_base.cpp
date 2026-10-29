@@ -8,20 +8,20 @@
 
 namespace odxf {
 
-IReadStream::~IReadStream() = default;
+read_stream_base::~read_stream_base() = default;
 
-void IReadStream::header(const Header& /* header */) {}
+void read_stream_base::header(const odxf::header& /* header */) {}
 
-void IReadStream::lineType(const LineType& /* lineType */) {}
+void read_stream_base::lineType(const odxf::line_type& /* lineType */) {}
 
-void IReadStream::layer(const Layer& /* layer */) {}
+void read_stream_base::layer(const odxf::layer& /* layer */) {}
 
-void IReadStream::arc(const Arc& /* arc */) {}
+void read_stream_base::arc(const odxf::arc& /* arc */) {}
 
-void IReadStream::circle(const Circle& /* circle */) {}
+void read_stream_base::circle(const odxf::circle& /* circle */) {}
 
-void IReadStream::line(const Line& /* line */) {}
+void read_stream_base::line(const odxf::line& /* line */) {}
 
-void IReadStream::lwPolyline(const LWPolyline& /* lwPolyline */) {}
+void read_stream_base::lwPolyline(const odxf::lw_polyline& /* lwPolyline */) {}
 
 }   // namespace odxf

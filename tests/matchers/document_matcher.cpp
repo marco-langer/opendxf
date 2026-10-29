@@ -7,10 +7,10 @@
 #include "header_matcher.hpp"
 #include "tables_matcher.hpp"
 
-testing::Matcher<odxf::Document> IsDocument(const odxf::Document& expected)
+testing::Matcher<odxf::document> is_document(const odxf::document& expected)
 {
     return testing::AllOf(
-        testing::Field("header", &odxf::Document::header, IsHeader(expected.header)),
-        testing::Field("tables", &odxf::Document::tables, AreTables(expected.tables)),
-        testing::Field("entities", &odxf::Document::entities, AreEntities(expected.entities)));
+        testing::Field("header", &odxf::document::header, is_header(expected.header)),
+        testing::Field("tables", &odxf::document::tables, are_tables(expected.tables)),
+        testing::Field("entities", &odxf::document::entities, are_entities(expected.entities)));
 }

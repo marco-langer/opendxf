@@ -5,26 +5,26 @@
 
 namespace {
 
-testing::Matcher<odxf::Layer> IsLayer(const odxf::Layer& expected)
+testing::Matcher<odxf::layer> is_layer(const odxf::layer& expected)
 {
     return testing::AllOf(
-        testing::Field("name", &odxf::Layer::name, expected.name),
-        testing::Field("color", &odxf::Layer::color, expected.color),
-        testing::Field("trueColor", &odxf::Layer::trueColor, expected.trueColor),
-        testing::Field("lineweight", &odxf::Layer::lineweight, expected.lineweight),
-        testing::Field("lineType", &odxf::Layer::lineType, expected.lineType),
-        testing::Field("transparency", &odxf::Layer::transparency, expected.transparency),
-        testing::Field("flags", &odxf::Layer::flags, expected.flags));
+        testing::Field("name", &odxf::layer::name, expected.name),
+        testing::Field("color", &odxf::layer::color, expected.color),
+        testing::Field("trueColor", &odxf::layer::trueColor, expected.trueColor),
+        testing::Field("lineweight", &odxf::layer::lineweight, expected.lineweight),
+        testing::Field("lineType", &odxf::layer::lineType, expected.lineType),
+        testing::Field("transparency", &odxf::layer::transparency, expected.transparency),
+        testing::Field("flags", &odxf::layer::flags, expected.flags));
 }
 
 }   // namespace
 
-testing::Matcher<std::vector<odxf::Layer>> AreLayers(const std::vector<odxf::Layer>& expected)
+testing::Matcher<std::vector<odxf::layer>> are_layers(const std::vector<odxf::layer>& expected)
 {
-    std::vector<testing::Matcher<odxf::Layer>> elementMatchers;
+    std::vector<testing::Matcher<odxf::layer>> elementMatchers;
     elementMatchers.reserve(expected.size());
-    for (const odxf::Layer& expectedLayer : expected) {
-        elementMatchers.push_back(IsLayer(expectedLayer));
+    for (const odxf::layer& expectedLayer : expected) {
+        elementMatchers.push_back(is_layer(expectedLayer));
     }
 
     return testing::ElementsAreArray(elementMatchers);

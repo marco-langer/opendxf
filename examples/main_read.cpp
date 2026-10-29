@@ -9,7 +9,7 @@
 #include <print>
 #include <string>
 
-struct DocumentStats final
+struct document_stats final
 {
     int layers{ 0 };
 
@@ -19,7 +19,7 @@ struct DocumentStats final
     int lwPolylines{ 0 };
 };
 
-void printDocumentStats(const DocumentStats& stats)
+void printDocumentStats(const document_stats& stats)
 {
     std::println(
         "layers: {}\narcs: {}\ncircles: {}\nlines: {}\nlw polylines: {}",
@@ -30,7 +30,7 @@ void printDocumentStats(const DocumentStats& stats)
         stats.lwPolylines);
 }
 
-void printError(const odxf::Error& error)
+void printError(const odxf::error& error)
 {
     if (error.lineNumber.has_value()) {
         std::println("error reading file: line {}: {}", error.lineNumber.value(), error.what);
@@ -50,31 +50,31 @@ std::expected<std::filesystem::path, std::string> parseFilePath(int argc, char**
 
 void printUsage(const std::string& error) { std::println("error: {}", error); }
 
-class Reader final : public odxf::IReadStream
+class reader final : public odxf::read_stream_base
 {
 public:
-    const DocumentStats& stats() const& { return m_docStats; }
+    const document_stats& stats() const& { return m_docStats; }
 
 private:
-    void layer(const odxf::Layer& /* layer */) override { m_docStats.layers += 1; }
+    void layer(const odxf::layer& /* layer */) override { m_docStats.layers += 1; }
 
-    void arc(const odxf::Arc& /* arc */) override { m_docStats.arcs += 1; }
+    void arc(const odxf::arc& /* arc */) override { m_docStats.arcs += 1; }
 
-    void circle(const odxf::Circle& /* circle */) override { m_docStats.circles += 1; }
+    void circle(const odxf::circle& /* circle */) override { m_docStats.circles += 1; }
 
-    void line(const odxf::Line& /* line */) override { m_docStats.lines += 1; }
+    void line(const odxf::line& /* line */) override { m_docStats.lines += 1; }
 
-    void lwPolyline(const odxf::LWPolyline& /* lwPolyline */) override
+    void lwPolyline(const odxf::lw_polyline& /* lwPolyline */) override
     {
         m_docStats.lwPolylines += 1;
     }
 
-    DocumentStats m_docStats;
+    document_stats m_docStats;
 };
 
 int main(int argc, char** argv)
 {
-    Reader reader;
+    reader reader;
 
     const std::expected<std::filesystem::path, std::string> filePath{ parseFilePath(argc, argv) };
     if (!filePath.has_value()) {
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    const std::expected<void, odxf::Error> result{ odxf::read(filePath.value(), reader) };
+    const std::expected<void, odxf::error> result{ odxf::read(filePath.value(), reader) };
     if (!result.has_value()) {
         printError(result.error());
 

@@ -15,7 +15,7 @@
 
 namespace {
 
-void writeHeader(std::ofstream& stream, const odxf::Header& header)
+void writeHeader(std::ofstream& stream, const odxf::header& header)
 {
     stream << "999\nopendxf";
     stream << "\n0\nSECTION";
@@ -76,13 +76,13 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
                                 }
                                 stream << element;
                             },
-                            [&stream](const odxf::Coordinate2d& coord) {
+                            [&stream](const odxf::coordinate2d& coord) {
                                 stream << "\n10\n";
                                 stream << coord.x;
                                 stream << "\n20\n";
                                 stream << coord.y;
                             },
-                            [&stream](const odxf::Coordinate3d& coord) {
+                            [&stream](const odxf::coordinate3d& coord) {
                                 stream << "\n10\n";
                                 stream << coord.x;
                                 stream << "\n20\n";
@@ -96,10 +96,10 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
     stream << "\n0\nENDSEC";
 }
 
-void writeLineType(std::ofstream& stream, const odxf::LineType& lineType)
+void writeLineType(std::ofstream& stream, const odxf::line_type& lineType)
 {
     double patternLength{ 0.0 };
-    for (const odxf::LineTypeElement& element : lineType.elements) {
+    for (const odxf::line_type_element& element : lineType.elements) {
         patternLength += std::abs(element.length);
     }
 
@@ -110,18 +110,18 @@ void writeLineType(std::ofstream& stream, const odxf::LineType& lineType)
     stream << "\n72\n65";
     stream << "\n73\n" << lineType.elements.size();
     stream << "\n40\n" << patternLength;
-    for (const odxf::LineTypeElement& element : lineType.elements) {
+    for (const odxf::line_type_element& element : lineType.elements) {
         stream << "\n49\n" << element.length;
         stream << "\n74\n" << element.complexFlags;
     }
 }
 
-void writeLineTypes(std::ofstream& stream, const std::vector<odxf::LineType>& lineTypes)
+void writeLineTypes(std::ofstream& stream, const std::vector<odxf::line_type>& lineTypes)
 {
     stream << "\n0\nTABLE";
     stream << "\n2\nLTYPE";
     stream << "\n70\n" << lineTypes.size();
-    for (const odxf::LineType& lineType : lineTypes) {
+    for (const odxf::line_type& lineType : lineTypes) {
         writeLineType(stream, lineType);
     }
     stream << "\n0\nENDTAB";
@@ -135,16 +135,16 @@ void writeTrueColor(std::ofstream& stream, const std::optional<int>& maybeTrueCo
 }
 
 // BYLAYER is written as no group code 440.
-void writeTransparency(std::ofstream& stream, const odxf::EntityTransparency& transparency)
+void writeTransparency(std::ofstream& stream, const odxf::entity_transparency& transparency)
 {
-    if (std::holds_alternative<odxf::ByBlock>(transparency)) {
+    if (std::holds_alternative<odxf::by_block>(transparency)) {
         stream << "\n440\n" << odxf::byBlockTransparencyValue;
-    } else if (const auto* byValue{ std::get_if<odxf::Transparency>(&transparency) }) {
+    } else if (const auto* byValue{ std::get_if<odxf::transparency>(&transparency) }) {
         stream << "\n440\n" << odxf::encodeTransparency(*byValue);
     }
 }
 
-void writeLayer(std::ofstream& stream, const odxf::Layer& layer)
+void writeLayer(std::ofstream& stream, const odxf::layer& layer)
 {
     stream << "\n0\nLAYER";
     stream << "\n2\n" << layer.name;
@@ -160,22 +160,22 @@ void writeLayer(std::ofstream& stream, const odxf::Layer& layer)
     }
 }
 
-void writeLayers(std::ofstream& stream, const std::vector<odxf::Layer>& layers)
+void writeLayers(std::ofstream& stream, const std::vector<odxf::layer>& layers)
 {
     stream << "\n0\nTABLE";
     stream << "\n2\nLAYER";
     stream << "\n70\n" << layers.size();
-    for (const odxf::Layer& layer : layers) {
+    for (const odxf::layer& layer : layers) {
         writeLayer(stream, layer);
     }
     stream << "\n0\nENDTAB";
 }
 
 // Every application that owns xdata in the file needs an entry in the APPID table.
-void writeAppIds(std::ofstream& stream, const std::vector<odxf::Layer>& layers)
+void writeAppIds(std::ofstream& stream, const std::vector<odxf::layer>& layers)
 {
     const bool hasLayerTransparency{ std::ranges::any_of(
-        layers, [](const odxf::Layer& layer) { return layer.transparency.has_value(); }) };
+        layers, [](const odxf::layer& layer) { return layer.transparency.has_value(); }) };
     if (!hasLayerTransparency) {
         return;
     }
@@ -189,7 +189,7 @@ void writeAppIds(std::ofstream& stream, const std::vector<odxf::Layer>& layers)
     stream << "\n0\nENDTAB";
 }
 
-void writeTables(std::ofstream& stream, const odxf::Tables& tables)
+void writeTables(std::ofstream& stream, const odxf::tables& tables)
 {
     stream << "\n0\nSECTION";
     stream << "\n2\nTABLES";
@@ -206,7 +206,7 @@ void writeBlocks(std::ofstream& stream)
     stream << "\n0\nENDSEC";
 }
 
-void writeCoordinate(std::ofstream& stream, const odxf::Coordinate3d& coordinate)
+void writeCoordinate(std::ofstream& stream, const odxf::coordinate3d& coordinate)
 {
     stream << "\n10\n" << std::to_string(coordinate.x);
     stream << "\n20\n" << std::to_string(coordinate.y);
@@ -220,17 +220,17 @@ void writeThickness(std::ofstream& stream, const std::optional<double>& maybeThi
     }
 }
 
-void writeExtrusion(std::ofstream& stream, const std::optional<odxf::Vector3d>& maybeExtrusion)
+void writeExtrusion(std::ofstream& stream, const std::optional<odxf::vector3d>& maybeExtrusion)
 {
     if (maybeExtrusion) {
-        const odxf::Vector3d& extrusion{ *maybeExtrusion };
+        const odxf::vector3d& extrusion{ *maybeExtrusion };
         stream << "\n210\n" << std::to_string(extrusion.x);
         stream << "\n220\n" << std::to_string(extrusion.y);
         stream << "\n230\n" << std::to_string(extrusion.z);
     }
 }
 
-void writeEntityProperties(std::ofstream& stream, const odxf::EntityProperties& properties)
+void writeEntityProperties(std::ofstream& stream, const odxf::entity_properties& properties)
 {
     stream << "\n8\n" << properties.layer;
     stream << "\n6\n" << properties.lineType;
@@ -241,7 +241,7 @@ void writeEntityProperties(std::ofstream& stream, const odxf::EntityProperties& 
     writeTransparency(stream, properties.transparency);
 }
 
-void writeEntity(std::ofstream& stream, const odxf::Point& point)
+void writeEntity(std::ofstream& stream, const odxf::point& point)
 {
     stream << "\n0\nLINE\n100\nAcDbPoint";
     writeEntityProperties(stream, point.properties);
@@ -253,7 +253,7 @@ void writeEntity(std::ofstream& stream, const odxf::Point& point)
 }
 
 
-void writeEntity(std::ofstream& stream, const odxf::Ray& ray)
+void writeEntity(std::ofstream& stream, const odxf::ray& ray)
 {
     stream << "\n0\nLINE\n100\nAcDbRay";
     writeEntityProperties(stream, ray.properties);
@@ -265,7 +265,7 @@ void writeEntity(std::ofstream& stream, const odxf::Ray& ray)
     stream << "\n31\n" << std::to_string(ray.direction.z);
 }
 
-void writeEntity(std::ofstream& stream, const odxf::Line& line)
+void writeEntity(std::ofstream& stream, const odxf::line& line)
 {
     stream << "\n0\nLINE\n100\nAcDbLine";
     writeEntityProperties(stream, line.properties);
@@ -279,7 +279,7 @@ void writeEntity(std::ofstream& stream, const odxf::Line& line)
     writeExtrusion(stream, line.extrusion);
 }
 
-void writeEntity(std::ofstream& stream, const odxf::Circle& circle)
+void writeEntity(std::ofstream& stream, const odxf::circle& circle)
 {
     stream << "\n0\nCIRCLE\n100\nAcDbCircle";
     writeEntityProperties(stream, circle.properties);
@@ -291,7 +291,7 @@ void writeEntity(std::ofstream& stream, const odxf::Circle& circle)
     writeExtrusion(stream, circle.extrusion);
 }
 
-void writeEntity(std::ofstream& stream, const odxf::Arc& arc)
+void writeEntity(std::ofstream& stream, const odxf::arc& arc)
 {
     stream << "\n0\nARC\n100\nAcDbCircle";
     writeEntityProperties(stream, arc.properties);
@@ -306,7 +306,7 @@ void writeEntity(std::ofstream& stream, const odxf::Arc& arc)
     writeExtrusion(stream, arc.extrusion);
 }
 
-void writeEntity(std::ofstream& stream, const odxf::Ellipse& ellipse)
+void writeEntity(std::ofstream& stream, const odxf::ellipse& ellipse)
 {
     stream << "\n0\nARC\n100\nAcDbEllipse";
     writeEntityProperties(stream, ellipse.properties);
@@ -322,14 +322,14 @@ void writeEntity(std::ofstream& stream, const odxf::Ellipse& ellipse)
     writeExtrusion(stream, ellipse.extrusion);
 }
 
-void writeEntity(std::ofstream& stream, const odxf::LWPolyline& lwPolyline)
+void writeEntity(std::ofstream& stream, const odxf::lw_polyline& lwPolyline)
 {
     stream << "\n0\nLWPOLYLINE\n100\nAcDbPolyline";
     writeEntityProperties(stream, lwPolyline.properties);
     stream << "\n90\n" << lwPolyline.vertices.size();
     stream << "\n70\n" << lwPolyline.isClosed ? 1 : 0;
 
-    for (const odxf::Vertex& vertex : lwPolyline.vertices) {
+    for (const odxf::vertex& vertex : lwPolyline.vertices) {
         stream << "\n10\n" << std::to_string(vertex.position.x);
         stream << "\n20\n" << std::to_string(vertex.position.y);
         if (vertex.bulge.has_value()) {
@@ -338,12 +338,12 @@ void writeEntity(std::ofstream& stream, const odxf::LWPolyline& lwPolyline)
     }
 }
 
-std::expected<void, odxf::Error> checkStream(const std::ofstream& stream)
+std::expected<void, odxf::error> checkStream(const std::ofstream& stream)
 {
     if (!stream) {
         return std::unexpected(
-            odxf::Error{
-                .type = odxf::Error::Type::WriteError,
+            odxf::error{
+                .type = odxf::error_type::write_error,
                 .what = "unable to write the file",
             });
     }
@@ -355,16 +355,17 @@ std::expected<void, odxf::Error> checkStream(const std::ofstream& stream)
 
 namespace odxf {
 
-std::expected<void, Error> write(const std::filesystem::path& filePath, const Document& document)
+std::expected<void, error>
+write(const std::filesystem::path& filePath, const odxf::document& document)
 {
-    std::expected<WriteStream, Error> maybeStream{ WriteStream::open(
+    std::expected<write_stream, error> maybeStream{ write_stream::open(
         filePath, document.header, document.tables) };
     if (!maybeStream) {
         return std::unexpected(maybeStream.error());
     }
 
-    for (const Entity& entity : document.entities) {
-        if (std::expected<void, Error> maybeError = maybeStream->entity(entity); !maybeError) {
+    for (const odxf::entity& entity : document.entities) {
+        if (std::expected<void, error> maybeError = maybeStream->entity(entity); !maybeError) {
             return maybeError;
         }
     }
@@ -372,14 +373,14 @@ std::expected<void, Error> write(const std::filesystem::path& filePath, const Do
     return maybeStream->close();
 }
 
-std::expected<WriteStream, Error>
-WriteStream::open(const std::filesystem::path& filePath, const Header& header, const Tables& tables)
+std::expected<write_stream, error> write_stream::open(
+    const std::filesystem::path& filePath, const odxf::header& header, const odxf::tables& tables)
 {
     std::ofstream stream{ filePath };
     if (!stream.is_open()) {
         return std::unexpected(
-            Error{
-                .type = Error::Type::FileOpenError,
+            error{
+                .type = error_type::file_open_error,
                 .what = std::format(
                     "unable to open file {}",
                     reinterpret_cast<const char*>(filePath.u8string().c_str())),
@@ -393,25 +394,25 @@ WriteStream::open(const std::filesystem::path& filePath, const Header& header, c
     writeBlocks(stream);
     stream << "\n0\nSECTION\n2\nENTITIES";
 
-    if (std::expected<void, Error> maybeError = checkStream(stream); !maybeError) {
+    if (std::expected<void, error> maybeError = checkStream(stream); !maybeError) {
         return std::unexpected(maybeError.error());
     }
 
-    return WriteStream{ std::move(stream) };
+    return write_stream{ std::move(stream) };
 }
 
-WriteStream::WriteStream(std::ofstream stream)
+write_stream::write_stream(std::ofstream stream)
     : m_stream{ std::move(stream) }
 {
 }
 
-WriteStream::WriteStream(WriteStream&& other) noexcept
+write_stream::write_stream(write_stream&& other) noexcept
     : m_stream{ std::move(other.m_stream) }
     , m_isClosed{ std::exchange(other.m_isClosed, true) }
 {
 }
 
-WriteStream& WriteStream::operator=(WriteStream&& other) noexcept
+odxf::write_stream& write_stream::operator=(write_stream&& other) noexcept
 {
     if (this != &other) {
         if (!m_isClosed) {
@@ -424,19 +425,19 @@ WriteStream& WriteStream::operator=(WriteStream&& other) noexcept
     return *this;
 }
 
-WriteStream::~WriteStream()
+write_stream::~write_stream()
 {
     if (!m_isClosed) {
         static_cast<void>(close());
     }
 }
 
-std::expected<void, Error> WriteStream::entity(const Entity& entity)
+std::expected<void, error> write_stream::entity(const odxf::entity& entity)
 {
     if (m_isClosed) {
         return std::unexpected(
-            Error{
-                .type = Error::Type::WriteError,
+            error{
+                .type = error_type::write_error,
                 .what = "entity written after close",
             });
     }
@@ -446,12 +447,12 @@ std::expected<void, Error> WriteStream::entity(const Entity& entity)
     return checkStream(m_stream);
 }
 
-std::expected<void, Error> WriteStream::close()
+std::expected<void, error> write_stream::close()
 {
     if (m_isClosed) {
         return std::unexpected(
-            Error{
-                .type = Error::Type::WriteError,
+            error{
+                .type = error_type::write_error,
                 .what = "close called twice",
             });
     }

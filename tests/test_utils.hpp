@@ -5,4 +5,4 @@
 
 #include "opendxf/document.hpp"
 
-odxf::Document createExampleDocument();
+odxf::document createExampleDocument();

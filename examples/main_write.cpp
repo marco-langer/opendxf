@@ -7,7 +7,7 @@
 
 int main()
 {
-    odxf::Document document{
+    odxf::document document{
         .header{ .entries{ { "$ACADVER", "AC1032" } } },
         .tables{
             .lineTypes{
@@ -16,15 +16,15 @@ int main()
             .layers{ { .name{ "Test Layer" } } },
         },
         .entities{
-            odxf::Arc{
+            odxf::arc{
                 .center{ 0.0, 2.0 }, .radius{ 0.5 }, .startAngle{ 0.0 }, .endAngle{ 180.0 } },
-            odxf::Circle{ .center{}, .radius{ 1.0 } },
-            odxf::Line{ .start{ 0.0, 0.5, 0.0 }, .end{ 1.0, 1.5, 0.0 } },
-            odxf::Line{ .end{ 1.0, 1.0, 0.0 } },
+            odxf::circle{ .center{}, .radius{ 1.0 } },
+            odxf::line{ .start{ 0.0, 0.5, 0.0 }, .end{ 1.0, 1.5, 0.0 } },
+            odxf::line{ .end{ 1.0, 1.0, 0.0 } },
         },
     };
 
-    const std::expected<void, odxf::Error> result{ odxf::write("test.dxf", document) };
+    const std::expected<void, odxf::error> result{ odxf::write("test.dxf", document) };
     if (!result) {
         std::println("error: {}", result.error().what);
 

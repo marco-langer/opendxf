@@ -8,16 +8,16 @@
 
 namespace odxf {
 
-struct Error final
+enum class error_type
 {
-    enum class Type
-    {
-        FileOpenError,
-        InvalidFile,
-        WriteError
-    };
+    file_open_error,
+    invalid_file,
+    write_error
+};
 
-    Type type{ Type::InvalidFile };
+struct error final
+{
+    error_type type{ error_type::invalid_file };
     std::optional<int> lineNumber;
     std::string what;
 };

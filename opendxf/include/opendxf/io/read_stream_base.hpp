@@ -5,34 +5,34 @@
 
 namespace odxf {
 
-struct Arc;
-struct Circle;
-struct Header;
-struct Layer;
-struct Line;
-struct LineType;
-struct LWPolyline;
+struct arc;
+struct circle;
+struct header;
+struct layer;
+struct line;
+struct line_type;
+struct lw_polyline;
 
-class IReadStream
+class read_stream_base
 {
 public:
-    IReadStream() = default;
-    virtual ~IReadStream() = 0;
+    read_stream_base() = default;
+    virtual ~read_stream_base() = 0;
 
-    virtual void header(const Header& header);
-    virtual void lineType(const LineType& lineType);
-    virtual void layer(const Layer& layer);
+    virtual void header(const odxf::header& header);
+    virtual void lineType(const line_type& lineType);
+    virtual void layer(const odxf::layer& layer);
 
-    virtual void arc(const Arc& arc);
-    virtual void circle(const Circle& circle);
-    virtual void line(const Line& line);
-    virtual void lwPolyline(const LWPolyline& lwPolyline);
+    virtual void arc(const odxf::arc& arc);
+    virtual void circle(const odxf::circle& circle);
+    virtual void line(const odxf::line& line);
+    virtual void lwPolyline(const lw_polyline& lwPolyline);
 
 protected:
-    IReadStream(const IReadStream&) = default;
-    IReadStream(IReadStream&&) = default;
-    IReadStream& operator=(const IReadStream&) = default;
-    IReadStream& operator=(IReadStream&&) = default;
+    read_stream_base(const read_stream_base&) = default;
+    read_stream_base(read_stream_base&&) = default;
+    read_stream_base& operator=(const read_stream_base&) = default;
+    read_stream_base& operator=(read_stream_base&&) = default;
 };
 
 }   // namespace odxf

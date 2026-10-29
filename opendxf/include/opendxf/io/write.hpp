@@ -15,34 +15,37 @@
 
 namespace odxf {
 
-class WriteStream final
+class write_stream final
 {
 public:
     // Writes the header, the tables and an empty BLOCKS section, then returns a stream for the
     // entities. The file is complete after close() or when the stream is destroyed.
-    static std::expected<WriteStream, Error>
-    open(const std::filesystem::path& filePath, const Header& header, const Tables& tables);
+    static std::expected<write_stream, error> open(
+        const std::filesystem::path& filePath,
+        const odxf::header& header,
+        const odxf::tables& tables);
 
-    WriteStream(const WriteStream&) = delete;
-    WriteStream(WriteStream&& other) noexcept;
-    WriteStream& operator=(const WriteStream&) = delete;
-    WriteStream& operator=(WriteStream&& other) noexcept;
+    write_stream(const write_stream&) = delete;
+    write_stream(write_stream&& other) noexcept;
+    write_stream& operator=(const write_stream&) = delete;
+    write_stream& operator=(write_stream&& other) noexcept;
     // Closes the file if close() wasn't called. Errors are lost, call close() to get them.
-    ~WriteStream();
+    ~write_stream();
 
     // Writes the entity at the end of the ENTITIES section, so entities keep the order of the
     // calls.
-    std::expected<void, Error> entity(const Entity& entity);
+    std::expected<void, error> entity(const odxf::entity& entity);
     // Ends the ENTITIES section and the file.
-    std::expected<void, Error> close();
+    std::expected<void, error> close();
 
 private:
-    explicit WriteStream(std::ofstream stream);
+    explicit write_stream(std::ofstream stream);
 
     std::ofstream m_stream;
     bool m_isClosed{ false };
 };
 
-std::expected<void, Error> write(const std::filesystem::path& filePath, const Document& document);
+std::expected<void, error>
+write(const std::filesystem::path& filePath, const odxf::document& document);
 
 }   // namespace odxf

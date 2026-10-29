@@ -19,51 +19,51 @@
 
 namespace odxf {
 
-class IReadStream;
+class read_stream_base;
 
 // A type that holds the properties all entities share, e.g. Line.
 template <typename E>
-concept EntityType = requires(E& entity) {
-    { entity.properties } -> std::same_as<EntityProperties&>;
+concept entity_type = requires(E& entity) {
+    { entity.properties } -> std::same_as<entity_properties&>;
 };
 
-class Reader
+class reader
 {
 public:
-    Reader(IReadStream& stream);
+    reader(read_stream_base& stream);
 
-    Reader(const Reader&) = delete;
-    Reader(Reader&&) = delete;
-    Reader& operator=(const Reader&) = delete;
-    Reader& operator=(Reader&&) = delete;
+    reader(const reader&) = delete;
+    reader(reader&&) = delete;
+    reader& operator=(const reader&) = delete;
+    reader& operator=(reader&&) = delete;
 
-    std::expected<void, Error> readAll(const std::filesystem::path& filePath);
+    std::expected<void, error> readAll(const std::filesystem::path& filePath);
 
 private:
     bool open(const std::filesystem::path& filePath);
 
-    std::expected<void, Error> readHeader();
-    std::expected<HeaderEntry, Error> readHeaderEntry();
-    std::expected<std::variant<Coordinate2d, Coordinate3d>, Error> readHeaderCoordinate();
+    std::expected<void, error> readHeader();
+    std::expected<header_entry, error> readHeaderEntry();
+    std::expected<std::variant<coordinate2d, coordinate3d>, error> readHeaderCoordinate();
 
-    std::expected<void, Error> readTables();
-    std::expected<void, Error> readLineType();
-    std::expected<void, Error> readLayer();
+    std::expected<void, error> readTables();
+    std::expected<void, error> readLineType();
+    std::expected<void, error> readLayer();
 
-    std::expected<void, Error> readBlocks();
+    std::expected<void, error> readBlocks();
 
-    std::expected<void, Error> readEntities();
-    std::expected<void, Error> readLine();
-    std::expected<void, Error> readCircle();
-    std::expected<void, Error> readArc();
-    std::expected<void, Error> readLWPolyline();
+    std::expected<void, error> readEntities();
+    std::expected<void, error> readLine();
+    std::expected<void, error> readCircle();
+    std::expected<void, error> readArc();
+    std::expected<void, error> readLWPolyline();
 
     // Reads the group codes of one entity up to the next group code 0. readGroupCode is called for
     // each group code and returns false on an error.
-    template <EntityType E, std::predicate<E&> F>
-    std::expected<E, Error> readEntity(F readGroupCode);
+    template <entity_type E, std::predicate<E&> F>
+    std::expected<E, error> readEntity(F readGroupCode);
     // Reads the group codes all entities share, skips unknown ones. Returns false on an error.
-    bool readEntityProperty(EntityProperties& properties);
+    bool readEntityProperty(entity_properties& properties);
 
     bool readNext();
     bool readNextSingle();
@@ -75,9 +75,9 @@ private:
     bool parseInto(std::optional<T>& target);
 
     bool hasError() const;
-    std::expected<void, Error> makeError() const;
+    std::expected<void, error> makeError() const;
     // an Error at the current line, without a description
-    std::unexpected<Error> parseError() const;
+    std::unexpected<error> parseError() const;
     bool isSectionBegin() const;
     bool isSectionEnd() const;
     bool isHeaderBegin() const;
@@ -97,17 +97,17 @@ private:
 
     bool isEOF() const;
 
-    struct Data
+    struct data
     {
         int groupCode;
         std::string value;
     };
 
-    IReadStream& m_stream;
+    read_stream_base& m_stream;
     std::ifstream m_fileStream;
-    Data m_data;
+    data m_data;
     int m_currentLine{ 0 };
-    std::optional<Error> m_error;
+    std::optional<error> m_error;
     std::vector<std::string> m_layerNames;
 };
 

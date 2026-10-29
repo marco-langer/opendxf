@@ -8,10 +8,10 @@
 
 namespace {
 
-testing::Matcher<odxf::HeaderEntries>
-AreHeaderEntries(const odxf::HeaderEntries& expected, double maxError)
+testing::Matcher<odxf::header_entries>
+are_header_entries(const odxf::header_entries& expected, double maxError)
 {
-    std::vector<testing::Matcher<std::pair<const odxf::HeaderKey, odxf::HeaderValue>>>
+    std::vector<testing::Matcher<std::pair<const odxf::header_key, odxf::header_value>>>
         elementMatchers;
     elementMatchers.reserve(expected.size());
 
@@ -34,19 +34,19 @@ AreHeaderEntries(const odxf::HeaderEntries& expected, double maxError)
                     elementMatchers.push_back(
                         testing::Pair(key, testing::VariantWith<std::string>(testing::Eq(value))));
                 },
-                [&](const odxf::Coordinate2d& value) {
+                [&](const odxf::coordinate2d& value) {
                     elementMatchers.push_back(
                         testing::Pair(
                             key,
-                            testing::VariantWith<odxf::Coordinate2d>(
-                                IsCoordinate(value, maxError))));
+                            testing::VariantWith<odxf::coordinate2d>(
+                                is_coordinate(value, maxError))));
                 },
-                [&](const odxf::Coordinate3d& value) {
+                [&](const odxf::coordinate3d& value) {
                     elementMatchers.push_back(
                         testing::Pair(
                             key,
-                            testing::VariantWith<odxf::Coordinate3d>(
-                                IsCoordinate(value, maxError))));
+                            testing::VariantWith<odxf::coordinate3d>(
+                                is_coordinate(value, maxError))));
                 } },
             variantValue);
     }
@@ -56,8 +56,8 @@ AreHeaderEntries(const odxf::HeaderEntries& expected, double maxError)
 
 }   // namespace
 
-testing::Matcher<odxf::Header> IsHeader(const odxf::Header& expected, double maxError)
+testing::Matcher<odxf::header> is_header(const odxf::header& expected, double maxError)
 {
     return testing::Field(
-        "entries", &odxf::Header::entries, AreHeaderEntries(expected.entries, maxError));
+        "entries", &odxf::header::entries, are_header_entries(expected.entries, maxError));
 }

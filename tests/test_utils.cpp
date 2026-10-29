@@ -8,21 +8,21 @@
 #include "opendxf/header.hpp"
 #include "opendxf/layer.hpp"
 
-odxf::Document createExampleDocument()
+odxf::document createExampleDocument()
 {
     using namespace odxf;
 
-    Document expectedDocument;
+    document expectedDocument;
     auto& headerEntries{ expectedDocument.header.entries };
     headerEntries.try_emplace("$TEXTSIZE", 2.5);
     headerEntries.try_emplace("$LTSCALE", 2.0);
     headerEntries.try_emplace("$REGENMODE", 1);
     headerEntries.try_emplace("$ORTHOMODE", 0);
-    headerEntries.try_emplace("$LIMMAX", odxf::Coordinate2d{ 420, 297 });
-    headerEntries.try_emplace("$LIMMIN", odxf::Coordinate2d{});
+    headerEntries.try_emplace("$LIMMAX", odxf::coordinate2d{ 420, 297 });
+    headerEntries.try_emplace("$LIMMIN", odxf::coordinate2d{});
     headerEntries.try_emplace(
-        "$EXTMIN", odxf::Coordinate3d{ 77.48842691804612, 27.48842691804612, 0.0 });
-    headerEntries.try_emplace("$INSBASE", odxf::Coordinate3d{});
+        "$EXTMIN", odxf::coordinate3d{ 77.48842691804612, 27.48842691804612, 0.0 });
+    headerEntries.try_emplace("$INSBASE", odxf::coordinate3d{});
     headerEntries.try_emplace("$ACADVER", "AC1032");
     headerEntries.try_emplace("$TEXTSTYLE", "STANDARD");
 
@@ -66,21 +66,21 @@ odxf::Document createExampleDocument()
     const std::string layerNameLWPolylines{ "LW Polylines" };
     const std::string layerNameTrueColor{ "True Color" };
 
-    LineTypes& lineTypes{ expectedDocument.tables.lineTypes };
+    line_types& lineTypes{ expectedDocument.tables.lineTypes };
     lineTypes.push_back(
-        LineType{
+        line_type{
             .name = "CONTINUOUS",
             .displayName = "Solid Line",
         });
     lineTypes.push_back(
-        LineType{
+        line_type{
             .name = "DASHED",
             .displayName = "Dashed __ __ __",
             .flags = 0,
             .elements = { { .length = 0.5 }, { .length = -0.25 } },
         });
     lineTypes.push_back(
-        LineType{
+        line_type{
             .name = "DOT_DASH",
             .displayName = "Dot dash _ . _ .",
             .flags = 0,
@@ -91,7 +91,7 @@ odxf::Document createExampleDocument()
         });
     // The text element's details (75, 340, 46, 50, 44, 45, 9) are skipped.
     lineTypes.push_back(
-        LineType{
+        line_type{
             .name = "GAS",
             .displayName = "Gas line ---- GAS ----",
             .flags = 0,
@@ -100,56 +100,56 @@ odxf::Document createExampleDocument()
                           { .length = -0.25 } },
         });
 
-    Layers& layers{ expectedDocument.tables.layers };
+    odxf::layers& layers{ expectedDocument.tables.layers };
     // layerNameTest has no group code 370 and keeps the default lineweight
-    layers.emplace_back(Layer{ .name = layerNameTest }).flags = Layer::Flags::Frozen;
+    layers.emplace_back(layer{ .name = layerNameTest }).flags = layer::flag::frozen;
     layers.push_back(
-        Layer{ .name = layerNameLines, .color = 1, .lineweight = 50, .lineType = "DASHED" });
-    layers.push_back(Layer{ .name = layerNameLWPolylines, .color = -3, .lineweight = -3 });
+        layer{ .name = layerNameLines, .color = 1, .lineweight = 50, .lineType = "DASHED" });
+    layers.push_back(layer{ .name = layerNameLWPolylines, .color = -3, .lineweight = -3 });
     layers.push_back(
-        Layer{ .name = layerNameTrueColor, .color = 5, .trueColor = 0x3050A0, .lineweight = 0 });
+        layer{ .name = layerNameTrueColor, .color = 5, .trueColor = 0x3050A0, .lineweight = 0 });
 
     // layers[0] has a BYBLOCK transparency, which layers can't have, and stays opaque. layers[3]
     // only has xdata of another application with a 1071.
-    layers[1].transparency = Transparency{ .alpha = 0x4C };
-    layers[2].transparency = Transparency{ .alpha = 0xFF };
+    layers[1].transparency = transparency{ .alpha = 0x4C };
+    layers[2].transparency = transparency{ .alpha = 0xFF };
 
-    Entities& entities{ expectedDocument.entities };
+    odxf::entities& entities{ expectedDocument.entities };
 
     // no group codes 62, 370, 6, 48 and 440, keeps the defaults
     entities.push_back(
-        Line{
+        line{
             .properties = { .layer = layerNameLines, .trueColor = 0xFF8000 },
-            .start = Coordinate3d{ 0.0, 0.5, 0.0 },
-            .end = Coordinate3d{ 1.0, 1.5, 0.0 },
+            .start = coordinate3d{ 0.0, 0.5, 0.0 },
+            .end = coordinate3d{ 1.0, 1.5, 0.0 },
         });
-    entities.push_back(Line{
+    entities.push_back(line{
         .properties = {
             .layer = layerNameLines,
             .color = 3,
             .lineweight = 35,
             .lineType = "DOT_DASH",
             .lineTypeScale = 2.5,
-            .transparency = Transparency{ .alpha = 0x7F },
+            .transparency = transparency{ .alpha = 0x7F },
         },
-        .start = Coordinate3d{ 0.0, 0.0, 0.0 },
-        .end = Coordinate3d{ 1.0, 1.0, 0.0 },
+        .start = coordinate3d{ 0.0, 0.0, 0.0 },
+        .end = coordinate3d{ 1.0, 1.0, 0.0 },
     });
 
-    entities.push_back(Circle{
+    entities.push_back(circle{
         .properties = {
             .layer = layerNameTest,
             .color = 2,
             .trueColor = 0x00FF00,
             .lineweight = -2,
             .lineType = "BYBLOCK",
-            .transparency = ByBlock{},
+            .transparency = by_block{},
         },
-        .center = Coordinate3d{ 0.0, 0.0, 0.0 },
+        .center = coordinate3d{ 0.0, 0.0, 0.0 },
         .radius = 1.0,
     });
 
-    entities.push_back(Arc{
+    entities.push_back(arc{
         .properties = {
             .layer = layerNameTest,
             .color = 5,
@@ -157,61 +157,61 @@ odxf::Document createExampleDocument()
             .lineweight = -3,
             .lineType = "CONTINUOUS",
             .lineTypeScale = 0.5,
-            .transparency = Transparency{ .alpha = 0x00 },
+            .transparency = transparency{ .alpha = 0x00 },
         },
-        .center = Coordinate3d{ 0.0, 2.0, 0.0 },
+        .center = coordinate3d{ 0.0, 2.0, 0.0 },
         .radius = 0.5,
         .startAngle = 0.0,
         .endAngle = 180.0,
     });
 
-    entities.push_back(LWPolyline{
+    entities.push_back(lw_polyline{
         .properties = {
             .layer = layerNameLWPolylines,
             .color = 6,
             .trueColor = 0x808080,
             .lineweight = 211,
             .lineType = "GAS",
-            .transparency = Transparency{ .alpha = 0xFF },
+            .transparency = transparency{ .alpha = 0xFF },
         },
     });
     // has a 440 without the flag of a set value, which counts as BYLAYER
-    entities.push_back(LWPolyline{
+    entities.push_back(lw_polyline{
         .properties = {
             .layer = layerNameLWPolylines,
             .color = 256,
             .lineweight = -1,
             .lineType = "BYLAYER",
         },
-        .vertices = { Vertex{ .position = { 200.0, 200.0 } } },
+        .vertices = { vertex{ .position = { 200.0, 200.0 } } },
     });
     // no group codes 6, 48 and 440, keeps the defaults
-    entities.push_back(LWPolyline{
+    entities.push_back(lw_polyline{
         .properties = { .layer = layerNameLWPolylines, .color = 0, .lineweight = 13 },
         .isClosed = true,
         .vertices = {
-            Vertex{
+            vertex{
                 .position = { 10.0, 10.0 },
             },
-            Vertex{
+            vertex{
                 .position = { 10.0, 50.0 },
                 .bulge = 1.0,
             },
-            Vertex{
+            vertex{
                 .position = { 20.0, 60.0, },
             },
-            Vertex{
+            vertex{
                 .position = { 60.0, 60.0, },
                 .bulge = -1.0
             },
-            Vertex{
+            vertex{
                 .position = { 70.0, 50.0, },
             },
-            Vertex{
+            vertex{
                 .position = { 70.0, 20.0 },
                 .bulge = 1.0,
             },
-            Vertex{
+            vertex{
                 .position = { 60.0, 10.0 },
             },
         },

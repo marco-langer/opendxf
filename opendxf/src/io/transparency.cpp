@@ -5,31 +5,31 @@
 
 namespace odxf {
 
-std::optional<Transparency> decodeLayerTransparency(int value)
+std::optional<transparency> decodeLayerTransparency(int value)
 {
     if ((value & ~0xFF) != byValueTransparencyFlag) {
         // TODO: warn about the ignored value once opendxf can report warnings.
         return std::nullopt;
     }
 
-    return Transparency{ .alpha = static_cast<std::uint8_t>(value & 0xFF) };
+    return transparency{ .alpha = static_cast<std::uint8_t>(value & 0xFF) };
 }
 
-EntityTransparency decodeEntityTransparency(int value)
+entity_transparency decodeEntityTransparency(int value)
 {
     if (value == byBlockTransparencyValue) {
-        return ByBlock{};
+        return by_block{};
     }
 
     if ((value & ~0xFF) != byValueTransparencyFlag) {
         // TODO: warn about the ignored value once opendxf can report warnings.
-        return ByLayer{};
+        return by_layer{};
     }
 
-    return Transparency{ .alpha = static_cast<std::uint8_t>(value & 0xFF) };
+    return transparency{ .alpha = static_cast<std::uint8_t>(value & 0xFF) };
 }
 
-int encodeTransparency(const Transparency& transparency)
+int encodeTransparency(const odxf::transparency& transparency)
 {
     return byValueTransparencyFlag | transparency.alpha;
 }

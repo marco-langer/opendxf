@@ -7,4 +7,4 @@
 
 #include <gmock/gmock.h>
 
-testing::Matcher<odxf::Document> IsDocument(const odxf::Document& expected);
+testing::Matcher<odxf::document> is_document(const odxf::document& expected);

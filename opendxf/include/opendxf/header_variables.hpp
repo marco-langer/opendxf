@@ -12,49 +12,49 @@ namespace odxf {
 
 // errors for header variables that are present but malformed;
 // an absent optional variable is reported as std::nullopt instead
-enum class HeaderError
+enum class header_error
 {
-    WrongType,
-    InvalidValue
+    wrong_type,
+    invalid_value
 };
 
 // values as stored in $INSUNITS
-enum class LengthUnit
+enum class length_unit
 {
-    Unitless = 0,
-    Inches = 1,
-    Feet = 2,
-    Miles = 3,
-    Millimeters = 4,
-    Centimeters = 5,
-    Meters = 6,
-    Kilometers = 7,
-    Microinches = 8,
-    Mils = 9,
-    Yards = 10,
-    Angstroms = 11,
-    Nanometers = 12,
-    Microns = 13,
-    Decimeters = 14,
-    Decameters = 15,
-    Hectometers = 16,
-    Gigameters = 17,
-    AstronomicalUnits = 18,
-    LightYears = 19,
-    Parsecs = 20,
-    USSurveyFeet = 21,
-    USSurveyInch = 22,
-    USSurveyYard = 23,
-    USSurveyMile = 24
+    unitless = 0,
+    inches = 1,
+    feet = 2,
+    miles = 3,
+    millimeters = 4,
+    centimeters = 5,
+    meters = 6,
+    kilometers = 7,
+    microinches = 8,
+    mils = 9,
+    yards = 10,
+    angstroms = 11,
+    nanometers = 12,
+    microns = 13,
+    decimeters = 14,
+    decameters = 15,
+    hectometers = 16,
+    gigameters = 17,
+    astronomical_units = 18,
+    light_years = 19,
+    parsecs = 20,
+    us_survey_feet = 21,
+    us_survey_inch = 22,
+    us_survey_yard = 23,
+    us_survey_mile = 24
 };
 
-std::expected<std::optional<LengthUnit>, HeaderError> insertionUnits(const Header& header);
+std::expected<std::optional<length_unit>, header_error> insertionUnits(const odxf::header& header);
 
-void setInsertionUnits(Header& header, LengthUnit unit);
+void setInsertionUnits(odxf::header& header, length_unit unit);
 
-// $LTSCALE, the scale of all line type patterns. A scale that isn't positive is an InvalidValue.
-std::expected<std::optional<double>, HeaderError> lineTypeScale(const Header& header);
+// $LTSCALE, the scale of all line type patterns. A scale that isn't positive is an invalid_value.
+std::expected<std::optional<double>, header_error> lineTypeScale(const odxf::header& header);
 
-void setLineTypeScale(Header& header, double scale);
+void setLineTypeScale(odxf::header& header, double scale);
 
 }   // namespace odxf

@@ -7,5 +7,5 @@
 
 #include <gmock/gmock.h>
 
-testing::Matcher<odxf::Entities>
-AreEntities(const odxf::Entities& expected, double maxError = 1.0e-5);
+testing::Matcher<odxf::entities>
+are_entities(const odxf::entities& expected, double maxError = 1.0e-5);
