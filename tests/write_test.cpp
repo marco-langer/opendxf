@@ -150,7 +150,7 @@ TEST(write, fileOpenError)
 TEST(writeStream, entityAfterClose)
 {
     // Arrange
-    std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::write(
+    std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::WriteStream::open(
         "test_entity_after_close.dxf", odxf::Header{}, odxf::Tables{}) };
     ASSERT_TRUE(stream.has_value());
     ASSERT_TRUE(stream->close().has_value());
@@ -166,7 +166,7 @@ TEST(writeStream, entityAfterClose)
 TEST(writeStream, closeTwice)
 {
     // Arrange
-    std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::write(
+    std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::WriteStream::open(
         "test_close_twice.dxf", odxf::Header{}, odxf::Tables{}) };
     ASSERT_TRUE(stream.has_value());
     ASSERT_TRUE(stream->close().has_value());
@@ -191,7 +191,7 @@ TEST(writeStream, destructorCloses)
 
     // Act
     {
-        std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::write(
+        std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::WriteStream::open(
             filePath, document.header, document.tables) };
         ASSERT_TRUE(stream.has_value());
         ASSERT_TRUE(stream->entity(document.entities.front()).has_value());

@@ -15,18 +15,14 @@
 
 namespace odxf {
 
-class WriteStream;
-
-std::expected<void, Error> write(const std::filesystem::path& filePath, const Document& document);
-
-// Writes the header, the tables and an empty BLOCKS section, then returns a stream for the
-// entities. The file is complete after WriteStream::close() or when the stream is destroyed.
-std::expected<WriteStream, Error>
-write(const std::filesystem::path& filePath, const Header& header, const Tables& tables);
-
 class WriteStream final
 {
 public:
+    // Writes the header, the tables and an empty BLOCKS section, then returns a stream for the
+    // entities. The file is complete after close() or when the stream is destroyed.
+    static std::expected<WriteStream, Error>
+    open(const std::filesystem::path& filePath, const Header& header, const Tables& tables);
+
     WriteStream(const WriteStream&) = delete;
     WriteStream(WriteStream&& other) noexcept;
     WriteStream& operator=(const WriteStream&) = delete;
@@ -43,11 +39,10 @@ public:
 private:
     explicit WriteStream(std::ofstream stream);
 
-    friend std::expected<WriteStream, Error>
-    write(const std::filesystem::path& filePath, const Header& header, const Tables& tables);
-
     std::ofstream m_stream;
     bool m_isClosed{ false };
 };
+
+std::expected<void, Error> write(const std::filesystem::path& filePath, const Document& document);
 
 }   // namespace odxf

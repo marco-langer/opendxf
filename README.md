@@ -95,10 +95,12 @@ int main()
 }
 ```
 
-To write entities without holding them all in memory, pass the header and tables first and stream the entities. `close()` completes the file and reports errors; if it isn't called, the destructor completes the file and the error is lost:
+To write entities without holding them all in memory, open a `WriteStream` with the header and tables and stream the entities. `close()` completes the file and reports errors; if it isn't called, the destructor completes the file and the error is lost:
 
 ```cpp
-std::expected<odxf::WriteStream, odxf::Error> stream{ odxf::write("drawing.dxf", header, tables) };
+std::expected<odxf::WriteStream, odxf::Error> stream{
+    odxf::WriteStream::open("drawing.dxf", header, tables)
+};
 if (!stream) {
     // handle stream.error()
 }

@@ -12,14 +12,14 @@ DXF constrains what a writer can stream: the sections have a fixed order (HEADER
 
 Reading passes everything it reads, in file order, to an `IReadStream` implemented by the user: one hook per header, table entry and entity type. Hooks have empty default implementations, so users implement only the ones they need.
 
-Writing takes the header and tables up front and returns a `WriteStream`. `WriteStream::entity()` appends one entity, `WriteStream::close()` ends and closes the file. Only entities are streamed.
+Writing opens a `WriteStream` with the header and tables up front. `WriteStream::entity()` appends one entity, `WriteStream::close()` ends and closes the file. Only entities are streamed.
 
-Reading and writing a whole `Document` are built on the streams. Both directions use the same names, overloaded by what is passed:
+Reading and writing a whole `Document` are built on the streams:
 
-| Whole document                  | Streaming                                             |
-|---------------------------------|-------------------------------------------------------|
-| `read(path)` returns a document | `read(path, stream)` calls an `IReadStream`           |
-| `write(path, document)`         | `write(path, header, tables)` returns a `WriteStream` |
+| Whole document                  | Streaming                                                  |
+|---------------------------------|------------------------------------------------------------|
+| `read(path)` returns a document | `read(path, stream)` calls an `IReadStream`                |
+| `write(path, document)`         | `WriteStream::open(path, header, tables)` returns a stream |
 
 The path comes first in all of them. All of them return `std::expected` ([ADR 5](0005-errors-as-expected.md)).
 
@@ -27,8 +27,8 @@ The path comes first in all of them. All of them return `std::expected` ([ADR 5]
 
 - Memory use depends on what the user keeps, not on the size of the file.
 - Users can filter or process entities while reading, without a second pass over a document, and copy a file entity by entity.
-- Entities are the part of a file that grows. Header and tables are small and must be complete before the first entity anyway, so streaming them would only add a state machine with "table after entity" errors. Passing them to `write()` makes the section order a property of the API instead of a runtime check.
-- The arguments already say whether a whole document or a stream is meant, so the function names don't have to.
+- Entities are the part of a file that grows. Header and tables are small and must be complete before the first entity anyway, so streaming them would only add a state machine with "table after entity" errors. Passing them to `WriteStream::open()` makes the section order a property of the API instead of a runtime check.
+- `read` is overloaded, because the arguments already say whether a whole document or a stream is meant. The write stream is opened by `WriteStream::open()` instead of a second `write()` overload, because a `write()` that returns an open stream reads as if it wrote the whole file. `open()` pairs with `close()`, like `std::ofstream`.
 
 ## Consequences
 

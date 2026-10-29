@@ -357,7 +357,7 @@ namespace odxf {
 
 std::expected<void, Error> write(const std::filesystem::path& filePath, const Document& document)
 {
-    std::expected<WriteStream, Error> maybeStream{ write(
+    std::expected<WriteStream, Error> maybeStream{ WriteStream::open(
         filePath, document.header, document.tables) };
     if (!maybeStream) {
         return std::unexpected(maybeStream.error());
@@ -373,7 +373,7 @@ std::expected<void, Error> write(const std::filesystem::path& filePath, const Do
 }
 
 std::expected<WriteStream, Error>
-write(const std::filesystem::path& filePath, const Header& header, const Tables& tables)
+WriteStream::open(const std::filesystem::path& filePath, const Header& header, const Tables& tables)
 {
     std::ofstream stream{ filePath };
     if (!stream.is_open()) {
