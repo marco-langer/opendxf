@@ -3,17 +3,17 @@ add_library(opendxf STATIC
     include/opendxf/document.hpp
     include/opendxf/entities.hpp
     include/opendxf/header.hpp
-    include/opendxf/headervariables.hpp
+    include/opendxf/header_variables.hpp
     include/opendxf/io/error.hpp
-    include/opendxf/io/ireadstream.hpp
+    include/opendxf/io/read_stream_base.hpp
     include/opendxf/io/read.hpp
     include/opendxf/io/write.hpp
     include/opendxf/layer.hpp
     include/opendxf/opendxf.hpp
     include/opendxf/properties.hpp
     include/opendxf/tables.hpp
-    src/headervariables.cpp
-    src/io/ireadstream.cpp
+    src/header_variables.cpp
+    src/io/read_stream_base.cpp
     src/io/read.cpp
     src/io/reader.cpp
     src/io/reader.hpp

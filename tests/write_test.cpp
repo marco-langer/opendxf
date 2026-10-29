@@ -4,8 +4,8 @@
 #include "opendxf/io/read.hpp"
 #include "opendxf/io/write.hpp"
 
-#include "Matchers/DocumentMatcher.hpp"
-#include "TestUtils.hpp"
+#include "matchers/document_matcher.hpp"
+#include "test_utils.hpp"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

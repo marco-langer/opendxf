@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Marco Langer
 
-#include "opendxf/headervariables.hpp"
+#include "opendxf/header_variables.hpp"
 
 #include <cmath>
 #include <string>

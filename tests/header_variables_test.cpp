@@ -3,7 +3,7 @@
 
 #include "opendxf/opendxf.hpp"
 
-#include "TestUtils.hpp"
+#include "test_utils.hpp"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

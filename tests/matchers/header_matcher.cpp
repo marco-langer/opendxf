@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024 Marco Langer
 
-#include "HeaderMatcher.hpp"
+#include "header_matcher.hpp"
 
-#include "CoordinateMatcher.hpp"
+#include "coordinate_matcher.hpp"
 #include "overload.hpp"
 
 namespace {

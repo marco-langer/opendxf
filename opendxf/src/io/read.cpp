@@ -3,7 +3,7 @@
 
 #include "opendxf/io/read.hpp"
 
-#include "opendxf/io/ireadstream.hpp"
+#include "opendxf/io/read_stream_base.hpp"
 #include "reader.hpp"
 
 #include <utility>

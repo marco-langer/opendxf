@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024 Marco Langer
 
-#include "TestUtils.hpp"
+#include "test_utils.hpp"
 
 #include "opendxf/coordinate.hpp"
 #include "opendxf/entities.hpp"

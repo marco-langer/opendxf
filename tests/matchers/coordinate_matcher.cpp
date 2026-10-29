@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024 Marco Langer
 
-#include "CoordinateMatcher.hpp"
+#include "coordinate_matcher.hpp"
 
 testing::Matcher<const odxf::Coordinate2d&>
 IsCoordinate(const odxf::Coordinate2d& coordinate, double maxError)

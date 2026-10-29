@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024 Marco Langer
 
-#include "DocumentMatcher.hpp"
+#include "document_matcher.hpp"
 
-#include "EntitiesMatcher.hpp"
-#include "HeaderMatcher.hpp"
-#include "TablesMatcher.hpp"
+#include "entities_matcher.hpp"
+#include "header_matcher.hpp"
+#include "tables_matcher.hpp"
 
 testing::Matcher<odxf::Document> IsDocument(const odxf::Document& expected)
 {
