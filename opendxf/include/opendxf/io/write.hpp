@@ -21,7 +21,7 @@ public:
     // Writes the header, the tables and an empty BLOCKS section, then returns a stream for the
     // entities. The file is complete after close() or when the stream is destroyed.
     static std::expected<write_stream, error> open(
-        const std::filesystem::path& filePath,
+        const std::filesystem::path& file_path,
         const odxf::header& header,
         const odxf::tables& tables);
 
@@ -42,10 +42,10 @@ private:
     explicit write_stream(std::ofstream stream);
 
     std::ofstream m_stream;
-    bool m_isClosed{ false };
+    bool m_is_closed{ false };
 };
 
 std::expected<void, error>
-write(const std::filesystem::path& filePath, const odxf::document& document);
+write(const std::filesystem::path& file_path, const odxf::document& document);
 
 }   // namespace odxf

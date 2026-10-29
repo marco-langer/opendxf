@@ -48,13 +48,13 @@ enum class length_unit
     us_survey_mile = 24
 };
 
-std::expected<std::optional<length_unit>, header_error> insertionUnits(const odxf::header& header);
+std::expected<std::optional<length_unit>, header_error> insertion_units(const odxf::header& header);
 
-void setInsertionUnits(odxf::header& header, length_unit unit);
+void set_insertion_units(odxf::header& header, length_unit unit);
 
 // $LTSCALE, the scale of all line type patterns. A scale that isn't positive is an invalid_value.
-std::expected<std::optional<double>, header_error> lineTypeScale(const odxf::header& header);
+std::expected<std::optional<double>, header_error> line_type_scale(const odxf::header& header);
 
-void setLineTypeScale(odxf::header& header, double scale);
+void set_line_type_scale(odxf::header& header, double scale);
 
 }   // namespace odxf

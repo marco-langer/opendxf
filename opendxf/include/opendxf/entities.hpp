@@ -25,13 +25,13 @@ struct vector3d final
 struct entity_properties final
 {
     std::string layer;
-    int color{ 256 };                 // BYLAYER
-    std::optional<int> trueColor{};   // 0x00RRGGBB, takes precedence over color
+    int color{ 256 };                  // BYLAYER
+    std::optional<int> true_color{};   // 0x00RRGGBB, takes precedence over color
     // hundredths of a millimeter, or -1 BYLAYER, -2 BYBLOCK, -3 DEFAULT
     int lineweight{ -1 };
     // The name of an entry in the LTYPE table, or BYLAYER or BYBLOCK.
-    std::string lineType{ "BYLAYER" };
-    double lineTypeScale{ 1.0 };
+    std::string line_type{ "BYLAYER" };
+    double line_type_scale{ 1.0 };
     entity_transparency transparency{ by_layer{} };
 };
 
@@ -49,7 +49,7 @@ struct ray final
 {
     entity_properties properties;
 
-    coordinate3d startPoint;
+    coordinate3d start_point;
     vector3d direction;
 };
 
@@ -81,8 +81,8 @@ struct arc final
 
     coordinate3d center;
     double radius{ 0.0 };
-    double startAngle{ 0.0 };
-    double endAngle{ 0.0 };
+    double start_angle{ 0.0 };
+    double end_angle{ 0.0 };
 
     std::optional<vector3d> extrusion;
     std::optional<double> thickness;
@@ -93,10 +93,10 @@ struct ellipse final
     entity_properties properties;
 
     coordinate3d center;
-    coordinate3d endPointMajor;
-    double axisRatio{ 1.0 };
-    double startParameter{ 0.0 };
-    double endParameter{ 2 * std::numbers::pi };
+    coordinate3d end_point_major;
+    double axis_ratio{ 1.0 };
+    double start_parameter{ 0.0 };
+    double end_parameter{ 2 * std::numbers::pi };
 
     std::optional<vector3d> extrusion;
 };
@@ -114,7 +114,7 @@ struct lw_polyline final
     entity_properties properties;
 
     std::optional<double> elevation;
-    bool isClosed{ false };
+    bool is_closed{ false };
     odxf::vertices vertices;
 };
 

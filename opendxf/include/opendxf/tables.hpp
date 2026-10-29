@@ -16,7 +16,7 @@ struct line_type_element final
     double length{ 0.0 };
     // Group code 74: 0 for a plain element. Otherwise the element embeds a text (2) or a shape (4),
     // whose details are skipped when reading and not written.
-    int complexFlags{ 0 };
+    int complex_flags{ 0 };
 };
 
 using line_type_elements = std::vector<line_type_element>;
@@ -24,7 +24,7 @@ using line_type_elements = std::vector<line_type_element>;
 struct line_type final
 {
     std::string name;
-    std::string displayName;
+    std::string display_name;
     int flags{ 64 };
     // Empty for a continuous line.
     line_type_elements elements{};
@@ -35,7 +35,7 @@ using line_types = std::vector<line_type>;
 
 struct tables final
 {
-    line_types lineTypes;
+    odxf::line_types line_types;
     odxf::layers layers;
 };
 

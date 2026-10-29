@@ -13,14 +13,14 @@
 #include <limits>
 #include <optional>
 
-TEST(insertionUnits, valid)
+TEST(insertion_units, valid)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$INSUNITS", 4 } } };
 
     // Act
     const std::expected<std::optional<odxf::length_unit>, odxf::header_error> result{
-        odxf::insertionUnits(header)
+        odxf::insertion_units(header)
     };
 
     // Assert
@@ -28,14 +28,14 @@ TEST(insertionUnits, valid)
     EXPECT_EQ(result.value(), odxf::length_unit::millimeters);
 }
 
-TEST(insertionUnits, missing)
+TEST(insertion_units, missing)
 {
     // Arrange
     const odxf::header header{};
 
     // Act
     const std::expected<std::optional<odxf::length_unit>, odxf::header_error> result{
-        odxf::insertionUnits(header)
+        odxf::insertion_units(header)
     };
 
     // Assert
@@ -43,14 +43,14 @@ TEST(insertionUnits, missing)
     EXPECT_EQ(result.value(), std::nullopt);
 }
 
-TEST(insertionUnits, wrongType)
+TEST(insertion_units, wrong_type)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$INSUNITS", 4.0 } } };
 
     // Act
     const std::expected<std::optional<odxf::length_unit>, odxf::header_error> result{
-        odxf::insertionUnits(header)
+        odxf::insertion_units(header)
     };
 
     // Assert
@@ -61,14 +61,14 @@ TEST(insertionUnits, wrongType)
 class insertion_units_invalid_value_test : public testing::TestWithParam<int>
 {};
 
-TEST_P(insertion_units_invalid_value_test, invalidValue)
+TEST_P(insertion_units_invalid_value_test, invalid_value)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$INSUNITS", GetParam() } } };
 
     // Act
     const std::expected<std::optional<odxf::length_unit>, odxf::header_error> result{
-        odxf::insertionUnits(header)
+        odxf::insertion_units(header)
     };
 
     // Assert
@@ -77,47 +77,47 @@ TEST_P(insertion_units_invalid_value_test, invalidValue)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    insertionUnits, insertion_units_invalid_value_test, testing::Values(-1, 25));
+    insertion_units, insertion_units_invalid_value_test, testing::Values(-1, 25));
 
-TEST(setInsertionUnits, overwritesExistingValue)
+TEST(set_insertion_units, overwrites_existing_value)
 {
     // Arrange
     odxf::header header{ .entries{ { "$INSUNITS", 4.0 } } };
 
     // Act
-    odxf::setInsertionUnits(header, odxf::length_unit::inches);
+    odxf::set_insertion_units(header, odxf::length_unit::inches);
 
     // Assert
-    EXPECT_EQ(odxf::insertionUnits(header), odxf::length_unit::inches);
+    EXPECT_EQ(odxf::insertion_units(header), odxf::length_unit::inches);
 }
 
-TEST(insertionUnits, roundTrip)
+TEST(insertion_units, round_trip)
 {
     // Arrange
-    odxf::document document{ createExampleDocument() };
-    odxf::setInsertionUnits(document.header, odxf::length_unit::us_survey_feet);
+    odxf::document document{ create_example_document() };
+    odxf::set_insertion_units(document.header, odxf::length_unit::us_survey_feet);
 
-    const std::filesystem::path filePath{ "insunits.dxf" };
-    std::filesystem::remove(filePath);
+    const std::filesystem::path file_path{ "insunits.dxf" };
+    std::filesystem::remove(file_path);
 
     // Act
-    const std::expected<void, odxf::error> writeResult{ odxf::write(filePath, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
 
-    const std::expected<odxf::document, odxf::error> readDocument{ odxf::read(filePath) };
+    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
 
     // Assert
-    ASSERT_TRUE(writeResult.has_value());
-    ASSERT_TRUE(readDocument.has_value());
-    EXPECT_EQ(odxf::insertionUnits(readDocument->header), odxf::length_unit::us_survey_feet);
+    ASSERT_TRUE(write_result.has_value());
+    ASSERT_TRUE(read_document.has_value());
+    EXPECT_EQ(odxf::insertion_units(read_document->header), odxf::length_unit::us_survey_feet);
 }
 
-TEST(lineTypeScale, valid)
+TEST(line_type_scale, valid)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$LTSCALE", 2.5 } } };
 
     // Act
-    const std::expected<std::optional<double>, odxf::header_error> result{ odxf::lineTypeScale(
+    const std::expected<std::optional<double>, odxf::header_error> result{ odxf::line_type_scale(
         header) };
 
     // Assert
@@ -125,13 +125,13 @@ TEST(lineTypeScale, valid)
     EXPECT_EQ(result.value(), 2.5);
 }
 
-TEST(lineTypeScale, missing)
+TEST(line_type_scale, missing)
 {
     // Arrange
     const odxf::header header{};
 
     // Act
-    const std::expected<std::optional<double>, odxf::header_error> result{ odxf::lineTypeScale(
+    const std::expected<std::optional<double>, odxf::header_error> result{ odxf::line_type_scale(
         header) };
 
     // Assert
@@ -139,13 +139,13 @@ TEST(lineTypeScale, missing)
     EXPECT_EQ(result.value(), std::nullopt);
 }
 
-TEST(lineTypeScale, wrongType)
+TEST(line_type_scale, wrong_type)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$LTSCALE", 2 } } };
 
     // Act
-    const std::expected<std::optional<double>, odxf::header_error> result{ odxf::lineTypeScale(
+    const std::expected<std::optional<double>, odxf::header_error> result{ odxf::line_type_scale(
         header) };
 
     // Assert
@@ -156,13 +156,13 @@ TEST(lineTypeScale, wrongType)
 class line_type_scale_invalid_value_test : public testing::TestWithParam<double>
 {};
 
-TEST_P(line_type_scale_invalid_value_test, invalidValue)
+TEST_P(line_type_scale_invalid_value_test, invalid_value)
 {
     // Arrange
     const odxf::header header{ .entries{ { "$LTSCALE", GetParam() } } };
 
     // Act
-    const std::expected<std::optional<double>, odxf::header_error> result{ odxf::lineTypeScale(
+    const std::expected<std::optional<double>, odxf::header_error> result{ odxf::line_type_scale(
         header) };
 
     // Assert
@@ -171,7 +171,7 @@ TEST_P(line_type_scale_invalid_value_test, invalidValue)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    lineTypeScale,
+    line_type_scale,
     line_type_scale_invalid_value_test,
     testing::Values(
         0.0,
@@ -179,14 +179,14 @@ INSTANTIATE_TEST_SUITE_P(
         std::numeric_limits<double>::infinity(),
         std::numeric_limits<double>::quiet_NaN()));
 
-TEST(setLineTypeScale, overwritesExistingValue)
+TEST(set_line_type_scale, overwrites_existing_value)
 {
     // Arrange
     odxf::header header{ .entries{ { "$LTSCALE", 1.0 } } };
 
     // Act
-    odxf::setLineTypeScale(header, 4.0);
+    odxf::set_line_type_scale(header, 4.0);
 
     // Assert
-    EXPECT_EQ(odxf::lineTypeScale(header), 4.0);
+    EXPECT_EQ(odxf::line_type_scale(header), 4.0);
 }

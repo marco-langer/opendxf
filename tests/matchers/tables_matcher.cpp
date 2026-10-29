@@ -16,36 +16,36 @@ is_line_type_element(const odxf::line_type_element& expected)
         testing::Field(
             "length", &odxf::line_type_element::length, testing::DoubleNear(expected.length, 1e-9)),
         testing::Field(
-            "complexFlags", &odxf::line_type_element::complexFlags, expected.complexFlags));
+            "complex_flags", &odxf::line_type_element::complex_flags, expected.complex_flags));
 }
 
 testing::Matcher<odxf::line_type> is_line_type(const odxf::line_type& expected)
 {
-    std::vector<testing::Matcher<odxf::line_type_element>> elementMatchers;
-    elementMatchers.reserve(expected.elements.size());
+    std::vector<testing::Matcher<odxf::line_type_element>> element_matchers;
+    element_matchers.reserve(expected.elements.size());
     for (const odxf::line_type_element& element : expected.elements) {
-        elementMatchers.push_back(is_line_type_element(element));
+        element_matchers.push_back(is_line_type_element(element));
     }
 
     return testing::AllOf(
         testing::Field("name", &odxf::line_type::name, expected.name),
-        testing::Field("displayName", &odxf::line_type::displayName, expected.displayName),
+        testing::Field("display_name", &odxf::line_type::display_name, expected.display_name),
         testing::Field("flags", &odxf::line_type::flags, expected.flags),
         testing::Field(
             "elements",
             &odxf::line_type::elements,
-            testing::ElementsAreArray(std::move(elementMatchers))));
+            testing::ElementsAreArray(std::move(element_matchers))));
 }
 
 testing::Matcher<odxf::line_types> are_line_types(const odxf::line_types& expected)
 {
-    std::vector<testing::Matcher<odxf::line_type>> elementMatchers;
-    elementMatchers.reserve(expected.size());
-    for (const odxf::line_type& lineType : expected) {
-        elementMatchers.push_back(is_line_type(lineType));
+    std::vector<testing::Matcher<odxf::line_type>> element_matchers;
+    element_matchers.reserve(expected.size());
+    for (const odxf::line_type& line_type : expected) {
+        element_matchers.push_back(is_line_type(line_type));
     }
 
-    return testing::ElementsAreArray(std::move(elementMatchers));
+    return testing::ElementsAreArray(std::move(element_matchers));
 }
 
 }   // namespace
@@ -53,6 +53,7 @@ testing::Matcher<odxf::line_types> are_line_types(const odxf::line_types& expect
 testing::Matcher<odxf::tables> are_tables(const odxf::tables& expected)
 {
     return testing::AllOf(
-        testing::Field("lineTypes", &odxf::tables::lineTypes, are_line_types(expected.lineTypes)),
+        testing::Field(
+            "line_types", &odxf::tables::line_types, are_line_types(expected.line_types)),
         testing::Field("layers", &odxf::tables::layers, are_layers(expected.layers)));
 }

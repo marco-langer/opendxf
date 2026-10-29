@@ -20,13 +20,13 @@ public:
     virtual ~read_stream_base() = 0;
 
     virtual void header(const odxf::header& header);
-    virtual void lineType(const line_type& lineType);
+    virtual void line_type(const odxf::line_type& line_type);
     virtual void layer(const odxf::layer& layer);
 
     virtual void arc(const odxf::arc& arc);
     virtual void circle(const odxf::circle& circle);
     virtual void line(const odxf::line& line);
-    virtual void lwPolyline(const lw_polyline& lwPolyline);
+    virtual void lw_polyline(const odxf::lw_polyline& lw_polyline);
 
 protected:
     read_stream_base(const read_stream_base&) = default;

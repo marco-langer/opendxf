@@ -18,7 +18,7 @@ enum class error_type
 struct error final
 {
     error_type type{ error_type::invalid_file };
-    std::optional<int> lineNumber;
+    std::optional<int> line_number;
     std::string what;
 };
 

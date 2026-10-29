@@ -14,7 +14,7 @@
 namespace {
 
 template <typename T>
-std::optional<T> parseAs(const std::string& value)
+std::optional<T> parse_as(const std::string& value)
 {
     const char* first{ value.c_str() };
     if (!value.empty()) {
@@ -24,9 +24,9 @@ std::optional<T> parseAs(const std::string& value)
     }
 
     T result;
-    const auto [_, errorCode]{ std::from_chars(first, value.c_str() + value.size(), result) };
+    const auto [_, error_code]{ std::from_chars(first, value.c_str() + value.size(), result) };
 
-    return errorCode == std::errc() ? result : std::optional<T>{};
+    return error_code == std::errc() ? result : std::optional<T>{};
 }
 
 }   // namespace
@@ -34,23 +34,23 @@ std::optional<T> parseAs(const std::string& value)
 namespace odxf {
 
 template <typename T>
-bool reader::parseInto(T& target)
+bool reader::parse_into(T& target)
 {
-    const std::optional<T> maybeValue{ parseAs<T>(m_data.value) };
-    if (!maybeValue) {
-        m_error = parseError().error();
+    const std::optional<T> maybe_value{ parse_as<T>(m_data.value) };
+    if (!maybe_value) {
+        m_error = parse_error().error();
         return false;
     }
 
-    target = *maybeValue;
+    target = *maybe_value;
     return true;
 }
 
 template <typename T>
-bool reader::parseInto(std::optional<T>& target)
+bool reader::parse_into(std::optional<T>& target)
 {
     T value;
-    if (!parseInto(value)) {
+    if (!parse_into(value)) {
         return false;
     }
 
@@ -63,49 +63,49 @@ reader::reader(read_stream_base& stream)
 {
 }
 
-std::expected<void, error> reader::readAll(const std::filesystem::path& filePath)
+std::expected<void, error> reader::read_all(const std::filesystem::path& file_path)
 {
-    if (!open(filePath)) {
-        return makeError();
+    if (!open(file_path)) {
+        return make_error();
     }
 
-    if (std::expected<void, error> maybeError = readHeader(); !maybeError) {
-        return maybeError;
+    if (std::expected<void, error> maybe_error = read_header(); !maybe_error) {
+        return maybe_error;
     }
 
-    if (std::expected<void, error> maybeError = readTables(); !maybeError) {
-        return maybeError;
+    if (std::expected<void, error> maybe_error = read_tables(); !maybe_error) {
+        return maybe_error;
     }
 
-    if (std::expected<void, error> maybeError = readBlocks(); !maybeError) {
-        return maybeError;
+    if (std::expected<void, error> maybe_error = read_blocks(); !maybe_error) {
+        return maybe_error;
     }
 
-    if (std::expected<void, error> maybeError = readEntities(); !maybeError) {
-        return maybeError;
+    if (std::expected<void, error> maybe_error = read_entities(); !maybe_error) {
+        return maybe_error;
     }
 
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
-    if (isEOF()) {
+    if (is_eof()) {
         return {};
     }
 
-    return std::unexpected(error{ .lineNumber = m_currentLine, .what = "EOF missing" });
+    return std::unexpected(error{ .line_number = m_current_line, .what = "EOF missing" });
 }
 
-bool reader::open(const std::filesystem::path& filePath)
+bool reader::open(const std::filesystem::path& file_path)
 {
-    m_fileStream.open(filePath);
+    m_file_stream.open(file_path);
 
-    if (!m_fileStream.is_open()) {
+    if (!m_file_stream.is_open()) {
         m_error = error{
             .type = error_type::file_open_error,
             .what = std::format(
                 "unable to open file {}",
-                reinterpret_cast<const char*>(filePath.u8string().c_str())),
+                reinterpret_cast<const char*>(file_path.u8string().c_str())),
         };
 
         return false;
@@ -114,45 +114,45 @@ bool reader::open(const std::filesystem::path& filePath)
     return true;
 }
 
-std::expected<void, error> reader::readHeader()
+std::expected<void, error> reader::read_header()
 {
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
-    if (!isSectionBegin()) {
+    if (!is_section_begin()) {
         return std::unexpected(
             error{
-                .lineNumber = m_currentLine,
+                .line_number = m_current_line,
                 .what = "expected section begin",
             });
     }
 
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
-    if (!isHeaderBegin()) {
+    if (!is_header_begin()) {
         return {};   // header is optional
     }
 
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
     odxf::header header;
-    while (!isSectionEnd()) {
-        if (hasError()) {
+    while (!is_section_end()) {
+        if (has_error()) {
             return std::unexpected(m_error.value());
         }
 
-        std::expected<header_entry, error> maybeHeaderEntry{ readHeaderEntry() };
-        if (!maybeHeaderEntry) {
-            return std::unexpected(maybeHeaderEntry.error());
+        std::expected<header_entry, error> maybe_header_entry{ read_header_entry() };
+        if (!maybe_header_entry) {
+            return std::unexpected(maybe_header_entry.error());
         }
 
-        header_entry& headerEntry{ *maybeHeaderEntry };
-        header.entries.emplace(headerEntry);
+        odxf::header_entry& header_entry{ *maybe_header_entry };
+        header.entries.emplace(header_entry);
     }
 
     m_stream.header(header);
@@ -160,29 +160,29 @@ std::expected<void, error> reader::readHeader()
     return {};
 }
 
-std::expected<header_entry, error> reader::readHeaderEntry()
+std::expected<header_entry, error> reader::read_header_entry()
 {
-    if (m_data.groupCode != 9) {
+    if (m_data.group_code != 9) {
         return std::unexpected(
             error{
-                .lineNumber = m_currentLine,
+                .line_number = m_current_line,
                 .what = "expected group code 9 for header variable name",
             });
     }
 
     header_key key{ m_data.value };
 
-    if (!readNext()) {
+    if (!read_next()) {
         return std::unexpected(m_error.value());
     }
 
-    switch (m_data.groupCode) {
+    switch (m_data.group_code) {
     case 1:
     case 2:
     case 3: {
         header_value value{ m_data.value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -191,12 +191,12 @@ std::expected<header_entry, error> reader::readHeaderEntry()
 
     case 5: {
         if (key != "$HANDSEED") {
-            return parseError();
+            return parse_error();
         }
 
         header_value value{ m_data.value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -205,12 +205,12 @@ std::expected<header_entry, error> reader::readHeaderEntry()
 
     case 6: {
         if (key != "$CELTYPE" && key != "$DIMLTYPE" && key != "$DIMLTEX1" && key != "$DIMLTEX2") {
-            return parseError();
+            return parse_error();
         }
 
         header_value value{ m_data.value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -219,12 +219,12 @@ std::expected<header_entry, error> reader::readHeaderEntry()
 
     case 7: {
         if (key != "$TEXTSTYLE" && key != "$DIMTXSTY") {
-            return parseError();
+            return parse_error();
         }
 
         header_value value{ m_data.value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -233,12 +233,12 @@ std::expected<header_entry, error> reader::readHeaderEntry()
 
     case 8: {
         if (key != "$CLAYER") {
-            return parseError();
+            return parse_error();
         }
 
         header_value value{ m_data.value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -246,30 +246,30 @@ std::expected<header_entry, error> reader::readHeaderEntry()
     }
 
     case 10: {
-        std::expected<std::variant<coordinate2d, coordinate3d>, error> maybeCoordinate{
-            readHeaderCoordinate()
+        std::expected<std::variant<coordinate2d, coordinate3d>, error> maybe_coordinate{
+            read_header_coordinate()
         };
 
-        if (!maybeCoordinate) {
-            return std::unexpected(maybeCoordinate.error());
+        if (!maybe_coordinate) {
+            return std::unexpected(maybe_coordinate.error());
         }
 
         header_value value{ std::visit(
             [](const auto& coordinate) -> header_value { return coordinate; },
-            maybeCoordinate.value()) };
+            maybe_coordinate.value()) };
 
         return std::pair{ std::move(key), value };
     }
 
     case 40: {
-        const std::optional<double> maybeValue{ parseAs<double>(m_data.value) };
-        if (!maybeValue) {
-            return parseError();
+        const std::optional<double> maybe_value{ parse_as<double>(m_data.value) };
+        if (!maybe_value) {
+            return parse_error();
         }
 
-        header_value value{ *maybeValue };
+        header_value value{ *maybe_value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -278,16 +278,16 @@ std::expected<header_entry, error> reader::readHeaderEntry()
 
     case 50: {
         if (key != "$ANGBASE") {
-            return parseError();
+            return parse_error();
         }
-        const std::optional<double> maybeValue{ parseAs<double>(m_data.value) };
-        if (!maybeValue) {
-            return parseError();
+        const std::optional<double> maybe_value{ parse_as<double>(m_data.value) };
+        if (!maybe_value) {
+            return parse_error();
         }
 
-        header_value value{ *maybeValue };
+        header_value value{ *maybe_value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -296,17 +296,17 @@ std::expected<header_entry, error> reader::readHeaderEntry()
 
     case 62: {
         if (key != "$CECOLOR" && key != "$INTERFERECOLOR") {
-            return parseError();
+            return parse_error();
         }
 
-        const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
-        if (!maybeValue) {
-            return parseError();
+        const std::optional<int> maybe_value{ parse_as<int>(m_data.value) };
+        if (!maybe_value) {
+            return parse_error();
         }
 
-        header_value value{ *maybeValue };
+        header_value value{ *maybe_value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -314,14 +314,14 @@ std::expected<header_entry, error> reader::readHeaderEntry()
     }
 
     case 70: {
-        const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
-        if (!maybeValue) {
-            return parseError();
+        const std::optional<int> maybe_value{ parse_as<int>(m_data.value) };
+        if (!maybe_value) {
+            return parse_error();
         }
 
-        header_value value{ *maybeValue };
+        header_value value{ *maybe_value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -335,17 +335,17 @@ std::expected<header_entry, error> reader::readHeaderEntry()
             && key != "$LIGHTGLYPHDISPLAY" && key != "$TILEMODELIGHTSYNCH" && key != "$SOLIDHIST"
             && key != "$SHOWHIST" && key != "$DWFFRAME" && key != "$DGNFRAME"
             && key != "$CSHADOW") {
-            return parseError();
+            return parse_error();
         }
 
-        const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
-        if (!maybeValue) {
-            return parseError();
+        const std::optional<int> maybe_value{ parse_as<int>(m_data.value) };
+        if (!maybe_value) {
+            return parse_error();
         }
 
-        header_value value{ *maybeValue };
+        header_value value{ *maybe_value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -353,14 +353,14 @@ std::expected<header_entry, error> reader::readHeaderEntry()
     }
 
     case 290: {
-        const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
-        if (!maybeValue) {
-            return parseError();
+        const std::optional<int> maybe_value{ parse_as<int>(m_data.value) };
+        if (!maybe_value) {
+            return parse_error();
         }
 
-        header_value value{ *maybeValue != 0 };
+        header_value value{ *maybe_value != 0 };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -369,17 +369,17 @@ std::expected<header_entry, error> reader::readHeaderEntry()
 
     case 370: {
         if (key != "$CELWEIGHT") {
-            return parseError();
+            return parse_error();
         }
 
-        const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
-        if (!maybeValue) {
-            return parseError();
+        const std::optional<int> maybe_value{ parse_as<int>(m_data.value) };
+        if (!maybe_value) {
+            return parse_error();
         }
 
-        header_value value{ *maybeValue };
+        header_value value{ *maybe_value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -388,17 +388,17 @@ std::expected<header_entry, error> reader::readHeaderEntry()
 
     case 380: {
         if (key != "$CEPSNTYPE") {
-            return parseError();
+            return parse_error();
         }
 
-        const std::optional<int> maybeValue{ parseAs<int>(m_data.value) };
-        if (!maybeValue) {
-            return parseError();
+        const std::optional<int> maybe_value{ parse_as<int>(m_data.value) };
+        if (!maybe_value) {
+            return parse_error();
         }
 
-        header_value value{ *maybeValue };
+        header_value value{ *maybe_value };
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
 
@@ -408,9 +408,9 @@ std::expected<header_entry, error> reader::readHeaderEntry()
     default: {
         return std::unexpected(
             error{
-                .lineNumber = m_currentLine - 1,
+                .line_number = m_current_line - 1,
                 .what = std::format(
-                    "unexpected group code {} for header variable name", m_data.groupCode),
+                    "unexpected group code {} for header variable name", m_data.group_code),
             });
     }
     }
@@ -418,16 +418,16 @@ std::expected<header_entry, error> reader::readHeaderEntry()
     return {};
 }
 
-std::expected<std::variant<coordinate2d, coordinate3d>, error> reader::readHeaderCoordinate()
+std::expected<std::variant<coordinate2d, coordinate3d>, error> reader::read_header_coordinate()
 {
     double x{ 0.0 };
     double y{ 0.0 };
     std::optional<double> z;
 
-    while (m_data.groupCode == 10 || m_data.groupCode == 20 || m_data.groupCode == 30) {
-        switch (m_data.groupCode) {
+    while (m_data.group_code == 10 || m_data.group_code == 20 || m_data.group_code == 30) {
+        switch (m_data.group_code) {
         case 10: {
-            if (!parseInto(x)) {
+            if (!parse_into(x)) {
                 return std::unexpected(m_error.value());
             }
 
@@ -435,7 +435,7 @@ std::expected<std::variant<coordinate2d, coordinate3d>, error> reader::readHeade
         }
 
         case 20: {
-            if (!parseInto(y)) {
+            if (!parse_into(y)) {
                 return std::unexpected(m_error.value());
             }
 
@@ -443,7 +443,7 @@ std::expected<std::variant<coordinate2d, coordinate3d>, error> reader::readHeade
         }
 
         case 30: {
-            if (!parseInto(z)) {
+            if (!parse_into(z)) {
                 return std::unexpected(m_error.value());
             }
 
@@ -451,7 +451,7 @@ std::expected<std::variant<coordinate2d, coordinate3d>, error> reader::readHeade
         }
         }
 
-        if (!readNext()) {
+        if (!read_next()) {
             return std::unexpected(m_error.value());
         }
     }
@@ -463,94 +463,94 @@ std::expected<std::variant<coordinate2d, coordinate3d>, error> reader::readHeade
     return coordinate2d{ x, y };
 }
 
-std::expected<void, error> reader::readTables()
+std::expected<void, error> reader::read_tables()
 {
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
-    if (!isSectionBegin()) {
+    if (!is_section_begin()) {
         return std::unexpected(
             error{
-                .lineNumber = m_currentLine,
+                .line_number = m_current_line,
                 .what = "expected section begin",
             });
     }
 
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
-    if (!isTablesBegin()) {
+    if (!is_tables_begin()) {
         return std::unexpected(
             error{
-                .lineNumber = m_currentLine,
+                .line_number = m_current_line,
                 .what = "expected tables begin",
             });
     }
 
-    while (!isSectionEnd()) {
-        if (hasError()) {
-            return makeError();
+    while (!is_section_end()) {
+        if (has_error()) {
+            return make_error();
         }
 
-        if (isLayer()) {
-            std::expected<void, error> maybeResult{ readLayer() };
-            if (!maybeResult) {
-                return maybeResult;
+        if (is_layer()) {
+            std::expected<void, error> maybe_result{ read_layer() };
+            if (!maybe_result) {
+                return maybe_result;
             }
-        } else if (isLineType()) {
-            std::expected<void, error> maybeResult{ readLineType() };
-            if (!maybeResult) {
-                return maybeResult;
+        } else if (is_line_type()) {
+            std::expected<void, error> maybe_result{ read_line_type() };
+            if (!maybe_result) {
+                return maybe_result;
             }
         } else {
-            readNext();
+            read_next();
         }
 
-        if (hasError()) {
-            return makeError();
+        if (has_error()) {
+            return make_error();
         }
     }
 
     return {};
 }
 
-std::expected<void, error> reader::readLineType()
+std::expected<void, error> reader::read_line_type()
 {
-    if (!readNext()) {
+    if (!read_next()) {
         return std::unexpected(m_error.value());
     }
 
-    line_type lineType;
-    while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
+    odxf::line_type line_type;
+    while (m_data.group_code != 0) {
+        switch (m_data.group_code) {
         case 2: {
-            lineType.name = m_data.value;
+            line_type.name = m_data.value;
 
             break;
         }
 
         case 3: {
-            lineType.displayName = m_data.value;
+            line_type.display_name = m_data.value;
 
             break;
         }
 
         case 70: {
-            if (!parseInto(lineType.flags)) {
-                return makeError();
+            if (!parse_into(line_type.flags)) {
+                return make_error();
             }
 
             break;
         }
 
         case 49: {
-            const std::optional<double> maybeLength{ parseAs<double>(m_data.value) };
-            if (maybeLength.has_value()) {
-                lineType.elements.push_back(line_type_element{ .length = *maybeLength });
+            const std::optional<double> maybe_length{ parse_as<double>(m_data.value) };
+            if (maybe_length.has_value()) {
+                line_type.elements.push_back(line_type_element{ .length = *maybe_length });
             } else {
-                return parseError();
+                return parse_error();
             }
 
             break;
@@ -558,37 +558,37 @@ std::expected<void, error> reader::readLineType()
 
         // Follows the 49 of its element.
         case 74: {
-            const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
-            if (!maybeFlags.has_value() || lineType.elements.empty()) {
-                return parseError();
+            const std::optional<int> maybe_flags{ parse_as<int>(m_data.value) };
+            if (!maybe_flags.has_value() || line_type.elements.empty()) {
+                return parse_error();
             }
-            lineType.elements.back().complexFlags = *maybeFlags;
+            line_type.elements.back().complex_flags = *maybe_flags;
 
             break;
         }
         }
 
-        if (!readNext()) {
-            return makeError();
+        if (!read_next()) {
+            return make_error();
         }
     }
 
-    m_stream.lineType(lineType);
+    m_stream.line_type(line_type);
 
     return std::expected<void, error>();
 }
 
-std::expected<void, error> reader::readLayer()
+std::expected<void, error> reader::read_layer()
 {
-    if (!readNext()) {
+    if (!read_next()) {
         return std::unexpected(m_error.value());
     }
 
     odxf::layer layer;
     // The application that owns the xdata read next, empty before the first group code 1001.
-    std::string xdataApp;
-    while (m_data.groupCode != 0) {
-        switch (m_data.groupCode) {
+    std::string xdata_app;
+    while (m_data.group_code != 0) {
+        switch (m_data.group_code) {
         case 2: {
             layer.name = m_data.value;
 
@@ -596,70 +596,70 @@ std::expected<void, error> reader::readLayer()
         }
 
         case 62: {
-            if (!parseInto(layer.color)) {
-                return makeError();
+            if (!parse_into(layer.color)) {
+                return make_error();
             }
 
             break;
         }
 
         case 420: {
-            if (!parseInto(layer.trueColor)) {
-                return makeError();
+            if (!parse_into(layer.true_color)) {
+                return make_error();
             }
 
             break;
         }
 
         case 370: {
-            if (!parseInto(layer.lineweight)) {
-                return makeError();
+            if (!parse_into(layer.lineweight)) {
+                return make_error();
             }
 
             break;
         }
 
         case 6: {
-            layer.lineType = m_data.value;
+            layer.line_type = m_data.value;
 
             break;
         }
 
         case 70: {
-            const std::optional<int> maybeFlags{ parseAs<int>(m_data.value) };
-            if (maybeFlags.has_value()) {
-                layer.flags = static_cast<odxf::layer::flag>(*maybeFlags);
+            const std::optional<int> maybe_flags{ parse_as<int>(m_data.value) };
+            if (maybe_flags.has_value()) {
+                layer.flags = static_cast<odxf::layer::flag>(*maybe_flags);
             } else {
-                return parseError();
+                return parse_error();
             }
 
             break;
         }
 
         case 1001: {
-            xdataApp = m_data.value;
+            xdata_app = m_data.value;
 
             break;
         }
 
         case 1071: {
-            if (xdataApp != layerTransparencyApp) {
+            if (xdata_app != layer_transparency_app) {
                 break;
             }
 
-            const std::optional<int> maybeTransparency{ parseAs<int>(m_data.value) };
-            if (maybeTransparency.has_value()) {
-                layer.transparency = decodeLayerTransparency(*maybeTransparency);
+            const std::optional<int> maybe_transparency{ parse_as<int>(m_data.value) };
+            if (maybe_transparency.has_value()) {
+                layer.transparency = decode_layer_transparency(*maybe_transparency);
             } else {
-                return parseError();
+                return parse_error();
             }
 
             break;
         }
         }
 
-        if (!readNext()) {
-            return makeError();
+        if (!read_next()) {
+            return make_error();
         }
     }
 
@@ -668,99 +668,99 @@ std::expected<void, error> reader::readLayer()
     return std::expected<void, error>();
 }
 
-std::expected<void, error> reader::readBlocks()
+std::expected<void, error> reader::read_blocks()
 {
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
-    if (!isSectionBegin()) {
+    if (!is_section_begin()) {
         return std::unexpected(
             error{
-                .lineNumber = m_currentLine,
+                .line_number = m_current_line,
                 .what = "expected section begin",
             });
     }
 
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
-    if (!isBlocksBegin()) {
+    if (!is_blocks_begin()) {
         return std::unexpected(
             error{
-                .lineNumber = m_currentLine,
+                .line_number = m_current_line,
                 .what = "expected blocks begin",
             });
     }
 
-    while (readNext() && !isSectionEnd()) {
-        if (hasError()) {
-            return makeError();
+    while (read_next() && !is_section_end()) {
+        if (has_error()) {
+            return make_error();
         }
     }
 
     return {};
 }
 
-std::expected<void, error> reader::readEntities()
+std::expected<void, error> reader::read_entities()
 {
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
-    if (!isSectionBegin()) {
+    if (!is_section_begin()) {
         return std::unexpected(
             error{
-                .lineNumber = m_currentLine,
+                .line_number = m_current_line,
                 .what = "expected section begin",
             });
     }
 
-    if (!readNext()) {
-        return makeError();
+    if (!read_next()) {
+        return make_error();
     }
 
-    if (!isEntitiesBegin()) {
+    if (!is_entities_begin()) {
         return std::unexpected(
             error{
-                .lineNumber = m_currentLine,
+                .line_number = m_current_line,
                 .what = "expected entities begin",
             });
     }
 
-    while (!isSectionEnd()) {
-        if (hasError()) {
-            return makeError();
+    while (!is_section_end()) {
+        if (has_error()) {
+            return make_error();
         }
 
-        if (isLine()) {
-            std::expected<void, error> maybeResult{ readLine() };
-            if (!maybeResult) {
-                return maybeResult;
+        if (is_line()) {
+            std::expected<void, error> maybe_result{ read_line() };
+            if (!maybe_result) {
+                return maybe_result;
             }
 
-        } else if (isCircle()) {
-            std::expected<void, error> maybeResult{ readCircle() };
-            if (!maybeResult) {
-                return maybeResult;
+        } else if (is_circle()) {
+            std::expected<void, error> maybe_result{ read_circle() };
+            if (!maybe_result) {
+                return maybe_result;
             }
-        } else if (isArc()) {
-            std::expected<void, error> maybeResult{ readArc() };
-            if (!maybeResult) {
-                return maybeResult;
+        } else if (is_arc()) {
+            std::expected<void, error> maybe_result{ read_arc() };
+            if (!maybe_result) {
+                return maybe_result;
             }
-        } else if (isLWPolyline()) {
-            std::expected<void, error> maybeResult{ readLWPolyline() };
-            if (!maybeResult) {
-                return maybeResult;
+        } else if (is_lw_polyline()) {
+            std::expected<void, error> maybe_result{ read_lw_polyline() };
+            if (!maybe_result) {
+                return maybe_result;
             }
         } else {
-            readNext();
+            read_next();
         }
 
-        if (hasError()) {
-            return makeError();
+        if (has_error()) {
+            return make_error();
         }
     }
 
@@ -768,15 +768,15 @@ std::expected<void, error> reader::readEntities()
 }
 
 template <entity_type E, std::predicate<E&> F>
-std::expected<E, error> reader::readEntity(F readGroupCode)
+std::expected<E, error> reader::read_entity(F read_group_code)
 {
-    if (!readNext()) {
+    if (!read_next()) {
         return std::unexpected(m_error.value());
     }
 
     E entity;
-    while (m_data.groupCode != 0) {
-        if (!readGroupCode(entity) || !readNext()) {
+    while (m_data.group_code != 0) {
+        if (!read_group_code(entity) || !read_next()) {
             return std::unexpected(m_error.value());
         }
     }
@@ -784,27 +784,27 @@ std::expected<E, error> reader::readEntity(F readGroupCode)
     return entity;
 }
 
-bool reader::readEntityProperty(entity_properties& properties)
+bool reader::read_entity_property(entity_properties& properties)
 {
-    switch (m_data.groupCode) {
+    switch (m_data.group_code) {
     case 8: properties.layer = m_data.value; return true;
 
-    case 62: return parseInto(properties.color);
+    case 62: return parse_into(properties.color);
 
-    case 420: return parseInto(properties.trueColor);
+    case 420: return parse_into(properties.true_color);
 
-    case 370: return parseInto(properties.lineweight);
+    case 370: return parse_into(properties.lineweight);
 
-    case 6: properties.lineType = m_data.value; return true;
+    case 6: properties.line_type = m_data.value; return true;
 
-    case 48: return parseInto(properties.lineTypeScale);
+    case 48: return parse_into(properties.line_type_scale);
 
     case 440: {
         int transparency{ 0 };
-        if (!parseInto(transparency)) {
+        if (!parse_into(transparency)) {
             return false;
         }
-        properties.transparency = decodeEntityTransparency(transparency);
+        properties.transparency = decode_entity_transparency(transparency);
         return true;
     }
 
@@ -814,139 +814,139 @@ bool reader::readEntityProperty(entity_properties& properties)
     }
 }
 
-std::expected<void, error> reader::readLine()
+std::expected<void, error> reader::read_line()
 {
-    return readEntity<line>([this](odxf::line& line) -> bool {
-               switch (m_data.groupCode) {
-               case 10: return parseInto(line.start.x);
-               case 20: return parseInto(line.start.y);
-               case 11: return parseInto(line.end.x);
-               case 21: return parseInto(line.end.y);
-               default: return readEntityProperty(line.properties);
+    return read_entity<line>([this](odxf::line& line) -> bool {
+               switch (m_data.group_code) {
+               case 10: return parse_into(line.start.x);
+               case 20: return parse_into(line.start.y);
+               case 11: return parse_into(line.end.x);
+               case 21: return parse_into(line.end.y);
+               default: return read_entity_property(line.properties);
                }
            })
         .transform([this](const odxf::line& line) { m_stream.line(line); });
 }
 
-std::expected<void, error> reader::readCircle()
+std::expected<void, error> reader::read_circle()
 {
-    return readEntity<circle>([this](odxf::circle& circle) -> bool {
-               switch (m_data.groupCode) {
-               case 10: return parseInto(circle.center.x);
-               case 20: return parseInto(circle.center.y);
-               case 40: return parseInto(circle.radius);
-               default: return readEntityProperty(circle.properties);
+    return read_entity<circle>([this](odxf::circle& circle) -> bool {
+               switch (m_data.group_code) {
+               case 10: return parse_into(circle.center.x);
+               case 20: return parse_into(circle.center.y);
+               case 40: return parse_into(circle.radius);
+               default: return read_entity_property(circle.properties);
                }
            })
         .transform([this](const odxf::circle& circle) { m_stream.circle(circle); });
 }
 
-std::expected<void, error> reader::readArc()
+std::expected<void, error> reader::read_arc()
 {
-    return readEntity<arc>([this](odxf::arc& arc) -> bool {
-               switch (m_data.groupCode) {
-               case 10: return parseInto(arc.center.x);
-               case 20: return parseInto(arc.center.y);
-               case 40: return parseInto(arc.radius);
-               case 50: return parseInto(arc.startAngle);
-               case 51: return parseInto(arc.endAngle);
-               default: return readEntityProperty(arc.properties);
+    return read_entity<arc>([this](odxf::arc& arc) -> bool {
+               switch (m_data.group_code) {
+               case 10: return parse_into(arc.center.x);
+               case 20: return parse_into(arc.center.y);
+               case 40: return parse_into(arc.radius);
+               case 50: return parse_into(arc.start_angle);
+               case 51: return parse_into(arc.end_angle);
+               default: return read_entity_property(arc.properties);
                }
            })
         .transform([this](const odxf::arc& arc) { m_stream.arc(arc); });
 }
 
-std::expected<void, error> reader::readLWPolyline()
+std::expected<void, error> reader::read_lw_polyline()
 {
     odxf::vertex vertex;
-    int numXY{ 0 };
+    int num_xy{ 0 };
 
     // A vertex is complete once it has x and y. Its bulge, if any, follows directly.
-    const auto pushCompleteVertex = [&](lw_polyline& lwPolyline) {
-        if (numXY == 2) {
-            lwPolyline.vertices.push_back(vertex);
-            numXY = 0;
+    const auto push_complete_vertex = [&](odxf::lw_polyline& lw_polyline) {
+        if (num_xy == 2) {
+            lw_polyline.vertices.push_back(vertex);
+            num_xy = 0;
             vertex.bulge.reset();
         }
     };
 
-    std::expected<lw_polyline, error> maybeLWPolyline{ readEntity<lw_polyline>(
-        [&](lw_polyline& lwPolyline) -> bool {
-            switch (m_data.groupCode) {
+    std::expected<lw_polyline, error> maybe_lw_polyline{ read_entity<lw_polyline>(
+        [&](odxf::lw_polyline& lw_polyline) -> bool {
+            switch (m_data.group_code) {
             case 90: {
-                int verticesCount{ 0 };
-                if (!parseInto(verticesCount)) {
+                int vertices_count{ 0 };
+                if (!parse_into(vertices_count)) {
                     return false;
                 }
-                if (verticesCount >= 0) {
-                    lwPolyline.vertices.reserve(static_cast<std::size_t>(verticesCount));
+                if (vertices_count >= 0) {
+                    lw_polyline.vertices.reserve(static_cast<std::size_t>(vertices_count));
                 }
                 return true;
             }
 
             case 70: {
                 int flags{ 0 };
-                if (!parseInto(flags)) {
+                if (!parse_into(flags)) {
                     return false;
                 }
-                lwPolyline.isClosed = (flags & 1) != 0;
+                lw_polyline.is_closed = (flags & 1) != 0;
                 return true;
             }
 
             case 10:
-                pushCompleteVertex(lwPolyline);
-                if (!parseInto(vertex.position.x)) {
+                push_complete_vertex(lw_polyline);
+                if (!parse_into(vertex.position.x)) {
                     return false;
                 }
-                numXY++;
+                num_xy++;
                 return true;
 
             case 20:
-                pushCompleteVertex(lwPolyline);
-                if (!parseInto(vertex.position.y)) {
+                push_complete_vertex(lw_polyline);
+                if (!parse_into(vertex.position.y)) {
                     return false;
                 }
-                numXY++;
+                num_xy++;
                 return true;
 
             case 42:
-                if (!parseInto(vertex.bulge)) {
+                if (!parse_into(vertex.bulge)) {
                     return false;
                 }
-                pushCompleteVertex(lwPolyline);
+                push_complete_vertex(lw_polyline);
                 return true;
 
-            default: return readEntityProperty(lwPolyline.properties);
+            default: return read_entity_property(lw_polyline.properties);
             }
         }) };
 
-    if (!maybeLWPolyline) {
-        return std::unexpected(maybeLWPolyline.error());
+    if (!maybe_lw_polyline) {
+        return std::unexpected(maybe_lw_polyline.error());
     }
 
-    pushCompleteVertex(*maybeLWPolyline);
-    m_stream.lwPolyline(*maybeLWPolyline);
+    push_complete_vertex(*maybe_lw_polyline);
+    m_stream.lw_polyline(*maybe_lw_polyline);
 
     return {};
 }
 
-bool reader::readNext()
+bool reader::read_next()
 {
     bool success{ false };
     do {
-        success = readNextSingle();
-    } while (m_data.groupCode == 999 && success);
+        success = read_next_single();
+    } while (m_data.group_code == 999 && success);
 
     return success;
 }
 
-bool reader::readNextSingle()
+bool reader::read_next_single()
 {
-    m_currentLine++;
+    m_current_line++;
 
-    if (!std::getline(m_fileStream, m_data.value)) {
+    if (!std::getline(m_file_stream, m_data.value)) {
         m_error = error{
-            .lineNumber = m_currentLine,
+            .line_number = m_current_line,
             .what = "unable to read line",
         };
 
@@ -959,21 +959,21 @@ bool reader::readNextSingle()
             ++first;
         }
     }
-    const auto [_, errorCode]{ std::from_chars(
-        first, m_data.value.c_str() + m_data.value.size(), m_data.groupCode) };
-    if (errorCode != std::errc()) {
+    const auto [_, error_code]{ std::from_chars(
+        first, m_data.value.c_str() + m_data.value.size(), m_data.group_code) };
+    if (error_code != std::errc()) {
         m_error = error{
-            .lineNumber = m_currentLine,
+            .line_number = m_current_line,
             .what = "unable to parse group code",
         };
 
         return false;
     }
 
-    m_currentLine++;
-    if (!std::getline(m_fileStream, m_data.value)) {
+    m_current_line++;
+    if (!std::getline(m_file_stream, m_data.value)) {
         m_error = error{
-            .lineNumber = m_currentLine,
+            .line_number = m_current_line,
             .what = "unable to read line",
         };
 
@@ -983,45 +983,54 @@ bool reader::readNextSingle()
     return true;
 }
 
-bool reader::hasError() const { return m_error.has_value(); }
+bool reader::has_error() const { return m_error.has_value(); }
 
-std::expected<void, error> reader::makeError() const { return std::unexpected(m_error.value()); }
+std::expected<void, error> reader::make_error() const { return std::unexpected(m_error.value()); }
 
-std::unexpected<error> reader::parseError() const
+std::unexpected<error> reader::parse_error() const
 {
-    return std::unexpected(error{ .lineNumber = m_currentLine });
+    return std::unexpected(error{ .line_number = m_current_line });
 }
 
-bool reader::isSectionBegin() const { return m_data.groupCode == 0 && m_data.value == "SECTION"; }
+bool reader::is_section_begin() const
+{
+    return m_data.group_code == 0 && m_data.value == "SECTION";
+}
 
-bool reader::isSectionEnd() const { return m_data.groupCode == 0 && m_data.value == "ENDSEC"; }
+bool reader::is_section_end() const { return m_data.group_code == 0 && m_data.value == "ENDSEC"; }
 
-bool reader::isHeaderBegin() const { return m_data.groupCode == 2 && m_data.value == "HEADER"; }
+bool reader::is_header_begin() const { return m_data.group_code == 2 && m_data.value == "HEADER"; }
 
-bool reader::isTablesBegin() const { return m_data.groupCode == 2 && m_data.value == "TABLES"; }
+bool reader::is_tables_begin() const { return m_data.group_code == 2 && m_data.value == "TABLES"; }
 
-bool reader::isBlocksBegin() const { return m_data.groupCode == 2 && m_data.value == "BLOCKS"; }
+bool reader::is_blocks_begin() const { return m_data.group_code == 2 && m_data.value == "BLOCKS"; }
 
-bool reader::isEntitiesBegin() const { return m_data.groupCode == 2 && m_data.value == "ENTITIES"; }
+bool reader::is_entities_begin() const
+{
+    return m_data.group_code == 2 && m_data.value == "ENTITIES";
+}
 
-bool reader::isTableBegin() const { return m_data.groupCode == 0 && m_data.value == "TABLE"; }
+bool reader::is_table_begin() const { return m_data.group_code == 0 && m_data.value == "TABLE"; }
 
-bool reader::isTableEnd() const { return m_data.groupCode == 0 && m_data.value == "ENDTAB"; }
+bool reader::is_table_end() const { return m_data.group_code == 0 && m_data.value == "ENDTAB"; }
 
-bool reader::isLayerBegin() const { return m_data.groupCode == 2 && m_data.value == "LAYER"; }
+bool reader::is_layer_begin() const { return m_data.group_code == 2 && m_data.value == "LAYER"; }
 
-bool reader::isLayer() const { return m_data.groupCode == 0 && m_data.value == "LAYER"; }
+bool reader::is_layer() const { return m_data.group_code == 0 && m_data.value == "LAYER"; }
 
-bool reader::isLineType() const { return m_data.groupCode == 0 && m_data.value == "LTYPE"; }
+bool reader::is_line_type() const { return m_data.group_code == 0 && m_data.value == "LTYPE"; }
 
-bool reader::isLine() const { return m_data.groupCode == 0 && m_data.value == "LINE"; }
+bool reader::is_line() const { return m_data.group_code == 0 && m_data.value == "LINE"; }
 
-bool odxf::reader::isCircle() const { return m_data.groupCode == 0 && m_data.value == "CIRCLE"; }
+bool odxf::reader::is_circle() const { return m_data.group_code == 0 && m_data.value == "CIRCLE"; }
 
-bool reader::isArc() const { return m_data.groupCode == 0 && m_data.value == "ARC"; }
+bool reader::is_arc() const { return m_data.group_code == 0 && m_data.value == "ARC"; }
 
-bool reader::isLWPolyline() const { return m_data.groupCode == 0 && m_data.value == "LWPOLYLINE"; }
+bool reader::is_lw_polyline() const
+{
+    return m_data.group_code == 0 && m_data.value == "LWPOLYLINE";
+}
 
-bool reader::isEOF() const { return m_data.groupCode == 0 && m_data.value == "EOF"; }
+bool reader::is_eof() const { return m_data.group_code == 0 && m_data.value == "EOF"; }
 
 }   // namespace odxf

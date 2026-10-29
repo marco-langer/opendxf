@@ -9,16 +9,16 @@
 
 namespace {
 
-constexpr std::string_view insUnitsKey{ "$INSUNITS" };
-constexpr std::string_view ltScaleKey{ "$LTSCALE" };
+constexpr std::string_view ins_units_key{ "$INSUNITS" };
+constexpr std::string_view lt_scale_key{ "$LTSCALE" };
 
 }   // namespace
 
 namespace odxf {
 
-std::expected<std::optional<length_unit>, header_error> insertionUnits(const odxf::header& header)
+std::expected<std::optional<length_unit>, header_error> insertion_units(const odxf::header& header)
 {
-    const auto it{ header.entries.find(insUnitsKey) };
+    const auto it{ header.entries.find(ins_units_key) };
     if (it == header.entries.end()) {
         return std::nullopt;
     }
@@ -36,14 +36,14 @@ std::expected<std::optional<length_unit>, header_error> insertionUnits(const odx
     return static_cast<length_unit>(*value);
 }
 
-void setInsertionUnits(odxf::header& header, length_unit unit)
+void set_insertion_units(odxf::header& header, length_unit unit)
 {
-    header.entries.insert_or_assign(std::string{ insUnitsKey }, static_cast<int>(unit));
+    header.entries.insert_or_assign(std::string{ ins_units_key }, static_cast<int>(unit));
 }
 
-std::expected<std::optional<double>, header_error> lineTypeScale(const odxf::header& header)
+std::expected<std::optional<double>, header_error> line_type_scale(const odxf::header& header)
 {
-    const auto it{ header.entries.find(ltScaleKey) };
+    const auto it{ header.entries.find(lt_scale_key) };
     if (it == header.entries.end()) {
         return std::nullopt;
     }
@@ -60,9 +60,9 @@ std::expected<std::optional<double>, header_error> lineTypeScale(const odxf::hea
     return *value;
 }
 
-void setLineTypeScale(odxf::header& header, double scale)
+void set_line_type_scale(odxf::header& header, double scale)
 {
-    header.entries.insert_or_assign(std::string{ ltScaleKey }, scale);
+    header.entries.insert_or_assign(std::string{ lt_scale_key }, scale);
 }
 
 }   // namespace odxf

@@ -17,18 +17,18 @@ public:
 
 private:
     void header(const odxf::header& header) override { m_document.header = header; }
-    void lineType(const odxf::line_type& lineType) override
+    void line_type(const odxf::line_type& line_type) override
     {
-        m_document.tables.lineTypes.push_back(lineType);
+        m_document.tables.line_types.push_back(line_type);
     }
     void layer(const odxf::layer& layer) override { m_document.tables.layers.push_back(layer); }
 
     void arc(const odxf::arc& arc) override { m_document.entities.push_back(arc); }
     void circle(const odxf::circle& circle) override { m_document.entities.push_back(circle); }
     void line(const odxf::line& line) override { m_document.entities.push_back(line); }
-    void lwPolyline(const odxf::lw_polyline& lwPolyline) override
+    void lw_polyline(const odxf::lw_polyline& lw_polyline) override
     {
-        m_document.entities.push_back(lwPolyline);
+        m_document.entities.push_back(lw_polyline);
     }
 
     odxf::document m_document;
@@ -38,18 +38,18 @@ private:
 
 namespace odxf {
 
-std::expected<document, error> read(const std::filesystem::path& filePath)
+std::expected<document, error> read(const std::filesystem::path& file_path)
 {
     document_stream stream;
 
-    return read(filePath, stream).transform([&stream] { return std::move(stream).document(); });
+    return read(file_path, stream).transform([&stream] { return std::move(stream).document(); });
 }
 
-std::expected<void, error> read(const std::filesystem::path& filePath, read_stream_base& stream)
+std::expected<void, error> read(const std::filesystem::path& file_path, read_stream_base& stream)
 {
     reader reader{ stream };
 
-    return reader.readAll(filePath);
+    return reader.read_all(file_path);
 }
 
 }   // namespace odxf

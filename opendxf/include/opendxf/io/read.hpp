@@ -13,8 +13,8 @@ namespace odxf {
 
 class read_stream_base;
 
-std::expected<document, error> read(const std::filesystem::path& filePath);
+std::expected<document, error> read(const std::filesystem::path& file_path);
 
-std::expected<void, error> read(const std::filesystem::path& filePath, read_stream_base& stream);
+std::expected<void, error> read(const std::filesystem::path& file_path, read_stream_base& stream);
 
 }   // namespace odxf

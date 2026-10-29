@@ -8,4 +8,4 @@
 #include <gmock/gmock.h>
 
 testing::Matcher<odxf::entities>
-are_entities(const odxf::entities& expected, double maxError = 1.0e-5);
+are_entities(const odxf::entities& expected, double max_error = 1.0e-5);
