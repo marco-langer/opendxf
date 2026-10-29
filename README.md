@@ -34,33 +34,33 @@ Tests and examples are only built when opendxf is the top-level project. Use `OP
 
 ### Reading
 
-Read a whole file into an `odxf::Document`:
+Read a whole file into an `odxf::document`:
 
 ```cpp
-const std::expected<odxf::Document, odxf::Error> document{ odxf::read("drawing.dxf") };
+const std::expected<odxf::document, odxf::error> document{ odxf::read("drawing.dxf") };
 ```
 
-To process a file without holding it in memory, derive from `odxf::IReadStream` and override the callbacks you are interested in:
+To process a file without holding it in memory, derive from `odxf::read_stream_base` and override the callbacks you are interested in:
 
 ```cpp
 #include <opendxf/opendxf.hpp>
 
 #include <print>
 
-class LineCounter final : public odxf::IReadStream
+class line_counter final : public odxf::read_stream_base
 {
 public:
     int lines{ 0 };
 
 private:
-    void line(const odxf::Line& /* line */) override { lines += 1; }
+    void line(const odxf::line& /* line */) override { lines += 1; }
 };
 
 int main()
 {
-    LineCounter counter;
+    line_counter counter;
 
-    const std::expected<void, odxf::Error> result{ odxf::read("drawing.dxf", counter) };
+    const std::expected<void, odxf::error> result{ odxf::read("drawing.dxf", counter) };
     if (!result) {
         std::println("error: {}", result.error().what);
         return EXIT_FAILURE;
@@ -72,7 +72,7 @@ int main()
 
 ### Writing
 
-Fill an `odxf::Document` and write it:
+Fill an `odxf::document` and write it:
 
 ```cpp
 #include <opendxf/opendxf.hpp>
@@ -81,19 +81,19 @@ Fill an `odxf::Document` and write it:
 
 int main()
 {
-    const odxf::Document document{
+    const odxf::document document{
         .header{ .entries{ { "$ACADVER", "AC1032" } } },
         .tables{
-            .lineTypes{ { .name{ "CONTINUOUS" }, .displayName{ "Solid Line" } } },
+            .line_types{ { .name{ "CONTINUOUS" }, .display_name{ "Solid Line" } } },
             .layers{ { .name{ "Layer 1" } } },
         },
         .entities{
-            odxf::Circle{ .center{}, .radius{ 1.0 } },
-            odxf::Line{ .start{ 0.0, 0.0, 0.0 }, .end{ 1.0, 1.0, 0.0 } },
+            odxf::circle{ .center{}, .radius{ 1.0 } },
+            odxf::line{ .start{ 0.0, 0.0, 0.0 }, .end{ 1.0, 1.0, 0.0 } },
         },
     };
 
-    const std::expected<void, odxf::Error> result{ odxf::write("drawing.dxf", document) };
+    const std::expected<void, odxf::error> result{ odxf::write("drawing.dxf", document) };
     if (!result) {
         std::println("error: {}", result.error().what);
         return EXIT_FAILURE;
@@ -101,17 +101,17 @@ int main()
 }
 ```
 
-To write entities without holding them all in memory, open a `WriteStream` with the header and tables and stream the entities. `close()` completes the file and reports errors; if it isn't called, the destructor completes the file and the error is lost:
+To write entities without holding them all in memory, open a `write_stream` with the header and tables and stream the entities. `close()` completes the file and reports errors; if it isn't called, the destructor completes the file and the error is lost:
 
 ```cpp
-std::expected<odxf::WriteStream, odxf::Error> stream{
-    odxf::WriteStream::open("drawing.dxf", header, tables)
+std::expected<odxf::write_stream, odxf::error> stream{
+    odxf::write_stream::open("drawing.dxf", header, tables)
 };
 if (!stream) {
     // handle stream.error()
 }
 
-for (const odxf::Line& line : computeLines()) {
+for (const odxf::line& line : compute_lines()) {
     if (!stream->entity(line)) {
         // handle the error
     }

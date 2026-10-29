@@ -8,7 +8,7 @@ Reading fails on malformed or unsupported files, which are common in practice. T
 
 ## Decision
 
-The library does not throw. Functions that can fail return `std::expected<T, Error>`. `Error` carries the line number and a description.
+The library does not throw. Functions that can fail return `std::expected<T, error>`. `error` carries the line number and a description.
 
 ## Rationale
 
@@ -19,7 +19,7 @@ This deviates from Core Guidelines [E.2](https://isocpp.github.io/CppCoreGuideli
 
 ## Consequences
 
-- Every function inside the reader that can fail has to pass errors on to its caller. This makes the reader code noisy. Helpers like `parseInto` and `readEntity` reduce it, but do not remove it.
+- Every function inside the reader that can fail has to pass errors on to its caller. This makes the reader code noisy. Helpers like `parse_into` and `read_entity` reduce it, but do not remove it.
 
 ## Open questions
 

@@ -19,8 +19,8 @@ All header variables are read into and written from a generic key/value map. Typ
 
 | Variable    | Accessor                                    |
 |-------------|---------------------------------------------|
-| `$INSUNITS` | `insertionUnits()` / `setInsertionUnits()`  |
-| `$LTSCALE`  | `lineTypeScale()` / `setLineTypeScale()`    |
+| `$INSUNITS` | `insertion_units()` / `set_insertion_units()`  |
+| `$LTSCALE`  | `line_type_scale()` / `set_line_type_scale()`    |
 
 ## Tables
 
@@ -95,10 +95,10 @@ type is incomplete.
 | 440           | Transparency |            | ✓             | ✓     |
 | 1001 + 1071   | Transparency | ✓          |               | ✓     |
 
-Entities read transparency for ARC, CIRCLE, LINE and LWPOLYLINE into an `EntityTransparency`:
-`ByLayer`, `ByBlock` or a `Transparency` with an alpha from 0 (fully transparent) to 255
+Entities read transparency for ARC, CIRCLE, LINE and LWPOLYLINE into an `entity_transparency`:
+`by_layer`, `by_block` or a `transparency` with an alpha from 0 (fully transparent) to 255
 (opaque). DXF stores it as `0x02000000 | alpha`, or `0x01000000` for BYBLOCK. A missing group
-code 440 and any other value mean `ByLayer`.
+code 440 and any other value mean `by_layer`.
 
 Layers keep their transparency in xdata: a 1071 that follows the 1001 naming the transparency
 application. A 1071 of any other application is ignored, as is all other xdata. A layer without
