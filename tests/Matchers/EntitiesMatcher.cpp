@@ -4,19 +4,11 @@
 #include "EntitiesMatcher.hpp"
 
 #include "CoordinateMatcher.hpp"
+#include "overload.hpp"
 
 #include <variant>
 
 namespace {
-
-template <typename... Ts>
-struct overload : Ts...
-{
-    using Ts::operator()...;
-};
-
-template <typename... Ts>
-overload(Ts...) -> overload<Ts...>;
 
 testing::Matcher<odxf::Vector3d> IsVector(const odxf::Vector3d& expected, double maxError)
 {
@@ -170,7 +162,7 @@ testing::Matcher<const odxf::Ray&> IsRay(const odxf::Ray& expected, double maxEr
 testing::Matcher<odxf::Entity> IsEntity(const odxf::Entity& expected, double maxError)
 {
     return std::visit(
-        overload{
+        odxf::overload{
             [maxError](const odxf::Arc& arc) -> testing::Matcher<odxf::Entity> {
                 return testing::VariantWith<odxf::Arc>(IsArc(arc, maxError));
             },

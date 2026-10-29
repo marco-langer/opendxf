@@ -3,6 +3,7 @@
 
 #include "opendxf/write.hpp"
 
+#include "overload.hpp"
 #include "transparency.hpp"
 
 #include <algorithm>
@@ -11,15 +12,6 @@
 #include <iomanip>
 
 namespace {
-
-template <typename... Ts>
-struct overload : Ts...
-{
-    using Ts::operator()...;
-};
-
-template <typename... Ts>
-overload(Ts...) -> overload<Ts...>;
 
 void writeHeader(std::ofstream& stream, const odxf::Header& header)
 {
@@ -30,71 +22,72 @@ void writeHeader(std::ofstream& stream, const odxf::Header& header)
     for (const auto& [key, value] : header.entries) {
         stream << "\n9\n" << key;
         std::visit(
-            overload{ [&stream, &key](bool element) {
-                         stream << "\n290\n";
-                         stream << element;
-                     },
-                      [&stream, &key](int element) {
-                          if (key == "$CECOLOR" || key == "$INTERFERECOLOR") {
-                              stream << "\n62\n";
-                          } else if (
-                              key == "$ENDCAPS" || key == "$JOINSTYLE" || key == "$SORTENTS"
-                              || key == "$INDEXCTL" || key == "$HIDETEXT" || key == "$HALOGAP"
-                              || key == "$OBSLTYPE" || key == "$INTERSECTIONDISPLAY"
-                              || key == "$DIMASSOC" || key == "$LOFTNORMALS"
-                              || key == "$LIGHTGLYPHDISPLAY" || key == "$TILEMODELIGHTSYNCH"
-                              || key == "$SOLIDHIST" || key == "$SHOWHIST" || key == "$DWFFRAME"
-                              || key == "$DGNFRAME" || key == "$CSHADOW") {
-                              stream << "\n280\n";
-                          } else if (key == "$CELWEIGHT") {
-                              stream << "\n370\n";
-                          } else if (key == "$CEPSNTYPE") {
-                              stream << "\n380\n";
-                          } else {
-                              stream << "\n70\n";
-                          }
-                          stream << element;
-                      },
-                      [&stream, &key](double element) {
-                          if (key == "$ANGBASE") {
-                              stream << "\n50\n";
-                          } else {
-                              stream << "\n40\n";
-                          }
-                          stream << element;
-                      },
-                      [&stream, &key](const std::string& element) {
-                          if (key == "$DIMSTYLE") {
-                              stream << "\n2\n";
-                          } else if (key == "$HANDSEED") {
-                              stream << "\n5\n";
-                          } else if (
-                              key == "$CELTYPE" || key == "$DIMLTYPE" || key == "$DIMLTEX1"
-                              || key == "$DIMLTEX2") {
-                              stream << "\n6\n";
-                          } else if (key == "$TEXTSTYLE" || key == "$DIMTXSTY") {
-                              stream << "\n7\n";
-                          } else if (key == "$CLAYER") {
-                              stream << "\n8\n";
-                          } else {
-                              stream << "\n1\n";
-                          }
-                          stream << element;
-                      },
-                      [&stream](const odxf::Coordinate2d& coord) {
-                          stream << "\n10\n";
-                          stream << coord.x;
-                          stream << "\n20\n";
-                          stream << coord.y;
-                      },
-                      [&stream](const odxf::Coordinate3d& coord) {
-                          stream << "\n10\n";
-                          stream << coord.x;
-                          stream << "\n20\n";
-                          stream << coord.y;
-                          stream << "\n30\n";
-                          stream << coord.z;
-                      } },
+            odxf::overload{ [&stream, &key](bool element) {
+                               stream << "\n290\n";
+                               stream << element;
+                           },
+                            [&stream, &key](int element) {
+                                if (key == "$CECOLOR" || key == "$INTERFERECOLOR") {
+                                    stream << "\n62\n";
+                                } else if (
+                                    key == "$ENDCAPS" || key == "$JOINSTYLE" || key == "$SORTENTS"
+                                    || key == "$INDEXCTL" || key == "$HIDETEXT" || key == "$HALOGAP"
+                                    || key == "$OBSLTYPE" || key == "$INTERSECTIONDISPLAY"
+                                    || key == "$DIMASSOC" || key == "$LOFTNORMALS"
+                                    || key == "$LIGHTGLYPHDISPLAY" || key == "$TILEMODELIGHTSYNCH"
+                                    || key == "$SOLIDHIST" || key == "$SHOWHIST"
+                                    || key == "$DWFFRAME" || key == "$DGNFRAME"
+                                    || key == "$CSHADOW") {
+                                    stream << "\n280\n";
+                                } else if (key == "$CELWEIGHT") {
+                                    stream << "\n370\n";
+                                } else if (key == "$CEPSNTYPE") {
+                                    stream << "\n380\n";
+                                } else {
+                                    stream << "\n70\n";
+                                }
+                                stream << element;
+                            },
+                            [&stream, &key](double element) {
+                                if (key == "$ANGBASE") {
+                                    stream << "\n50\n";
+                                } else {
+                                    stream << "\n40\n";
+                                }
+                                stream << element;
+                            },
+                            [&stream, &key](const std::string& element) {
+                                if (key == "$DIMSTYLE") {
+                                    stream << "\n2\n";
+                                } else if (key == "$HANDSEED") {
+                                    stream << "\n5\n";
+                                } else if (
+                                    key == "$CELTYPE" || key == "$DIMLTYPE" || key == "$DIMLTEX1"
+                                    || key == "$DIMLTEX2") {
+                                    stream << "\n6\n";
+                                } else if (key == "$TEXTSTYLE" || key == "$DIMTXSTY") {
+                                    stream << "\n7\n";
+                                } else if (key == "$CLAYER") {
+                                    stream << "\n8\n";
+                                } else {
+                                    stream << "\n1\n";
+                                }
+                                stream << element;
+                            },
+                            [&stream](const odxf::Coordinate2d& coord) {
+                                stream << "\n10\n";
+                                stream << coord.x;
+                                stream << "\n20\n";
+                                stream << coord.y;
+                            },
+                            [&stream](const odxf::Coordinate3d& coord) {
+                                stream << "\n10\n";
+                                stream << coord.x;
+                                stream << "\n20\n";
+                                stream << coord.y;
+                                stream << "\n30\n";
+                                stream << coord.z;
+                            } },
             value);
     }
 
