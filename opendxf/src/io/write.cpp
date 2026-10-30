@@ -7,13 +7,30 @@
 #include "transparency.hpp"
 
 #include <algorithm>
+#include <array>
+#include <charconv>
 #include <cmath>
 #include <format>
 #include <fstream>
-#include <iomanip>
+#include <system_error>
 #include <utility>
 
 namespace {
+
+// Writes the shortest representation that reads back as the same double. A formatting error
+// fails the stream, so check_stream() reports it like any other write error.
+void write_value(std::ofstream& stream, int group_code, double value)
+{
+    std::array<char, 32> buffer;
+    const auto [end, ec]{ std::to_chars(buffer.data(), buffer.data() + buffer.size(), value) };
+    if (ec != std::errc{}) {
+        stream.setstate(std::ios::failbit);
+        return;
+    }
+
+    stream << '\n' << group_code << '\n';
+    stream.write(buffer.data(), end - buffer.data());
+}
 
 void write_header(std::ofstream& stream, const odxf::header& header)
 {
@@ -51,12 +68,7 @@ void write_header(std::ofstream& stream, const odxf::header& header)
                                 stream << element;
                             },
                             [&stream, &key](double element) {
-                                if (key == "$ANGBASE") {
-                                    stream << "\n50\n";
-                                } else {
-                                    stream << "\n40\n";
-                                }
-                                stream << element;
+                                write_value(stream, key == "$ANGBASE" ? 50 : 40, element);
                             },
                             [&stream, &key](const std::string& element) {
                                 if (key == "$DIMSTYLE") {
@@ -77,18 +89,13 @@ void write_header(std::ofstream& stream, const odxf::header& header)
                                 stream << element;
                             },
                             [&stream](const odxf::coordinate2d& coord) {
-                                stream << "\n10\n";
-                                stream << coord.x;
-                                stream << "\n20\n";
-                                stream << coord.y;
+                                write_value(stream, 10, coord.x);
+                                write_value(stream, 20, coord.y);
                             },
                             [&stream](const odxf::coordinate3d& coord) {
-                                stream << "\n10\n";
-                                stream << coord.x;
-                                stream << "\n20\n";
-                                stream << coord.y;
-                                stream << "\n30\n";
-                                stream << coord.z;
+                                write_value(stream, 10, coord.x);
+                                write_value(stream, 20, coord.y);
+                                write_value(stream, 30, coord.z);
                             } },
             value);
     }
@@ -109,9 +116,9 @@ void write_line_type(std::ofstream& stream, const odxf::line_type& line_type)
     stream << "\n3\n" << line_type.display_name;
     stream << "\n72\n65";
     stream << "\n73\n" << line_type.elements.size();
-    stream << "\n40\n" << pattern_length;
+    write_value(stream, 40, pattern_length);
     for (const odxf::line_type_element& element : line_type.elements) {
-        stream << "\n49\n" << element.length;
+        write_value(stream, 49, element.length);
         stream << "\n74\n" << element.complex_flags;
     }
 }
@@ -208,15 +215,15 @@ void write_blocks(std::ofstream& stream)
 
 void write_coordinate(std::ofstream& stream, const odxf::coordinate3d& coordinate)
 {
-    stream << "\n10\n" << std::to_string(coordinate.x);
-    stream << "\n20\n" << std::to_string(coordinate.y);
-    stream << "\n30\n" << std::to_string(coordinate.z);
+    write_value(stream, 10, coordinate.x);
+    write_value(stream, 20, coordinate.y);
+    write_value(stream, 30, coordinate.z);
 }
 
 void write_thickness(std::ofstream& stream, const std::optional<double>& maybe_thickness)
 {
     if (maybe_thickness) {
-        stream << "\n39\n" << *maybe_thickness;
+        write_value(stream, 39, *maybe_thickness);
     }
 }
 
@@ -224,9 +231,9 @@ void write_extrusion(std::ofstream& stream, const std::optional<odxf::vector3d>&
 {
     if (maybe_extrusion) {
         const odxf::vector3d& extrusion{ *maybe_extrusion };
-        stream << "\n210\n" << std::to_string(extrusion.x);
-        stream << "\n220\n" << std::to_string(extrusion.y);
-        stream << "\n230\n" << std::to_string(extrusion.z);
+        write_value(stream, 210, extrusion.x);
+        write_value(stream, 220, extrusion.y);
+        write_value(stream, 230, extrusion.z);
     }
 }
 
@@ -236,7 +243,7 @@ void write_entity_properties(std::ofstream& stream, const odxf::entity_propertie
     stream << "\n6\n" << properties.line_type;
     stream << "\n62\n" << properties.color;
     stream << "\n370\n" << properties.lineweight;
-    stream << "\n48\n" << properties.line_type_scale;
+    write_value(stream, 48, properties.line_type_scale);
     write_true_color(stream, properties.true_color);
     write_transparency(stream, properties.transparency);
 }
@@ -246,9 +253,9 @@ void write_entity(std::ofstream& stream, const odxf::point& point)
     stream << "\n0\nPOINT\n100\nAcDbPoint";
     write_entity_properties(stream, point.properties);
     write_thickness(stream, point.thickness);
-    stream << "\n10\n" << std::to_string(point.coordinate.x);
-    stream << "\n20\n" << std::to_string(point.coordinate.y);
-    stream << "\n30\n" << std::to_string(point.coordinate.z);
+    write_value(stream, 10, point.coordinate.x);
+    write_value(stream, 20, point.coordinate.y);
+    write_value(stream, 30, point.coordinate.z);
     write_extrusion(stream, point.extrusion);
 }
 
@@ -257,12 +264,12 @@ void write_entity(std::ofstream& stream, const odxf::ray& ray)
 {
     stream << "\n0\nRAY\n100\nAcDbRay";
     write_entity_properties(stream, ray.properties);
-    stream << "\n10\n" << std::to_string(ray.start_point.x);
-    stream << "\n20\n" << std::to_string(ray.start_point.y);
-    stream << "\n30\n" << std::to_string(ray.start_point.z);
-    stream << "\n11\n" << std::to_string(ray.direction.x);
-    stream << "\n21\n" << std::to_string(ray.direction.y);
-    stream << "\n31\n" << std::to_string(ray.direction.z);
+    write_value(stream, 10, ray.start_point.x);
+    write_value(stream, 20, ray.start_point.y);
+    write_value(stream, 30, ray.start_point.z);
+    write_value(stream, 11, ray.direction.x);
+    write_value(stream, 21, ray.direction.y);
+    write_value(stream, 31, ray.direction.z);
 }
 
 void write_entity(std::ofstream& stream, const odxf::line& line)
@@ -270,12 +277,12 @@ void write_entity(std::ofstream& stream, const odxf::line& line)
     stream << "\n0\nLINE\n100\nAcDbLine";
     write_entity_properties(stream, line.properties);
     write_thickness(stream, line.thickness);
-    stream << "\n10\n" << std::to_string(line.start.x);
-    stream << "\n20\n" << std::to_string(line.start.y);
-    stream << "\n30\n" << std::to_string(line.start.z);
-    stream << "\n11\n" << std::to_string(line.end.x);
-    stream << "\n21\n" << std::to_string(line.end.y);
-    stream << "\n31\n" << std::to_string(line.end.z);
+    write_value(stream, 10, line.start.x);
+    write_value(stream, 20, line.start.y);
+    write_value(stream, 30, line.start.z);
+    write_value(stream, 11, line.end.x);
+    write_value(stream, 21, line.end.y);
+    write_value(stream, 31, line.end.z);
     write_extrusion(stream, line.extrusion);
 }
 
@@ -284,10 +291,10 @@ void write_entity(std::ofstream& stream, const odxf::circle& circle)
     stream << "\n0\nCIRCLE\n100\nAcDbCircle";
     write_entity_properties(stream, circle.properties);
     write_thickness(stream, circle.thickness);
-    stream << "\n10\n" << std::to_string(circle.center.x);
-    stream << "\n20\n" << std::to_string(circle.center.y);
-    stream << "\n30\n" << std::to_string(circle.center.z);
-    stream << "\n40\n" << std::to_string(circle.radius);
+    write_value(stream, 10, circle.center.x);
+    write_value(stream, 20, circle.center.y);
+    write_value(stream, 30, circle.center.z);
+    write_value(stream, 40, circle.radius);
     write_extrusion(stream, circle.extrusion);
 }
 
@@ -296,13 +303,13 @@ void write_entity(std::ofstream& stream, const odxf::arc& arc)
     stream << "\n0\nARC\n100\nAcDbCircle";
     write_entity_properties(stream, arc.properties);
     write_thickness(stream, arc.thickness);
-    stream << "\n10\n" << std::to_string(arc.center.x);
-    stream << "\n20\n" << std::to_string(arc.center.y);
-    stream << "\n30\n" << std::to_string(arc.center.z);
-    stream << "\n40\n" << std::to_string(arc.radius);
+    write_value(stream, 10, arc.center.x);
+    write_value(stream, 20, arc.center.y);
+    write_value(stream, 30, arc.center.z);
+    write_value(stream, 40, arc.radius);
     stream << "\n100\nAcDbArc";
-    stream << "\n50\n" << std::to_string(arc.start_angle);
-    stream << "\n51\n" << std::to_string(arc.end_angle);
+    write_value(stream, 50, arc.start_angle);
+    write_value(stream, 51, arc.end_angle);
     write_extrusion(stream, arc.extrusion);
 }
 
@@ -310,15 +317,15 @@ void write_entity(std::ofstream& stream, const odxf::ellipse& ellipse)
 {
     stream << "\n0\nELLIPSE\n100\nAcDbEllipse";
     write_entity_properties(stream, ellipse.properties);
-    stream << "\n10\n" << std::to_string(ellipse.center.x);
-    stream << "\n20\n" << std::to_string(ellipse.center.y);
-    stream << "\n30\n" << std::to_string(ellipse.center.z);
-    stream << "\n11\n" << std::to_string(ellipse.end_point_major.x);
-    stream << "\n21\n" << std::to_string(ellipse.end_point_major.y);
-    stream << "\n31\n" << std::to_string(ellipse.end_point_major.z);
-    stream << "\n40\n" << std::to_string(ellipse.axis_ratio);
-    stream << "\n41\n" << std::to_string(ellipse.start_parameter);
-    stream << "\n42\n" << std::to_string(ellipse.end_parameter);
+    write_value(stream, 10, ellipse.center.x);
+    write_value(stream, 20, ellipse.center.y);
+    write_value(stream, 30, ellipse.center.z);
+    write_value(stream, 11, ellipse.end_point_major.x);
+    write_value(stream, 21, ellipse.end_point_major.y);
+    write_value(stream, 31, ellipse.end_point_major.z);
+    write_value(stream, 40, ellipse.axis_ratio);
+    write_value(stream, 41, ellipse.start_parameter);
+    write_value(stream, 42, ellipse.end_parameter);
     write_extrusion(stream, ellipse.extrusion);
 }
 
@@ -330,10 +337,10 @@ void write_entity(std::ofstream& stream, const odxf::lw_polyline& lw_polyline)
     stream << "\n70\n" << (lw_polyline.is_closed ? 1 : 0);
 
     for (const odxf::vertex& vertex : lw_polyline.vertices) {
-        stream << "\n10\n" << std::to_string(vertex.position.x);
-        stream << "\n20\n" << std::to_string(vertex.position.y);
+        write_value(stream, 10, vertex.position.x);
+        write_value(stream, 20, vertex.position.y);
         if (vertex.bulge.has_value()) {
-            stream << "\n42\n" << std::to_string(*vertex.bulge);
+            write_value(stream, 42, *vertex.bulge);
         }
     }
 }
@@ -386,8 +393,6 @@ std::expected<write_stream, error> write_stream::open(
                     reinterpret_cast<const char*>(file_path.u8string().c_str())),
             });
     }
-
-    stream << std::setprecision(16);
 
     write_header(stream, header);
     write_tables(stream, tables);
