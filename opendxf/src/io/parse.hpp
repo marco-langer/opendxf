@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "standard_arithmetic.hpp"
+
 #include <charconv>
 #include <optional>
 #include <string_view>
@@ -11,7 +13,7 @@ namespace odxf {
 
 // Parses a group code or a numeric value. Leading spaces are skipped because DXF writers
 // right-justify group codes and integers, anything after the number is an error.
-template <typename T>
+template <standard_arithmetic T>
 std::optional<T> parse_as(std::string_view value)
 {
     const char* first{ value.data() };

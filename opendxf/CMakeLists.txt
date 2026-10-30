@@ -18,6 +18,7 @@ add_library(opendxf STATIC
     src/io/read.cpp
     src/io/reader.cpp
     src/io/reader.hpp
+    src/io/standard_arithmetic.hpp
     src/io/transparency.cpp
     src/io/transparency.hpp
     src/io/write.cpp
