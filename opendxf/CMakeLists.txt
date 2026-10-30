@@ -13,10 +13,12 @@ add_library(opendxf STATIC
     include/opendxf/properties.hpp
     include/opendxf/tables.hpp
     src/header_variables.cpp
+    src/io/parse.hpp
     src/io/read_stream_base.cpp
     src/io/read.cpp
     src/io/reader.cpp
     src/io/reader.hpp
+    src/io/standard_arithmetic.hpp
     src/io/transparency.cpp
     src/io/transparency.hpp
     src/io/write.cpp

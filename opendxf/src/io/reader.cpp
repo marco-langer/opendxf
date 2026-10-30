@@ -2,34 +2,14 @@
 // Copyright (c) 2024 Marco Langer
 
 #include "reader.hpp"
+#include "parse.hpp"
 #include "transparency.hpp"
 
 #include "opendxf/io/read_stream_base.hpp"
 #include "opendxf/layer.hpp"
 #include "opendxf/tables.hpp"
 
-#include <charconv>
 #include <format>
-
-namespace {
-
-template <typename T>
-std::optional<T> parse_as(const std::string& value)
-{
-    const char* first{ value.c_str() };
-    if (!value.empty()) {
-        while (*first == ' ') {
-            ++first;
-        }
-    }
-
-    T result;
-    const auto [_, error_code]{ std::from_chars(first, value.c_str() + value.size(), result) };
-
-    return error_code == std::errc() ? result : std::optional<T>{};
-}
-
-}   // namespace
 
 namespace odxf {
 
@@ -953,15 +933,8 @@ bool reader::read_next_single()
         return false;
     }
 
-    const char* first{ m_data.value.c_str() };
-    if (!m_data.value.empty()) {
-        while (*first == ' ') {
-            ++first;
-        }
-    }
-    const auto [_, error_code]{ std::from_chars(
-        first, m_data.value.c_str() + m_data.value.size(), m_data.group_code) };
-    if (error_code != std::errc()) {
+    const std::optional<int> maybe_group_code{ parse_as<int>(m_data.value) };
+    if (!maybe_group_code) {
         m_error = error{
             .line_number = m_current_line,
             .what = "unable to parse group code",
@@ -969,6 +942,7 @@ bool reader::read_next_single()
 
         return false;
     }
+    m_data.group_code = *maybe_group_code;
 
     m_current_line++;
     if (!std::getline(m_file_stream, m_data.value)) {

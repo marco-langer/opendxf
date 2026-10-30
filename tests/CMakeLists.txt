@@ -32,6 +32,7 @@ add_executable(opendxf-tests
     matchers/tables_matcher.cpp
     matchers/tables_matcher.hpp
     header_variables_test.cpp
+    parse_test.cpp
     read_test.cpp
     test_utils.cpp
     test_utils.hpp

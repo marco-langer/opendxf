@@ -4,13 +4,13 @@
 #include "opendxf/io/write.hpp"
 
 #include "overload.hpp"
+#include "standard_arithmetic.hpp"
 #include "transparency.hpp"
 
 #include <algorithm>
 #include <array>
 #include <charconv>
 #include <cmath>
-#include <concepts>
 #include <format>
 #include <fstream>
 #include <system_error>
@@ -18,15 +18,10 @@
 
 namespace {
 
-// the arithmetic types std::to_chars accepts; its bool overload is deleted
-template <typename T>
-concept standard_arithmetic =
-    (std::integral<T> || std::floating_point<T>) && !std::same_as<T, bool>;
-
 // DXF numbers must not depend on the locale, which operator<< takes from the stream. Doubles get
 // the shortest representation that reads back as the same value. A formatting error fails the
 // stream, so check_stream() reports it like any other write error.
-template <standard_arithmetic T>
+template <odxf::standard_arithmetic T>
 void write_number(std::ofstream& stream, T value)
 {
     std::array<char, 32> buffer;
