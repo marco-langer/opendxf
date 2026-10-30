@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2024 Marco Langer
 
+#include "opendxf/header_variables.hpp"
 #include "opendxf/io/read.hpp"
 #include "opendxf/io/write.hpp"
 
@@ -14,6 +15,7 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <locale>
 #include <string>
 #include <vector>
 
@@ -77,6 +79,82 @@ TEST(Write, KeepsEntityOrder)
 
     // Act
     const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+
+    // Assert
+    ASSERT_TRUE(write_result.has_value());
+    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
+
+    ASSERT_TRUE(read_document.has_value());
+    EXPECT_THAT(*read_document, is_document(document));
+}
+
+TEST(Write, DoublesRoundTrip)
+{
+    // Arrange
+    // 0.1 + 0.2 needs all 17 significant digits, 1e-7 is below six decimals
+    const double scale{ 0.1 + 0.2 };
+    const odxf::coordinate3d start{ 212.5115730819539, 1e-7, 0.0 };
+
+    odxf::document document;
+    odxf::set_line_type_scale(document.header, scale);
+    document.entities = {
+        odxf::line{ .start = start },
+        odxf::circle{ .radius = scale },
+    };
+
+    const std::filesystem::path file_path{ "test_doubles_round_trip.dxf" };
+    std::filesystem::remove(file_path);
+    ASSERT_FALSE(std::filesystem::exists(file_path));
+
+    // Act
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+
+    // Assert
+    ASSERT_TRUE(write_result.has_value());
+    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
+
+    ASSERT_TRUE(read_document.has_value());
+    const std::expected<std::optional<double>, odxf::header_error> maybe_scale{
+        odxf::line_type_scale(read_document->header)
+    };
+    ASSERT_TRUE(maybe_scale.has_value());
+    EXPECT_EQ(*maybe_scale, scale);
+    ASSERT_EQ(read_document->entities.size(), 2);
+
+    const auto& line{ std::get<odxf::line>(read_document->entities[0]) };
+    EXPECT_EQ(line.start.x, start.x);
+    EXPECT_EQ(line.start.y, start.y);
+    EXPECT_EQ(std::get<odxf::circle>(read_document->entities[1]).radius, scale);
+}
+
+// groups digits and uses a decimal comma, like de_DE, without needing that locale installed
+struct german_numpunct final : std::numpunct<char>
+{
+    char do_decimal_point() const override { return ','; }
+    char do_thousands_sep() const override { return '.'; }
+    std::string do_grouping() const override { return "\3"; }
+};
+
+TEST(Write, IgnoresGlobalLocale)
+{
+    // Arrange
+    odxf::document document;
+    document.tables.layers.push_back(
+        odxf::layer{ .name = "0", .transparency = odxf::transparency{ .alpha = 0x4C } });
+    document.entities = {
+        odxf::line{ .properties = { .true_color = 1234567 }, .start = { 1234.5, 0.25, 0.0 } },
+    };
+
+    const std::filesystem::path file_path{ "test_global_locale.dxf" };
+    std::filesystem::remove(file_path);
+    ASSERT_FALSE(std::filesystem::exists(file_path));
+
+    const std::locale previous_locale{ std::locale::global(
+        std::locale{ std::locale::classic(), new german_numpunct }) };
+
+    // Act
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    std::locale::global(previous_locale);
 
     // Assert
     ASSERT_TRUE(write_result.has_value());
