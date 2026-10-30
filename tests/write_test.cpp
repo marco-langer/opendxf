@@ -15,6 +15,7 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <locale>
 #include <string>
 #include <vector>
 
@@ -124,6 +125,43 @@ TEST(Write, DoublesRoundTrip)
     EXPECT_EQ(line.start.x, start.x);
     EXPECT_EQ(line.start.y, start.y);
     EXPECT_EQ(std::get<odxf::circle>(read_document->entities[1]).radius, scale);
+}
+
+// groups digits and uses a decimal comma, like de_DE, without needing that locale installed
+struct german_numpunct final : std::numpunct<char>
+{
+    char do_decimal_point() const override { return ','; }
+    char do_thousands_sep() const override { return '.'; }
+    std::string do_grouping() const override { return "\3"; }
+};
+
+TEST(Write, IgnoresGlobalLocale)
+{
+    // Arrange
+    odxf::document document;
+    document.tables.layers.push_back(
+        odxf::layer{ .name = "0", .transparency = odxf::transparency{ .alpha = 0x4C } });
+    document.entities = {
+        odxf::line{ .properties = { .true_color = 1234567 }, .start = { 1234.5, 0.25, 0.0 } },
+    };
+
+    const std::filesystem::path file_path{ "test_global_locale.dxf" };
+    std::filesystem::remove(file_path);
+    ASSERT_FALSE(std::filesystem::exists(file_path));
+
+    const std::locale previous_locale{ std::locale::global(
+        std::locale{ std::locale::classic(), new german_numpunct }) };
+
+    // Act
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    std::locale::global(previous_locale);
+
+    // Assert
+    ASSERT_TRUE(write_result.has_value());
+    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
+
+    ASSERT_TRUE(read_document.has_value());
+    EXPECT_THAT(*read_document, is_document(document));
 }
 
 TEST(Write, LayerTransparencyRegistersApp)

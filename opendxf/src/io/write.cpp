@@ -10,6 +10,7 @@
 #include <array>
 #include <charconv>
 #include <cmath>
+#include <concepts>
 #include <format>
 #include <fstream>
 #include <system_error>
@@ -17,9 +18,16 @@
 
 namespace {
 
-// Writes the shortest representation that reads back as the same double. A formatting error
-// fails the stream, so check_stream() reports it like any other write error.
-void write_value(std::ofstream& stream, int group_code, double value)
+// the arithmetic types std::to_chars accepts; its bool overload is deleted
+template <typename T>
+concept standard_arithmetic =
+    (std::integral<T> || std::floating_point<T>) && !std::same_as<T, bool>;
+
+// DXF numbers must not depend on the locale, which operator<< takes from the stream. Doubles get
+// the shortest representation that reads back as the same value. A formatting error fails the
+// stream, so check_stream() reports it like any other write error.
+template <standard_arithmetic T>
+void write_number(std::ofstream& stream, T value)
 {
     std::array<char, 32> buffer;
     const auto [end, ec]{ std::to_chars(buffer.data(), buffer.data() + buffer.size(), value) };
@@ -28,8 +36,16 @@ void write_value(std::ofstream& stream, int group_code, double value)
         return;
     }
 
-    stream << '\n' << group_code << '\n';
     stream.write(buffer.data(), end - buffer.data());
+}
+
+template <typename T>
+void write_value(std::ofstream& stream, int group_code, T value)
+{
+    stream << '\n';
+    write_number(stream, group_code);
+    stream << '\n';
+    write_number(stream, value);
 }
 
 void write_header(std::ofstream& stream, const odxf::header& header)
@@ -42,8 +58,7 @@ void write_header(std::ofstream& stream, const odxf::header& header)
         stream << "\n9\n" << key;
         std::visit(
             odxf::overload{ [&stream, &key](bool element) {
-                               stream << "\n290\n";
-                               stream << element;
+                               write_value(stream, 290, static_cast<int>(element));
                            },
                             [&stream, &key](int element) {
                                 if (key == "$CECOLOR" || key == "$INTERFERECOLOR") {
@@ -65,7 +80,7 @@ void write_header(std::ofstream& stream, const odxf::header& header)
                                 } else {
                                     stream << "\n70\n";
                                 }
-                                stream << element;
+                                write_number(stream, element);
                             },
                             [&stream, &key](double element) {
                                 write_value(stream, key == "$ANGBASE" ? 50 : 40, element);
@@ -112,14 +127,14 @@ void write_line_type(std::ofstream& stream, const odxf::line_type& line_type)
 
     stream << "\n0\nLTYPE";
     stream << "\n2\n" << line_type.name;
-    stream << "\n70\n" << line_type.flags;
+    write_value(stream, 70, line_type.flags);
     stream << "\n3\n" << line_type.display_name;
     stream << "\n72\n65";
-    stream << "\n73\n" << line_type.elements.size();
+    write_value(stream, 73, line_type.elements.size());
     write_value(stream, 40, pattern_length);
     for (const odxf::line_type_element& element : line_type.elements) {
         write_value(stream, 49, element.length);
-        stream << "\n74\n" << element.complex_flags;
+        write_value(stream, 74, element.complex_flags);
     }
 }
 
@@ -127,7 +142,7 @@ void write_line_types(std::ofstream& stream, const std::vector<odxf::line_type>&
 {
     stream << "\n0\nTABLE";
     stream << "\n2\nLTYPE";
-    stream << "\n70\n" << line_types.size();
+    write_value(stream, 70, line_types.size());
     for (const odxf::line_type& line_type : line_types) {
         write_line_type(stream, line_type);
     }
@@ -137,7 +152,7 @@ void write_line_types(std::ofstream& stream, const std::vector<odxf::line_type>&
 void write_true_color(std::ofstream& stream, const std::optional<int>& maybe_true_color)
 {
     if (maybe_true_color) {
-        stream << "\n420\n" << *maybe_true_color;
+        write_value(stream, 420, *maybe_true_color);
     }
 }
 
@@ -145,9 +160,9 @@ void write_true_color(std::ofstream& stream, const std::optional<int>& maybe_tru
 void write_transparency(std::ofstream& stream, const odxf::entity_transparency& transparency)
 {
     if (std::holds_alternative<odxf::by_block>(transparency)) {
-        stream << "\n440\n" << odxf::by_block_transparency_value;
+        write_value(stream, 440, odxf::by_block_transparency_value);
     } else if (const auto* by_value{ std::get_if<odxf::transparency>(&transparency) }) {
-        stream << "\n440\n" << odxf::encode_transparency(*by_value);
+        write_value(stream, 440, odxf::encode_transparency(*by_value));
     }
 }
 
@@ -155,15 +170,15 @@ void write_layer(std::ofstream& stream, const odxf::layer& layer)
 {
     stream << "\n0\nLAYER";
     stream << "\n2\n" << layer.name;
-    stream << "\n70\n" << layer.flags;
-    stream << "\n62\n" << layer.color;
+    write_value(stream, 70, std::to_underlying(layer.flags));
+    write_value(stream, 62, layer.color);
     write_true_color(stream, layer.true_color);
     stream << "\n6\n" << layer.line_type;
-    stream << "\n370\n" << layer.lineweight;
+    write_value(stream, 370, layer.lineweight);
     // xdata comes last in a record
     if (layer.transparency) {
         stream << "\n1001\n" << odxf::layer_transparency_app;
-        stream << "\n1071\n" << odxf::encode_transparency(*layer.transparency);
+        write_value(stream, 1071, odxf::encode_transparency(*layer.transparency));
     }
 }
 
@@ -171,7 +186,7 @@ void write_layers(std::ofstream& stream, const std::vector<odxf::layer>& layers)
 {
     stream << "\n0\nTABLE";
     stream << "\n2\nLAYER";
-    stream << "\n70\n" << layers.size();
+    write_value(stream, 70, layers.size());
     for (const odxf::layer& layer : layers) {
         write_layer(stream, layer);
     }
@@ -241,8 +256,8 @@ void write_entity_properties(std::ofstream& stream, const odxf::entity_propertie
 {
     stream << "\n8\n" << properties.layer;
     stream << "\n6\n" << properties.line_type;
-    stream << "\n62\n" << properties.color;
-    stream << "\n370\n" << properties.lineweight;
+    write_value(stream, 62, properties.color);
+    write_value(stream, 370, properties.lineweight);
     write_value(stream, 48, properties.line_type_scale);
     write_true_color(stream, properties.true_color);
     write_transparency(stream, properties.transparency);
@@ -333,8 +348,8 @@ void write_entity(std::ofstream& stream, const odxf::lw_polyline& lw_polyline)
 {
     stream << "\n0\nLWPOLYLINE\n100\nAcDbPolyline";
     write_entity_properties(stream, lw_polyline.properties);
-    stream << "\n90\n" << lw_polyline.vertices.size();
-    stream << "\n70\n" << (lw_polyline.is_closed ? 1 : 0);
+    write_value(stream, 90, lw_polyline.vertices.size());
+    write_value(stream, 70, lw_polyline.is_closed ? 1 : 0);
 
     for (const odxf::vertex& vertex : lw_polyline.vertices) {
         write_value(stream, 10, vertex.position.x);
