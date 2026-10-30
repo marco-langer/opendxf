@@ -109,6 +109,18 @@ INSTANTIATE_TEST_SUITE_P(
         parse_error_param{
             .filename = "empty_group_code_padded.dxf",
             .error_line = 5,
+        },
+        parse_error_param{
+            .filename = "trailing_chars_in_group_code.dxf",
+            .error_line = 3,
+        },
+        parse_error_param{
+            .filename = "trailing_chars_in_integer.dxf",
+            .error_line = 46,
+        },
+        parse_error_param{
+            .filename = "trailing_chars_in_double.dxf",
+            .error_line = 428,
         }
     )
 );
