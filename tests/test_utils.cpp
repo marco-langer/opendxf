@@ -121,8 +121,8 @@ odxf::document create_example_document()
     entities.push_back(
         line{
             .properties = { .layer = layer_name_lines, .true_color = 0xFF8000 },
-            .start = coordinate3d{ 0.0, 0.5, 0.0 },
-            .end = coordinate3d{ 1.0, 1.5, 0.0 },
+            .start = coordinate3d{ 0.0, 0.5, 0.25 },
+            .end = coordinate3d{ 1.0, 1.5, 0.75 },
         });
     entities.push_back(line{
         .properties = {
@@ -135,6 +135,8 @@ odxf::document create_example_document()
         },
         .start = coordinate3d{ 0.0, 0.0, 0.0 },
         .end = coordinate3d{ 1.0, 1.0, 0.0 },
+        .extrusion = vector3d{ 1.0, 0.0, 0.0 },
+        .thickness = 2.0,
     });
 
     entities.push_back(circle{
@@ -146,8 +148,9 @@ odxf::document create_example_document()
             .line_type = "BYBLOCK",
             .transparency = by_block{},
         },
-        .center = coordinate3d{ 0.0, 0.0, 0.0 },
+        .center = coordinate3d{ 0.0, 0.0, 3.0 },
         .radius = 1.0,
+        .thickness = 0.5,
     });
 
     entities.push_back(arc{
@@ -164,6 +167,7 @@ odxf::document create_example_document()
         .radius = 0.5,
         .start_angle = 0.0,
         .end_angle = 180.0,
+        .extrusion = vector3d{ 0.0, 0.0, -1.0 },
     });
 
     entities.push_back(lw_polyline{

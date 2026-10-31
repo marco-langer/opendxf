@@ -9,9 +9,31 @@
 #include "opendxf/layer.hpp"
 #include "opendxf/tables.hpp"
 
+#include <concepts>
 #include <format>
+#include <optional>
 
 namespace odxf {
+
+namespace {
+
+    // An entity with an optional extrusion direction (group codes 210, 220 and 230).
+    template <typename E>
+    concept extruded_entity = entity_type<E> && requires(E& entity) {
+        { entity.extrusion } -> std::same_as<std::optional<vector3d>&>;
+    };
+
+    // The extrusion is optional, but its group codes 210, 220 and 230 come one by one.
+    template <extruded_entity E>
+    vector3d& extrusion(E& entity)
+    {
+        if (!entity.extrusion) {
+            entity.extrusion.emplace();
+        }
+        return *entity.extrusion;
+    }
+
+}   // namespace
 
 template <typename T>
 bool reader::parse_into(T& target)
@@ -800,8 +822,14 @@ std::expected<void, error> reader::read_line()
                switch (m_data.group_code) {
                case 10: return parse_into(line.start.x);
                case 20: return parse_into(line.start.y);
+               case 30: return parse_into(line.start.z);
                case 11: return parse_into(line.end.x);
                case 21: return parse_into(line.end.y);
+               case 31: return parse_into(line.end.z);
+               case 39: return parse_into(line.thickness);
+               case 210: return parse_into(extrusion(line).x);
+               case 220: return parse_into(extrusion(line).y);
+               case 230: return parse_into(extrusion(line).z);
                default: return read_entity_property(line.properties);
                }
            })
@@ -814,7 +842,12 @@ std::expected<void, error> reader::read_circle()
                switch (m_data.group_code) {
                case 10: return parse_into(circle.center.x);
                case 20: return parse_into(circle.center.y);
+               case 30: return parse_into(circle.center.z);
                case 40: return parse_into(circle.radius);
+               case 39: return parse_into(circle.thickness);
+               case 210: return parse_into(extrusion(circle).x);
+               case 220: return parse_into(extrusion(circle).y);
+               case 230: return parse_into(extrusion(circle).z);
                default: return read_entity_property(circle.properties);
                }
            })
@@ -827,7 +860,12 @@ std::expected<void, error> reader::read_arc()
                switch (m_data.group_code) {
                case 10: return parse_into(arc.center.x);
                case 20: return parse_into(arc.center.y);
+               case 30: return parse_into(arc.center.z);
                case 40: return parse_into(arc.radius);
+               case 39: return parse_into(arc.thickness);
+               case 210: return parse_into(extrusion(arc).x);
+               case 220: return parse_into(extrusion(arc).y);
+               case 230: return parse_into(extrusion(arc).z);
                case 50: return parse_into(arc.start_angle);
                case 51: return parse_into(arc.end_angle);
                default: return read_entity_property(arc.properties);
@@ -912,6 +950,7 @@ std::expected<void, error> reader::read_lw_polyline()
 
 bool reader::read_next()
 {
+    // Group code 999 is a comment, possibly several in a row. Comments are skipped.
     bool success{ false };
     do {
         success = read_next_single();
