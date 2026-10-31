@@ -17,6 +17,7 @@ A change is done when:
 
 - A bug fix comes with a test that fails without the fix.
 - [DXF support](docs/support.md) is updated when the supported features or known limitations change.
+- A design decision, e.g. about the model, the structure of the reader or writer, error handling, dependencies or naming, is recorded in a new [ADR](docs/adr) or in an update of the existing one.
 
 ## Commits
 
