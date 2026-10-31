@@ -1,0 +1,25 @@
+name: Feature request
+description: Support for a DXF feature or a change to the API
+labels: [enhancement]
+body:
+  - type: textarea
+    id: feature
+    attributes:
+      label: Feature
+      description: Which DXF feature is missing, e.g. an entity, group code, section or header variable, or which API change do you need?
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What do you want to do with it?
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: >-
+        Optional: a link to the DXF reference or a sample file.
+        GitHub doesn't accept .dxf attachments, so zip the file or rename it to .txt before you drag it in.
