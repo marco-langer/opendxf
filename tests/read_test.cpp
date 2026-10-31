@@ -32,6 +32,30 @@ TEST(Read, Example)
     EXPECT_THAT(*result, is_document(expected_document));
 }
 
+TEST(Read, CrlfLineEndings)
+{
+    // Arrange
+    const auto lf_path{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "line_endings_lf.dxf" };
+    const auto crlf_path{ std::filesystem::path{ TEST_DATA_DIR } / "valid"
+                          / "line_endings_crlf.dxf" };
+    ASSERT_TRUE(std::filesystem::is_regular_file(lf_path));
+    ASSERT_TRUE(std::filesystem::is_regular_file(crlf_path));
+
+    // Act
+    const std::expected<odxf::document, odxf::error> lf_result{ odxf::read(lf_path) };
+    const std::expected<odxf::document, odxf::error> crlf_result{ odxf::read(crlf_path) };
+
+    // Assert
+    for (const auto* result : { &lf_result, &crlf_result }) {
+        if (!*result) {
+            const odxf::error& error{ result->error() };
+            FAIL() << std::format("Line ({}): {}", error.line_number.value_or(-1), error.what);
+        }
+    }
+
+    EXPECT_THAT(*crlf_result, is_document(*lf_result));
+}
+
 TEST(Read, Padded)
 {
     // Arrange

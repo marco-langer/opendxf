@@ -67,6 +67,7 @@ private:
 
     bool read_next();
     bool read_next_single();
+    bool read_text_line();
 
     // parse the current value into target, on failure sets the error and returns false
     template <typename T>
