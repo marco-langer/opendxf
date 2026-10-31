@@ -20,7 +20,9 @@ A change is done when:
   ctest --preset release
   ```
 
-- A bug fix comes with a test that fails without the fix.
+- A bug fix is two commits, each of which builds and passes the tests:
+  1. A `test:` commit exposes the bug with a test that reproduces it, skipped with `GTEST_SKIP()` and the reason, e.g. `GTEST_SKIP() << "reader requires a HEADER section";`. Removing the skip shows the test failing.
+  2. A `fix:` commit fixes the bug and removes the skip.
 - [DXF support](docs/support.md) is updated when the supported features or known limitations change.
 - A design decision, e.g. about the model, the structure of the reader or writer, error handling, dependencies or naming, is recorded in a new [ADR](docs/adr) or in an update of the existing one.
 
