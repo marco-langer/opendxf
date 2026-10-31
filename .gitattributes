@@ -1,0 +1,2 @@
+# Keep test data byte for byte, e.g. the CRLF line endings of line_endings_crlf.dxf.
+*.dxf -text

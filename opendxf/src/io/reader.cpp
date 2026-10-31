@@ -78,7 +78,7 @@ std::expected<void, error> reader::read_all(const std::filesystem::path& file_pa
 
 bool reader::open(const std::filesystem::path& file_path)
 {
-    m_file_stream.open(file_path);
+    m_file_stream.open(file_path, std::ios::binary);
 
     if (!m_file_stream.is_open()) {
         m_error = error{
@@ -922,14 +922,7 @@ bool reader::read_next()
 
 bool reader::read_next_single()
 {
-    m_current_line++;
-
-    if (!std::getline(m_file_stream, m_data.value)) {
-        m_error = error{
-            .line_number = m_current_line,
-            .what = "unable to read line",
-        };
-
+    if (!read_text_line()) {
         return false;
     }
 
@@ -944,7 +937,13 @@ bool reader::read_next_single()
     }
     m_data.group_code = *maybe_group_code;
 
+    return read_text_line();
+}
+
+bool reader::read_text_line()
+{
     m_current_line++;
+
     if (!std::getline(m_file_stream, m_data.value)) {
         m_error = error{
             .line_number = m_current_line,
@@ -952,6 +951,10 @@ bool reader::read_next_single()
         };
 
         return false;
+    }
+
+    if (m_data.value.ends_with('\r')) {
+        m_data.value.pop_back();
     }
 
     return true;
