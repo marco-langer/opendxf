@@ -45,6 +45,18 @@ All header variables are read into and written from a generic key/value map. Typ
 Unsupported tables and entities are skipped when reading. Entities are read and written in file
 order, which is the default draw order.
 
+## Z, thickness and extrusion
+
+| Group code      | Meaning                     | Entities read | Write |
+|-----------------|-----------------------------|:-------------:|:-----:|
+| 30, 31          | Z of a point                | ✓             | ✓     |
+| 39              | Thickness                   | ✓             | ✓     |
+| 210, 220, 230   | Extrusion direction         | ✓             | ✓     |
+
+Entities read them for ARC, CIRCLE and LINE. A missing group code 30 or 31 means 0; a missing
+thickness or extrusion stays empty, which DXF treats as 0 and (0, 0, 1). LWPOLYLINE elevation
+(38), thickness and extrusion are neither read nor written.
+
 ## Colors
 
 | Group code | Meaning     | LAYER read | Entities read | Write |

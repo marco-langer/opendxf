@@ -6,6 +6,7 @@
 #include "coordinate_matcher.hpp"
 #include "overload.hpp"
 
+#include <optional>
 #include <variant>
 
 namespace {
@@ -16,6 +17,24 @@ testing::Matcher<odxf::vector3d> is_vector(const odxf::vector3d& expected, doubl
         testing::Field("x", &odxf::vector3d::x, testing::DoubleNear(expected.x, max_error)),
         testing::Field("y", &odxf::vector3d::y, testing::DoubleNear(expected.y, max_error)),
         testing::Field("z", &odxf::vector3d::z, testing::DoubleNear(expected.z, max_error)));
+}
+
+testing::Matcher<std::optional<odxf::vector3d>>
+is_optional_vector(const std::optional<odxf::vector3d>& expected, double max_error)
+{
+    if (!expected) {
+        return testing::Eq(std::nullopt);
+    }
+    return testing::Optional(is_vector(*expected, max_error));
+}
+
+testing::Matcher<std::optional<double>>
+is_optional_double(const std::optional<double>& expected, double max_error)
+{
+    if (!expected) {
+        return testing::Eq(std::nullopt);
+    }
+    return testing::Optional(testing::DoubleNear(*expected, max_error));
 }
 
 testing::Matcher<odxf::entity_properties>
@@ -76,7 +95,13 @@ testing::Matcher<const odxf::line&> is_line(const odxf::line& expected, double m
             &odxf::line::properties,
             is_entity_properties(expected.properties, max_error)),
         testing::Field("start", &odxf::line::start, is_coordinate(expected.start, max_error)),
-        testing::Field("end", &odxf::line::end, is_coordinate(expected.end, max_error)));
+        testing::Field("end", &odxf::line::end, is_coordinate(expected.end, max_error)),
+        testing::Field(
+            "extrusion", &odxf::line::extrusion, is_optional_vector(expected.extrusion, max_error)),
+        testing::Field(
+            "thickness",
+            &odxf::line::thickness,
+            is_optional_double(expected.thickness, max_error)));
 }
 
 testing::Matcher<const odxf::circle&> is_circle(const odxf::circle& expected, double max_error)
@@ -88,7 +113,15 @@ testing::Matcher<const odxf::circle&> is_circle(const odxf::circle& expected, do
             is_entity_properties(expected.properties, max_error)),
         testing::Field("center", &odxf::circle::center, is_coordinate(expected.center, max_error)),
         testing::Field(
-            "radius", &odxf::circle::radius, testing::DoubleNear(expected.radius, max_error)));
+            "radius", &odxf::circle::radius, testing::DoubleNear(expected.radius, max_error)),
+        testing::Field(
+            "extrusion",
+            &odxf::circle::extrusion,
+            is_optional_vector(expected.extrusion, max_error)),
+        testing::Field(
+            "thickness",
+            &odxf::circle::thickness,
+            is_optional_double(expected.thickness, max_error)));
 }
 
 testing::Matcher<const odxf::arc&> is_arc(const odxf::arc& expected, double max_error)
@@ -106,9 +139,11 @@ testing::Matcher<const odxf::arc&> is_arc(const odxf::arc& expected, double max_
             &odxf::arc::start_angle,
             testing::DoubleNear(expected.start_angle, max_error)),
         testing::Field(
-            "end_angle",
-            &odxf::arc::end_angle,
-            testing::DoubleNear(expected.end_angle, max_error)));
+            "end_angle", &odxf::arc::end_angle, testing::DoubleNear(expected.end_angle, max_error)),
+        testing::Field(
+            "extrusion", &odxf::arc::extrusion, is_optional_vector(expected.extrusion, max_error)),
+        testing::Field(
+            "thickness", &odxf::arc::thickness, is_optional_double(expected.thickness, max_error)));
 }
 
 testing::Matcher<const odxf::ellipse&> is_ellipse(const odxf::ellipse& expected, double max_error)
