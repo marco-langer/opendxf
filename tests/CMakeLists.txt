@@ -49,6 +49,7 @@ target_compile_definitions(opendxf-tests PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_
 target_link_libraries(opendxf-tests
     PRIVATE
         opendxf
+        opendxf_warnings
         GTest::gmock_main
 )
 

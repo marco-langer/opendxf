@@ -28,3 +28,5 @@ add_library(opendxf STATIC
 target_include_directories(opendxf PUBLIC include PRIVATE src)
 
 target_compile_features(opendxf PUBLIC cxx_std_23)
+
+target_link_libraries(opendxf PRIVATE $<BUILD_INTERFACE:opendxf_warnings>)
