@@ -51,7 +51,8 @@ is_entity_properties(const odxf::entity_properties& expected, double max_error)
             &odxf::entity_properties::line_type_scale,
             testing::DoubleNear(expected.line_type_scale, max_error)),
         testing::Field(
-            "transparency", &odxf::entity_properties::transparency, expected.transparency));
+            "transparency", &odxf::entity_properties::transparency, expected.transparency),
+        testing::Field("is_visible", &odxf::entity_properties::is_visible, expected.is_visible));
 }
 
 testing::Matcher<odxf::vertex> is_vertex(const odxf::vertex& expected, double max_error)

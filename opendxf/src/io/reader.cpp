@@ -810,6 +810,16 @@ bool reader::read_entity_property(entity_properties& properties)
         return true;
     }
 
+    case 60: {
+        int visibility{ 0 };
+        if (!parse_into(visibility)) {
+            return false;
+        }
+        // 1 means invisible, 0 and any other value visible
+        properties.is_visible = visibility != 1;
+        return true;
+    }
+
     default:
         // unknown group codes are skipped
         return true;

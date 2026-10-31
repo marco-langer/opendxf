@@ -118,6 +118,17 @@ it, or with a value other than `0x02000000 | alpha`, is opaque (an empty `transp
 writer adds an APPID table that registers the transparency application when a layer has a
 transparency, and writes no APPID table otherwise.
 
+## Visibility
+
+| Group code | Meaning    | Entities read | Write |
+|------------|------------|:-------------:|:-----:|
+| 60         | Visibility | ✓             | ✓     |
+
+Entities read visibility for ARC, CIRCLE, LINE and LWPOLYLINE into `is_visible`. 1 means
+invisible; a missing group code 60, 0 and any other value mean visible. The writer writes 60 only
+for invisible entities. Invisible attributes (bit 1 of group code 70 on ATTDEF and ATTRIB) are a
+separate flag and not supported, since blocks are not.
+
 ## Known limitations
 
 - Only ASCII DXF is supported, binary DXF is not.

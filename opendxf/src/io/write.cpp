@@ -256,6 +256,9 @@ void write_entity_properties(std::ofstream& stream, const odxf::entity_propertie
     write_value(stream, 48, properties.line_type_scale);
     write_true_color(stream, properties.true_color);
     write_transparency(stream, properties.transparency);
+    if (!properties.is_visible) {
+        write_value(stream, 60, 1);
+    }
 }
 
 void write_entity(std::ofstream& stream, const odxf::point& point)
