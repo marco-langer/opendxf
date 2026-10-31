@@ -20,7 +20,7 @@ ctest --preset release
 - Name test suites, tests and fixtures in PascalCase, as GoogleTest does: `TEST(Subject, Behavior)`, e.g. `TEST(InsertionUnits, WrongType)`. GoogleTest joins them with underscores into class names, so underscores in them could collide.
 - Use `TEST_P` for tests that differ only in their data. Put the parameters in a struct and instantiate them with designated initializers, as in `parse_error_param` in `tests/read_test.cpp`.
 - Compare documents and entities with the matchers (`is_document`, `is_header`, ...) instead of field-by-field assertions in the test.
-- A bug fix comes with a test that fails without the fix.
+- A bug fix first adds its test with `GTEST_SKIP()` in a commit of its own, see the [definition of done](../CONTRIBUTING.md#definition-of-done).
 
 ## What is already covered
 
