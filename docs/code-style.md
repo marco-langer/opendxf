@@ -4,6 +4,8 @@ Formatting is handled by `clang-format` with the repo's `.clang-format`. This pa
 
 **Names are snake_case like the standard library's,** including types and enumerators; GoogleTest test names are PascalCase, see [ADR 6](adr/0006-standard-library-naming.md). Private data members start with `m_`. Qualify a type with `odxf::` where a variable has its name (`odxf::layer layer;`).
 
+**Comments explain what the code cannot: DXF facts and project decisions,** e.g. what a group code means, why the reader skips something, or a DXF default. They do not explain general C++ or CMake knowledge, repeat what a test already shows, or refer to anything outside the repo. This applies to C++ and CMake files alike.
+
 **Brace initialization** (`const int count{ 0 };`), see [ES.23](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#res-list).
 
 **`maybe_x` names a `std::optional` or `std::expected` that has not been checked yet,** so it is clear at the point of use whether the value is known to be there.
