@@ -1,0 +1,51 @@
+name: Bug report
+description: opendxf reads or writes a file wrong, rejects a valid file, or fails to build
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you do, and what went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: What should have happened instead? If another application reads the file differently, name it.
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Error message
+      description: The message of the returned `odxf::error`, including the line number, or the compiler output.
+      render: text
+  - type: textarea
+    id: dxf-file
+    attributes:
+      label: DXF file
+      description: >-
+        A file that reproduces the bug, as small as possible.
+        GitHub doesn't accept .dxf attachments, so zip the file or rename it to .txt before you drag it in,
+        or paste a short file in a code block.
+  - type: input
+    id: version
+    attributes:
+      label: opendxf commit
+      description: The commit you use, e.g. from `git rev-parse --short HEAD`.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Build environment
+      value: |
+        - OS:
+        - Compiler and version:
+        - Standard library (libstdc++, libc++ or MSVC STL):
+        - CMake version:
+        - Build type or preset:
+    validations:
+      required: true
