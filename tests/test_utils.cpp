@@ -132,13 +132,14 @@ odxf::document create_example_document()
             .line_type = "DOT_DASH",
             .line_type_scale = 2.5,
             .transparency = transparency{ .alpha = 0x7F },
+            .is_visible = false,
         },
         .start = coordinate3d{ 0.0, 0.0, 0.0 },
         .end = coordinate3d{ 1.0, 1.0, 0.0 },
         .extrusion = vector3d{ 1.0, 0.0, 0.0 },
         .thickness = 2.0,
     });
-
+    // has an explicit 60 of 0, which is visible like a missing one
     entities.push_back(circle{
         .properties = {
             .layer = layer_name_test,

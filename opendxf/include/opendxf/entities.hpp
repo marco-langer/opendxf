@@ -33,6 +33,7 @@ struct entity_properties final
     std::string line_type{ "BYLAYER" };
     double line_type_scale{ 1.0 };
     entity_transparency transparency{ by_layer{} };
+    bool is_visible{ true };
 };
 
 struct point final
