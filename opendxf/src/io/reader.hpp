@@ -21,7 +21,7 @@ namespace odxf {
 
 class read_stream_base;
 
-// A type that holds the properties all entities share, e.g. Line.
+// A type that holds the properties all entities share, e.g. line.
 template <typename E>
 concept entity_type = requires(E& entity) {
     { entity.properties } -> std::same_as<entity_properties&>;

@@ -9,14 +9,22 @@
 #include "opendxf/layer.hpp"
 #include "opendxf/tables.hpp"
 
+#include <concepts>
 #include <format>
+#include <optional>
 
 namespace odxf {
 
 namespace {
 
-    // The extrusion is optional, but its group codes 210, 220 and 230 come one by one.
+    // An entity with an optional extrusion direction (group codes 210, 220 and 230).
     template <typename E>
+    concept extruded_entity = entity_type<E> && requires(E& entity) {
+        { entity.extrusion } -> std::same_as<std::optional<vector3d>&>;
+    };
+
+    // The extrusion is optional, but its group codes 210, 220 and 230 come one by one.
+    template <extruded_entity E>
     vector3d& extrusion(E& entity)
     {
         if (!entity.extrusion) {
