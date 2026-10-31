@@ -942,6 +942,7 @@ std::expected<void, error> reader::read_lw_polyline()
 
 bool reader::read_next()
 {
+    // Group code 999 is a comment, possibly several in a row. Comments are skipped.
     bool success{ false };
     do {
         success = read_next_single();
