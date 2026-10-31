@@ -17,10 +17,25 @@ A change is done when:
 
 - A bug fix comes with a test that fails without the fix.
 - [DXF support](docs/support.md) is updated when the supported features or known limitations change.
-- Commits are small and focused, with a lowercase imperative subject, e.g. `read the layer of LWPOLYLINE entities`.
+
+## Commits
+
+- Each commit is one logical change that builds and passes the tests.
+- The subject is `<type>: <summary>`, e.g. `fix: accept CRLF line endings in the reader`. The type is one of:
+  - `feat`: a new feature
+  - `fix`: a bug fix
+  - `refactor`: a code change that neither adds a feature nor fixes a bug
+  - `docs`: documentation only
+  - `test`: tests only
+  - `build`: CMake, presets and other build configuration
+  - `chore`: anything else, e.g. repository configuration
+- A change that breaks the public API adds a `!` after the type, e.g. `refactor!: rename functions to snake case`, and a `BREAKING CHANGE:` line in the body that says what users have to change.
+- The summary is a lowercase imperative of about 50 characters (at most 72 for the whole subject) without a trailing period.
+- After a blank line, the body explains why the change is needed and, where it isn't obvious from the diff, how it works: the problem or use case, the relevant DXF behavior, and alternatives that were rejected. Wrap it at 72 characters.
+- Leave out the body only when the subject says everything, e.g. `docs: fix a typo in the README`.
 
 ## Pull requests
 
-- Branches are named `<type>/<short-description>`, where type is `feature`, `fix`, `refactor`, `docs` or `chore`, e.g. `fix/reader-crlf`.
-- Titles follow the commit subject style and describe the whole change, e.g. `read and write the visibility of entities`.
+- Branches are named `<type>/<short-description>` with the commit types above, e.g. `fix/reader-crlf`.
+- Titles follow the commit subject format and describe the whole change, e.g. `feat: read and write the visibility of entities`.
 - The description follows the [pull request template](.github/pull_request_template.md).
