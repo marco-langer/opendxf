@@ -6,7 +6,12 @@ Code conventions are in [docs/code-style.md](docs/code-style.md), test conventio
 
 A change is done when:
 
-- All touched C++ files are formatted with `clang-format` (the repo has a `.clang-format`).
+- All touched C++ files are formatted with `clang-format` (the repo has a `.clang-format`):
+
+  ```sh
+  git diff --name-only --diff-filter=d main -- '*.cpp' '*.hpp' | xargs -r clang-format -i
+  ```
+
 - The release preset builds without warnings and all tests pass:
 
   ```sh
