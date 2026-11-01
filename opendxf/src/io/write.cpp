@@ -348,6 +348,10 @@ void write_entity(std::ofstream& stream, const odxf::lw_polyline& lw_polyline)
     write_entity_properties(stream, lw_polyline.properties);
     write_value(stream, 90, lw_polyline.vertices.size());
     write_value(stream, 70, lw_polyline.is_closed ? 1 : 0);
+    if (lw_polyline.elevation) {
+        write_value(stream, 38, *lw_polyline.elevation);
+    }
+    write_thickness(stream, lw_polyline.thickness);
 
     for (const odxf::vertex& vertex : lw_polyline.vertices) {
         write_value(stream, 10, vertex.position.x);
@@ -356,6 +360,7 @@ void write_entity(std::ofstream& stream, const odxf::lw_polyline& lw_polyline)
             write_value(stream, 42, *vertex.bulge);
         }
     }
+    write_extrusion(stream, lw_polyline.extrusion);
 }
 
 std::expected<void, odxf::error> check_stream(const std::ofstream& stream)

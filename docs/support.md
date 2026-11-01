@@ -50,12 +50,13 @@ order, which is the default draw order.
 | Group code      | Meaning                     | Entities read | Write |
 |-----------------|-----------------------------|:-------------:|:-----:|
 | 30, 31          | Z of a point                | ✓             | ✓     |
+| 38              | Elevation of LWPOLYLINE     | ✓             | ✓     |
 | 39              | Thickness                   | ✓             | ✓     |
 | 210, 220, 230   | Extrusion direction         | ✓             | ✓     |
 
-Entities read them for ARC, CIRCLE and LINE. A missing group code 30 or 31 means 0; a missing
-thickness or extrusion stays empty, which DXF treats as 0 and (0, 0, 1). LWPOLYLINE elevation
-(38), thickness and extrusion are neither read nor written.
+Entities read them for ARC, CIRCLE, LINE and LWPOLYLINE, which has an elevation, the z of all of
+its vertices, instead of z values. A missing group code 30 or 31 means 0; a missing elevation,
+thickness or extrusion stays empty, which DXF treats as 0, 0 and (0, 0, 1).
 
 ## Colors
 

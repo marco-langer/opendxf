@@ -114,9 +114,14 @@ struct lw_polyline final
 {
     entity_properties properties;
 
+    // the z of all vertices, which have only x and y
     std::optional<double> elevation;
     bool is_closed{ false };
     odxf::vertices vertices;
+
+    // defines the object coordinate system the vertices and the elevation are in
+    std::optional<vector3d> extrusion;
+    std::optional<double> thickness;
 };
 
 using entity = std::variant<arc, circle, ellipse, line, lw_polyline, point, ray>;

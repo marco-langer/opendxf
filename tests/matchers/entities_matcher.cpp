@@ -83,9 +83,21 @@ is_lw_polyline(const odxf::lw_polyline& expected, double max_error)
             "properties",
             &odxf::lw_polyline::properties,
             is_entity_properties(expected.properties, max_error)),
+        testing::Field(
+            "elevation",
+            &odxf::lw_polyline::elevation,
+            is_optional_double(expected.elevation, max_error)),
         testing::Field("is_closed", &odxf::lw_polyline::is_closed, expected.is_closed),
         testing::Field(
-            "vertices", &odxf::lw_polyline::vertices, are_vertices(expected.vertices, max_error)));
+            "vertices", &odxf::lw_polyline::vertices, are_vertices(expected.vertices, max_error)),
+        testing::Field(
+            "extrusion",
+            &odxf::lw_polyline::extrusion,
+            is_optional_vector(expected.extrusion, max_error)),
+        testing::Field(
+            "thickness",
+            &odxf::lw_polyline::thickness,
+            is_optional_double(expected.thickness, max_error)));
 }
 
 testing::Matcher<const odxf::line&> is_line(const odxf::line& expected, double max_error)
