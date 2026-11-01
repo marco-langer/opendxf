@@ -1,4 +1,4 @@
-# 3. Reading and writing stream, documents are built on the streams
+# 3. Streaming read and write, with documents built on the streams
 
 Status: accepted
 
@@ -10,15 +10,15 @@ DXF constrains what a writer can stream: the sections have a fixed order (HEADER
 
 ## Decision
 
-Reading passes everything it reads, in file order, to an `read_stream_base` implemented by the user: one hook per header, table entry and entity type. Hooks have empty default implementations, so users implement only the ones they need.
+Reading passes everything it reads, in file order, to a `read_stream_base` implemented by the user: one callback per header, table entry and entity type. Callbacks have empty default implementations, so users implement only the ones they need.
 
 Writing opens a `write_stream` with the header and tables up front. `write_stream::entity()` appends one entity, `write_stream::close()` ends and closes the file. Only entities are streamed.
 
 Reading and writing a whole `document` are built on the streams:
 
-| Whole document                  | Streaming                                                  |
-|---------------------------------|------------------------------------------------------------|
-| `read(path)` returns a document | `read(path, stream)` calls an `read_stream_base`                |
+| Document                        | Stream                                                      |
+|---------------------------------|-------------------------------------------------------------|
+| `read(path)` returns a document | `read(path, stream)` calls a `read_stream_base`             |
 | `write(path, document)`         | `write_stream::open(path, header, tables)` returns a stream |
 
 The path comes first in all of them. All of them return `std::expected` ([ADR 5](0005-errors-as-expected.md)).
@@ -32,7 +32,7 @@ The path comes first in all of them. All of them return `std::expected` ([ADR 5]
 
 ## Consequences
 
-- Every new entity type adds a hook to `read_stream_base`.
+- Every new entity type adds a callback to `read_stream_base`.
 - The writer writes the header as given. Header variables that depend on the entities, like `$EXTMIN`, `$EXTMAX` and `$HANDSEED`, are the caller's responsibility, because the header is written before the first entity.
 - The destructor of `write_stream` closes the file if `close()` wasn't called, like `std::ofstream`, and the error is lost. Callers who need to know whether the file was written completely call `close()`. A stream abandoned after an error also leaves a complete file, with the entities written so far.
 - Calling `entity()` or `close()` after `close()` is an error.

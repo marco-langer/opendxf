@@ -55,7 +55,7 @@ private:
             return;
         }
 
-        // The hooks can't stop the reader, so the first error is kept and reported by close().
+        // The callbacks can't stop the reader, so the first error is kept and reported by close().
         if (std::expected<void, odxf::error> maybe_error = m_stream->entity(entity); !maybe_error) {
             m_error = maybe_error.error();
         }
