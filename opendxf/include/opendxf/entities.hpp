@@ -44,6 +44,8 @@ struct point final
 
     std::optional<vector3d> extrusion;
     std::optional<double> thickness;
+    // in degrees, rotates the symbol of the point when $PDMODE is not a dot
+    std::optional<double> x_axis_angle;
 };
 
 struct ray final

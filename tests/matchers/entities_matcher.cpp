@@ -201,7 +201,11 @@ testing::Matcher<const odxf::point&> is_point(const odxf::point& expected, doubl
         testing::Field(
             "thickness",
             &odxf::point::thickness,
-            is_optional_double(expected.thickness, max_error)));
+            is_optional_double(expected.thickness, max_error)),
+        testing::Field(
+            "x_axis_angle",
+            &odxf::point::x_axis_angle,
+            is_optional_double(expected.x_axis_angle, max_error)));
 }
 
 testing::Matcher<const odxf::ray&> is_ray(const odxf::ray& expected, double max_error)

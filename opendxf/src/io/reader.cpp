@@ -980,6 +980,7 @@ std::expected<void, error> reader::read_point()
                case 210: return parse_into(extrusion(point).x);
                case 220: return parse_into(extrusion(point).y);
                case 230: return parse_into(extrusion(point).z);
+               case 50: return parse_into(point.x_axis_angle);
                default: return read_entity_property(point.properties);
                }
            })
