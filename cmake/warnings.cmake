@@ -22,8 +22,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             -Wfloat-equal
             -Wformat=2
             -Wimplicit-fallthrough
-            # free functions in the examples lack a declaration
-            # -Wmissing-declarations
+            -Wmissing-declarations
             -Wnon-virtual-dtor
             -Wnull-dereference
             -Wold-style-cast
