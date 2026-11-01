@@ -24,4 +24,6 @@ void read_stream_base::line(const odxf::line& /* line */) {}
 
 void read_stream_base::lw_polyline(const odxf::lw_polyline& /* lw_polyline */) {}
 
+void read_stream_base::point(const odxf::point& /* point */) {}
+
 }   // namespace odxf

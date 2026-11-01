@@ -12,6 +12,7 @@ struct layer;
 struct line;
 struct line_type;
 struct lw_polyline;
+struct point;
 
 class read_stream_base
 {
@@ -27,6 +28,7 @@ public:
     virtual void circle(const odxf::circle& circle);
     virtual void line(const odxf::line& line);
     virtual void lw_polyline(const odxf::lw_polyline& lw_polyline);
+    virtual void point(const odxf::point& point);
 
 protected:
     read_stream_base(const read_stream_base&) = default;

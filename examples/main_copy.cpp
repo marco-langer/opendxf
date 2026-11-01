@@ -46,6 +46,7 @@ private:
     void circle(const odxf::circle& circle) override { copy(circle); }
     void line(const odxf::line& line) override { copy(line); }
     void lw_polyline(const odxf::lw_polyline& lw_polyline) override { copy(lw_polyline); }
+    void point(const odxf::point& point) override { copy(point); }
 
     template <typename E>
     void copy(const E& entity)

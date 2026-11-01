@@ -57,6 +57,7 @@ private:
     std::expected<void, error> read_circle();
     std::expected<void, error> read_arc();
     std::expected<void, error> read_lw_polyline();
+    std::expected<void, error> read_point();
 
     // Reads the group codes of one entity up to the next group code 0. read_group_code is called
     // for each group code and returns false on an error.
@@ -95,6 +96,7 @@ private:
     bool is_circle() const;
     bool is_arc() const;
     bool is_lw_polyline() const;
+    bool is_point() const;
 
     bool is_eof() const;
 
