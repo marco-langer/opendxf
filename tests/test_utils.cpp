@@ -240,5 +240,18 @@ odxf::document create_example_document()
         .x_axis_angle = 30.0,
     });
 
+    entities.push_back(ray{
+        .properties = {
+            .layer = layer_name_test,
+            .color = 5,
+            .lineweight = 35,
+            .line_type = "DASHED",
+            .transparency = by_block{},
+            .is_visible = false,
+        },
+        .start_point = coordinate3d{ 1.0, 2.0, 3.0 },
+        .direction = vector3d{ 0.6, 0.0, 0.8 },
+    });
+
     return expected_document;
 }

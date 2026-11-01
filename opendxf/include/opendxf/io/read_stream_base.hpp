@@ -13,6 +13,7 @@ struct line;
 struct line_type;
 struct lw_polyline;
 struct point;
+struct ray;
 
 class read_stream_base
 {
@@ -29,6 +30,7 @@ public:
     virtual void line(const odxf::line& line);
     virtual void lw_polyline(const odxf::lw_polyline& lw_polyline);
     virtual void point(const odxf::point& point);
+    virtual void ray(const odxf::ray& ray);
 
 protected:
     read_stream_base(const read_stream_base&) = default;
