@@ -351,6 +351,7 @@ void write_entity(std::ofstream& stream, const odxf::lw_polyline& lw_polyline)
     if (lw_polyline.elevation) {
         write_value(stream, 38, *lw_polyline.elevation);
     }
+    write_thickness(stream, lw_polyline.thickness);
 
     for (const odxf::vertex& vertex : lw_polyline.vertices) {
         write_value(stream, 10, vertex.position.x);

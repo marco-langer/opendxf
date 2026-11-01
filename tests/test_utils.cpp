@@ -222,6 +222,7 @@ odxf::document create_example_document()
                 .position = { 60.0, 10.0 },
             },
         },
+        .thickness = 1.5,
     });
 
     return expected_document;

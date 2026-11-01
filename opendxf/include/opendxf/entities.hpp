@@ -118,6 +118,8 @@ struct lw_polyline final
     std::optional<double> elevation;
     bool is_closed{ false };
     odxf::vertices vertices;
+
+    std::optional<double> thickness;
 };
 
 using entity = std::variant<arc, circle, ellipse, line, lw_polyline, point, ray>;
