@@ -27,7 +27,7 @@ concept entity_type = requires(E& entity) {
     { entity.properties } -> std::same_as<entity_properties&>;
 };
 
-class reader
+class reader final
 {
 public:
     reader(read_stream_base& stream);
@@ -104,7 +104,7 @@ private:
 
     bool is_eof() const;
 
-    struct group
+    struct group final
     {
         int code{ 0 };
         std::string value;
