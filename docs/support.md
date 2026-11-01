@@ -45,9 +45,6 @@ All header variables are read into and written from a generic key/value map. Typ
 Unsupported tables and entities are skipped when reading. Entities are read and written in file
 order, which is the default draw order.
 
-The angle of the x axis of POINT (group code 50), which only affects how points are displayed, is
-skipped when reading and not written.
-
 ## Z, thickness and extrusion
 
 | Group code      | Meaning                     | Entities read | Write |

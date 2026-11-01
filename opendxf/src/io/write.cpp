@@ -270,6 +270,9 @@ void write_entity(std::ofstream& stream, const odxf::point& point)
     write_value(stream, 20, point.coordinate.y);
     write_value(stream, 30, point.coordinate.z);
     write_extrusion(stream, point.extrusion);
+    if (point.x_axis_angle) {
+        write_value(stream, 50, *point.x_axis_angle);
+    }
 }
 
 
