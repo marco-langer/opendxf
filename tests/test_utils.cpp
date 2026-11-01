@@ -194,6 +194,7 @@ odxf::document create_example_document()
     // no group codes 6, 48 and 440, keeps the defaults
     entities.push_back(lw_polyline{
         .properties = { .layer = layer_name_lw_polylines, .color = 0, .lineweight = 13 },
+        .elevation = 5.0,
         .is_closed = true,
         .vertices = {
             vertex{
