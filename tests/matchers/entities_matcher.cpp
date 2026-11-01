@@ -91,6 +91,10 @@ is_lw_polyline(const odxf::lw_polyline& expected, double max_error)
         testing::Field(
             "vertices", &odxf::lw_polyline::vertices, are_vertices(expected.vertices, max_error)),
         testing::Field(
+            "extrusion",
+            &odxf::lw_polyline::extrusion,
+            is_optional_vector(expected.extrusion, max_error)),
+        testing::Field(
             "thickness",
             &odxf::lw_polyline::thickness,
             is_optional_double(expected.thickness, max_error)));

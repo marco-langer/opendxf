@@ -222,6 +222,7 @@ odxf::document create_example_document()
                 .position = { 60.0, 10.0 },
             },
         },
+        .extrusion = vector3d{ 0.0, 0.0, -1.0 },
         .thickness = 1.5,
     });
 

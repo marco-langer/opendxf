@@ -119,6 +119,8 @@ struct lw_polyline final
     bool is_closed{ false };
     odxf::vertices vertices;
 
+    // defines the object coordinate system the vertices and the elevation are in
+    std::optional<vector3d> extrusion;
     std::optional<double> thickness;
 };
 

@@ -923,6 +923,9 @@ std::expected<void, error> reader::read_lw_polyline()
 
             case 38: return parse_into(lw_polyline.elevation);
             case 39: return parse_into(lw_polyline.thickness);
+            case 210: return parse_into(extrusion(lw_polyline).x);
+            case 220: return parse_into(extrusion(lw_polyline).y);
+            case 230: return parse_into(extrusion(lw_polyline).z);
 
             case 10:
                 push_complete_vertex(lw_polyline);

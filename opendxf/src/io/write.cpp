@@ -360,6 +360,7 @@ void write_entity(std::ofstream& stream, const odxf::lw_polyline& lw_polyline)
             write_value(stream, 42, *vertex.bulge);
         }
     }
+    write_extrusion(stream, lw_polyline.extrusion);
 }
 
 std::expected<void, odxf::error> check_stream(const std::ofstream& stream)
