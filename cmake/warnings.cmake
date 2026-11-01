@@ -11,9 +11,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             -Wall
             -Wextra
             -Wpedantic
-            # designated initializers in tests, examples and the library
-            # leave out members without a default member initializer
-            -Wno-missing-field-initializers
             -Wcast-align
             -Wcast-qual
             -Wconversion

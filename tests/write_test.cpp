@@ -68,9 +68,11 @@ TEST(Write, KeepsEntityOrder)
     // Arrange
     odxf::document document;
     document.entities = {
-        odxf::circle{ .radius = 1.0 },          odxf::line{ .end = { 1.0, 0.0, 0.0 } },
-        odxf::circle{ .radius = 2.0 },          odxf::arc{ .radius = 3.0, .end_angle = 90.0 },
-        odxf::line{ .end = { 2.0, 0.0, 0.0 } },
+        odxf::circle{ .properties = {}, .center = {}, .radius = 1.0 },
+        odxf::line{ .properties = {}, .start = {}, .end = { 1.0, 0.0, 0.0 } },
+        odxf::circle{ .properties = {}, .center = {}, .radius = 2.0 },
+        odxf::arc{ .properties = {}, .center = {}, .radius = 3.0, .end_angle = 90.0 },
+        odxf::line{ .properties = {}, .start = {}, .end = { 2.0, 0.0, 0.0 } },
     };
 
     const std::filesystem::path file_path{ "test_entity_order.dxf" };
@@ -98,8 +100,8 @@ TEST(Write, DoublesRoundTrip)
     odxf::document document;
     odxf::set_line_type_scale(document.header, scale);
     document.entities = {
-        odxf::line{ .start = start },
-        odxf::circle{ .radius = scale },
+        odxf::line{ .properties = {}, .start = start, .end = {} },
+        odxf::circle{ .properties = {}, .center = {}, .radius = scale },
     };
 
     const std::filesystem::path file_path{ "test_doubles_round_trip.dxf" };
@@ -142,7 +144,11 @@ TEST(Write, IgnoresGlobalLocale)
     document.tables.layers.push_back(
         odxf::layer{ .name = "0", .transparency = odxf::transparency{ .alpha = 0x4C } });
     document.entities = {
-        odxf::line{ .properties = { .true_color = 1234567 }, .start = { 1234.5, 0.25, 0.0 } },
+        odxf::line{
+            .properties = { .layer = {}, .true_color = 1234567 },
+            .start = { 1234.5, 0.25, 0.0 },
+            .end = {},
+        },
     };
 
     const std::filesystem::path file_path{ "test_global_locale.dxf" };
@@ -310,7 +316,9 @@ TEST(WriteStream, DestructorCloses)
     ASSERT_FALSE(std::filesystem::exists(file_path));
 
     odxf::document document;
-    document.entities = { odxf::line{ .end = { 1.0, 0.0, 0.0 } } };
+    document.entities = {
+        odxf::line{ .properties = {}, .start = {}, .end = { 1.0, 0.0, 0.0 } },
+    };
 
     // Act
     {

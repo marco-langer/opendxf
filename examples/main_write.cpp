@@ -16,11 +16,14 @@ int main()
             .layers{ { .name{ "Test Layer" } } },
         },
         .entities{
-            odxf::arc{
-                .center{ 0.0, 2.0 }, .radius{ 0.5 }, .start_angle{ 0.0 }, .end_angle{ 180.0 } },
-            odxf::circle{ .center{}, .radius{ 1.0 } },
-            odxf::line{ .start{ 0.0, 0.5, 0.0 }, .end{ 1.0, 1.5, 0.0 } },
-            odxf::line{ .end{ 1.0, 1.0, 0.0 } },
+            odxf::arc{ .properties{},
+                       .center{ 0.0, 2.0 },
+                       .radius{ 0.5 },
+                       .start_angle{ 0.0 },
+                       .end_angle{ 180.0 } },
+            odxf::circle{ .properties{}, .center{}, .radius{ 1.0 } },
+            odxf::line{ .properties{}, .start{ 0.0, 0.5, 0.0 }, .end{ 1.0, 1.5, 0.0 } },
+            odxf::line{ .properties{}, .start{}, .end{ 1.0, 1.0, 0.0 } },
         },
     };
 

@@ -180,6 +180,7 @@ odxf::document create_example_document()
             .line_type = "GAS",
             .transparency = transparency{ .alpha = 0xFF },
         },
+        .vertices = {},
     });
     // has a 440 without the flag of a set value, which counts as BYLAYER
     entities.push_back(lw_polyline{

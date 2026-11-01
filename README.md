@@ -61,8 +61,8 @@ int main()
             .layers{ { .name{ "Layer 1" } } },
         },
         .entities{
-            odxf::circle{ .center{}, .radius{ 1.0 } },
-            odxf::line{ .start{ 0.0, 0.0, 0.0 }, .end{ 1.0, 1.0, 0.0 } },
+            odxf::circle{ .properties{}, .center{}, .radius{ 1.0 } },
+            odxf::line{ .properties{}, .start{ 0.0, 0.0, 0.0 }, .end{ 1.0, 1.0, 0.0 } },
         },
     };
 

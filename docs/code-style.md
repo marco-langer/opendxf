@@ -8,6 +8,8 @@ Formatting is handled by `clang-format` with the repo's `.clang-format`. This pa
 
 **Brace initialization** (`const int count{ 0 };`), see [ES.23](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#res-list).
 
+**Scalar data members always have a default member initializer,** so no member is left uninitialized, see [ES.20](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#res-always) and [Type.6](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#pro-type-memberinit). **A class-type member has one only if it may be left out:** a `std::optional` gets `{}`, because `std::nullopt` stands for a value missing from the file. Other class-type members, e.g. coordinates or `properties`, get none, so GCC's `-Wmissing-field-initializers` reports a designated initializer that leaves them out. Name them explicitly, e.g. `.properties = {}`.
+
 **`maybe_x` names a `std::optional` or `std::expected` that has not been checked yet,** so it is clear at the point of use whether the value is known to be there.
 
 **Reader helpers return `bool` and store the error in `m_error`.** Helpers like `read_next()` and `parse_into()` record the error once, where it happens, with the current line. Call sites stay short (`if (!parse_into(x)) { return make_error(); }`), which matters because the reader has many of them.
