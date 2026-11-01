@@ -252,7 +252,7 @@ INSTANTIATE_TEST_SUITE_P(
         entity_type_param{ .entity = odxf::point{}, .type = "POINT", .subclass = "AcDbPoint" },
         entity_type_param{ .entity = odxf::ray{}, .type = "RAY", .subclass = "AcDbRay" }
     ),
-    [](const testing::TestParamInfo<entity_type_param>& info) { return info.param.type; }
+    [](const testing::TestParamInfo<entity_type_param>& param_info) { return param_info.param.type; }
 );
 // clang-format on
 
