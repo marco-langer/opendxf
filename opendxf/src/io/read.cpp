@@ -30,6 +30,7 @@ private:
     {
         m_document.entities.push_back(lw_polyline);
     }
+    void point(const odxf::point& point) override { m_document.entities.push_back(point); }
 
     odxf::document m_document;
 };

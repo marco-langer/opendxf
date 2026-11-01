@@ -17,17 +17,19 @@ struct document_stats final
     int circles{ 0 };
     int lines{ 0 };
     int lw_polylines{ 0 };
+    int points{ 0 };
 };
 
 void print_document_stats(const document_stats& stats)
 {
     std::println(
-        "layers: {}\narcs: {}\ncircles: {}\nlines: {}\nlw polylines: {}",
+        "layers: {}\narcs: {}\ncircles: {}\nlines: {}\nlw polylines: {}\npoints: {}",
         stats.layers,
         stats.arcs,
         stats.circles,
         stats.lines,
-        stats.lw_polylines);
+        stats.lw_polylines,
+        stats.points);
 }
 
 void print_error(const odxf::error& error)
@@ -68,6 +70,8 @@ private:
     {
         m_doc_stats.lw_polylines += 1;
     }
+
+    void point(const odxf::point& /* point */) override { m_doc_stats.points += 1; }
 
     document_stats m_doc_stats;
 };

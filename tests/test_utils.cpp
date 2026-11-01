@@ -226,5 +226,19 @@ odxf::document create_example_document()
         .thickness = 1.5,
     });
 
+    // its 50, the angle of the x axis for displaying points, is skipped
+    entities.push_back(point{
+        .properties = {
+            .layer = layer_name_test,
+            .color = 4,
+            .lineweight = 25,
+            .line_type = "DASHED",
+            .transparency = transparency{ .alpha = 0x40 },
+        },
+        .coordinate = coordinate3d{ 5.0, 6.0, 7.0 },
+        .extrusion = vector3d{ 0.0, 1.0, 0.0 },
+        .thickness = 0.25,
+    });
+
     return expected_document;
 }
