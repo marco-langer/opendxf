@@ -32,45 +32,18 @@ Tests and examples are only built when opendxf is the top-level project. Use `OP
 
 ## Usage
 
-### Reading
+opendxf has two APIs:
+
+- The document API reads a whole file into an `odxf::document` and writes one, similar to a DOM.
+- The stream API reads and writes one entity at a time, so the memory use doesn't grow with the number of entities. Reading calls a callback for each entity, similar to SAX.
+
+### Documents
 
 Read a whole file into an `odxf::document`:
 
 ```cpp
 const std::expected<odxf::document, odxf::error> document{ odxf::read("drawing.dxf") };
 ```
-
-To process a file without holding it in memory, derive from `odxf::read_stream_base` and override the callbacks you are interested in:
-
-```cpp
-#include <opendxf/opendxf.hpp>
-
-#include <print>
-
-class line_counter final : public odxf::read_stream_base
-{
-public:
-    int lines{ 0 };
-
-private:
-    void line(const odxf::line& /* line */) override { lines += 1; }
-};
-
-int main()
-{
-    line_counter counter;
-
-    const std::expected<void, odxf::error> result{ odxf::read("drawing.dxf", counter) };
-    if (!result) {
-        std::println("error: {}", result.error().what);
-        return EXIT_FAILURE;
-    }
-
-    std::println("lines: {}", counter.lines);
-}
-```
-
-### Writing
 
 Fill an `odxf::document` and write it:
 
@@ -101,7 +74,62 @@ int main()
 }
 ```
 
-To write entities without holding them all in memory, open a `write_stream` with the header and tables and stream the entities. `close()` completes the file and reports errors; if it isn't called, the destructor completes the file and the error is lost:
+### Streams
+
+To read a file, derive from `odxf::read_stream_base` and override the callbacks you are interested in. The reader calls them in the order of the file: once for the header, then for each table entry and each entity. This example adds up the lengths of the lines on the layer `Walls`:
+
+```cpp
+#include <opendxf/opendxf.hpp>
+
+#include <cmath>
+#include <cstdlib>
+#include <expected>
+#include <print>
+#include <string>
+#include <utility>
+
+double length(const odxf::line& line)
+{
+    return std::hypot(
+        line.end.x - line.start.x, line.end.y - line.start.y, line.end.z - line.start.z);
+}
+
+class line_length final : public odxf::read_stream_base
+{
+public:
+    explicit line_length(std::string layer)
+        : m_layer{ std::move(layer) }
+    {
+    }
+
+    double total{ 0.0 };
+
+private:
+    void line(const odxf::line& line) override
+    {
+        if (line.properties.layer == m_layer) {
+            total += length(line);
+        }
+    }
+
+    std::string m_layer;
+};
+
+int main()
+{
+    line_length walls{ "Walls" };
+
+    const std::expected<void, odxf::error> result{ odxf::read("drawing.dxf", walls) };
+    if (!result) {
+        std::println("error: {}", result.error().what);
+        return EXIT_FAILURE;
+    }
+
+    std::println("length of the lines on layer Walls: {}", walls.total);
+}
+```
+
+To write a file, open a `write_stream` with the header and tables and pass it the entities. `close()` completes the file and reports errors; if it isn't called, the destructor completes the file and the error is lost:
 
 ```cpp
 std::expected<odxf::write_stream, odxf::error> stream{
