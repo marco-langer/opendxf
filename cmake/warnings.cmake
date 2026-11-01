@@ -27,8 +27,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             -Wnull-dereference
             -Wold-style-cast
             -Woverloaded-virtual
-            # variables named like their type, e.g. `const entity& entity`
-            # -Wshadow
             -Wsign-conversion
             -Wsign-promo
             -Wundef
@@ -51,6 +49,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             -Wnoexcept
             -Wredundant-decls
             -Wredundant-tags
+            # -Wshadow also warns about variables named like a type alias,
+            # e.g. `const odxf::entity& entity`, which the naming allows
+            -Wshadow=local
             -Wstrict-null-sentinel
             -Wsuggest-attribute=noreturn
             -Wsuggest-override
