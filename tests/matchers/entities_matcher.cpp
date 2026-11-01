@@ -168,9 +168,7 @@ testing::Matcher<const odxf::ellipse&> is_ellipse(const odxf::ellipse& expected,
             is_entity_properties(expected.properties, max_error)),
         testing::Field("center", &odxf::ellipse::center, is_coordinate(expected.center, max_error)),
         testing::Field(
-            "end_point_major",
-            &odxf::ellipse::end_point_major,
-            is_coordinate(expected.end_point_major, max_error)),
+            "major_axis", &odxf::ellipse::major_axis, is_vector(expected.major_axis, max_error)),
         testing::Field(
             "axis_ratio",
             &odxf::ellipse::axis_ratio,

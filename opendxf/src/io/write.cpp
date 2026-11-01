@@ -336,9 +336,9 @@ void write_entity(std::ofstream& stream, const odxf::ellipse& ellipse)
     write_value(stream, 10, ellipse.center.x);
     write_value(stream, 20, ellipse.center.y);
     write_value(stream, 30, ellipse.center.z);
-    write_value(stream, 11, ellipse.end_point_major.x);
-    write_value(stream, 21, ellipse.end_point_major.y);
-    write_value(stream, 31, ellipse.end_point_major.z);
+    write_value(stream, 11, ellipse.major_axis.x);
+    write_value(stream, 21, ellipse.major_axis.y);
+    write_value(stream, 31, ellipse.major_axis.z);
     write_value(stream, 40, ellipse.axis_ratio);
     write_value(stream, 41, ellipse.start_parameter);
     write_value(stream, 42, ellipse.end_parameter);
