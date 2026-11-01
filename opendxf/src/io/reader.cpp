@@ -767,6 +767,11 @@ std::expected<void, error> reader::read_entities()
             if (!maybe_result) {
                 return maybe_result;
             }
+        } else if (is_ellipse()) {
+            std::expected<void, error> maybe_result{ read_ellipse() };
+            if (!maybe_result) {
+                return maybe_result;
+            }
         } else {
             read_next();
         }
@@ -1008,6 +1013,28 @@ std::expected<void, error> reader::read_ray()
         .transform([this](const odxf::ray& ray) { m_stream.ray(ray); });
 }
 
+std::expected<void, error> reader::read_ellipse()
+{
+    return read_entity<ellipse>([this](odxf::ellipse& ellipse) -> bool {
+               switch (m_data.group_code) {
+               case 10: return parse_into(ellipse.center.x);
+               case 20: return parse_into(ellipse.center.y);
+               case 30: return parse_into(ellipse.center.z);
+               case 11: return parse_into(ellipse.major_axis.x);
+               case 21: return parse_into(ellipse.major_axis.y);
+               case 31: return parse_into(ellipse.major_axis.z);
+               case 40: return parse_into(ellipse.axis_ratio);
+               case 41: return parse_into(ellipse.start_parameter);
+               case 42: return parse_into(ellipse.end_parameter);
+               case 210: return parse_into(extrusion(ellipse).x);
+               case 220: return parse_into(extrusion(ellipse).y);
+               case 230: return parse_into(extrusion(ellipse).z);
+               default: return read_entity_property(ellipse.properties);
+               }
+           })
+        .transform([this](const odxf::ellipse& ellipse) { m_stream.ellipse(ellipse); });
+}
+
 bool reader::read_next()
 {
     // Group code 999 is a comment, possibly several in a row. Comments are skipped.
@@ -1110,6 +1137,8 @@ bool reader::is_lw_polyline() const
 bool reader::is_point() const { return m_data.group_code == 0 && m_data.value == "POINT"; }
 
 bool reader::is_ray() const { return m_data.group_code == 0 && m_data.value == "RAY"; }
+
+bool reader::is_ellipse() const { return m_data.group_code == 0 && m_data.value == "ELLIPSE"; }
 
 bool reader::is_eof() const { return m_data.group_code == 0 && m_data.value == "EOF"; }
 

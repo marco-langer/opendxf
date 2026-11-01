@@ -36,7 +36,7 @@ All header variables are read into and written from a generic key/value map. Typ
 |------------|:----:|:-----:|
 | ARC        | ✓    | ✓     |
 | CIRCLE     | ✓    | ✓     |
-| ELLIPSE    | –    | ✓     |
+| ELLIPSE    | ✓    | ✓     |
 | LINE       | ✓    | ✓     |
 | LWPOLYLINE | ✓    | ✓     |
 | POINT      | ✓    | ✓     |
@@ -54,10 +54,11 @@ order, which is the default draw order.
 | 39              | Thickness                   | ✓             | ✓     |
 | 210, 220, 230   | Extrusion direction         | ✓             | ✓     |
 
-Entities read them for ARC, CIRCLE, LINE, LWPOLYLINE and POINT. RAY reads only its z values, since
-DXF defines no thickness or extrusion for it. LWPOLYLINE has an elevation, the z of all of its
-vertices, instead of z values. A missing group code 30 or 31 means 0; a missing elevation,
-thickness or extrusion stays empty, which DXF treats as 0, 0 and (0, 0, 1).
+Entities read them for ARC, CIRCLE, LINE, LWPOLYLINE and POINT. ELLIPSE reads its z values and
+extrusion and RAY only its z values, since DXF defines no thickness for them and no extrusion for
+RAY. LWPOLYLINE has an elevation, the z of all of its vertices, instead of z values. A missing group
+code 30 or 31 means 0; a missing elevation, thickness or extrusion stays empty, which DXF treats as
+0, 0 and (0, 0, 1).
 
 ## Colors
 
@@ -66,8 +67,8 @@ thickness or extrusion stays empty, which DXF treats as 0, 0 and (0, 0, 1).
 | 62         | Color index | ✓          | ✓             | ✓     |
 | 420        | True color  | ✓          | ✓             | ✓     |
 
-Entities read colors for ARC, CIRCLE, LINE, LWPOLYLINE, POINT and RAY. A missing group code 62
-means 256 (BYLAYER) on entities and 7 on layers. A negative layer color means the layer is off. A
+Entities read colors for ARC, CIRCLE, ELLIPSE, LINE, LWPOLYLINE, POINT and RAY. A missing group code
+62 means 256 (BYLAYER) on entities and 7 on layers. A negative layer color means the layer is off. A
 true color (`0x00RRGGBB`) takes precedence over the color index, which files keep as a fallback for
 older readers. Color names (group code 430) are not supported.
 
@@ -77,11 +78,11 @@ older readers. Color names (group code 430) are not supported.
 |------------|------------|:----------:|:-------------:|:-----:|
 | 370        | Lineweight | ✓          | ✓             | ✓     |
 
-Entities read lineweights for ARC, CIRCLE, LINE, LWPOLYLINE, POINT and RAY. Lineweights are in
-hundredths of a millimeter. Entities can also be -1 (BYLAYER), -2 (BYBLOCK) or -3 (DEFAULT), layers -3
-(DEFAULT). DEFAULT means the default lineweight of the application; DXF files don't store it. A
-missing group code 370 means -1 on entities and -3 on layers. Values are stored as read, without
-checking them against the lineweights DXF allows.
+Entities read lineweights for ARC, CIRCLE, ELLIPSE, LINE, LWPOLYLINE, POINT and RAY. Lineweights are
+in hundredths of a millimeter. Entities can also be -1 (BYLAYER), -2 (BYBLOCK) or -3 (DEFAULT),
+layers -3 (DEFAULT). DEFAULT means the default lineweight of the application; DXF files don't store
+it. A missing group code 370 means -1 on entities and -3 on layers. Values are stored as read,
+without checking them against the lineweights DXF allows.
 
 ## Line types
 
@@ -93,10 +94,10 @@ checking them against the lineweights DXF allows.
 | 6          | Line type name                |            | ✓          | ✓             | ✓     |
 | 48         | Line type scale               |            |            | ✓             | ✓     |
 
-Entities read line types for ARC, CIRCLE, LINE, LWPOLYLINE, POINT and RAY. Lengths are in drawing
-units: a positive length is a dash, a negative one a gap and 0 a dot. The total pattern length (40) is
-computed when writing and not stored. A missing group code 6 means BYLAYER on entities and
-CONTINUOUS on layers; a missing 48 means 1.0.
+Entities read line types for ARC, CIRCLE, ELLIPSE, LINE, LWPOLYLINE, POINT and RAY. Lengths are in
+drawing units: a positive length is a dash, a negative one a gap and 0 a dot. The total pattern
+length (40) is computed when writing and not stored. A missing group code 6 means BYLAYER on
+entities and CONTINUOUS on layers; a missing 48 means 1.0.
 
 Complex elements, which embed a text or a shape, only keep their flags (74). Their details (75,
 340, 46, 50, 44, 45 and 9) are skipped when reading and not written, so a written complex line
@@ -109,7 +110,7 @@ type is incomplete.
 | 440           | Transparency |            | ✓             | ✓     |
 | 1001 + 1071   | Transparency | ✓          |               | ✓     |
 
-Entities read transparency for ARC, CIRCLE, LINE, LWPOLYLINE, POINT and RAY into an
+Entities read transparency for ARC, CIRCLE, ELLIPSE, LINE, LWPOLYLINE, POINT and RAY into an
 `entity_transparency`: `by_layer`, `by_block` or a `transparency` with an alpha from 0 (fully
 transparent) to 255 (opaque). DXF stores it as `0x02000000 | alpha`, or `0x01000000` for BYBLOCK. A
 missing group code 440 and any other value mean `by_layer`.
@@ -126,10 +127,10 @@ transparency, and writes no APPID table otherwise.
 |------------|------------|:-------------:|:-----:|
 | 60         | Visibility | ✓             | ✓     |
 
-Entities read visibility for ARC, CIRCLE, LINE, LWPOLYLINE, POINT and RAY into `is_visible`. 1 means
-invisible; a missing group code 60, 0 and any other value mean visible. The writer writes 60 only
-for invisible entities. Invisible attributes (bit 1 of group code 70 on ATTDEF and ATTRIB) are a
-separate flag and not supported, since blocks are not.
+Entities read visibility for ARC, CIRCLE, ELLIPSE, LINE, LWPOLYLINE, POINT and RAY into
+`is_visible`. 1 means invisible; a missing group code 60, 0 and any other value mean visible. The
+writer writes 60 only for invisible entities. Invisible attributes (bit 1 of group code 70 on ATTDEF
+and ATTRIB) are a separate flag and not supported, since blocks are not.
 
 ## Known limitations
 

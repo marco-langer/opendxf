@@ -7,6 +7,7 @@ namespace odxf {
 
 struct arc;
 struct circle;
+struct ellipse;
 struct header;
 struct layer;
 struct line;
@@ -27,6 +28,7 @@ public:
 
     virtual void arc(const odxf::arc& arc);
     virtual void circle(const odxf::circle& circle);
+    virtual void ellipse(const odxf::ellipse& ellipse);
     virtual void line(const odxf::line& line);
     virtual void lw_polyline(const odxf::lw_polyline& lw_polyline);
     virtual void point(const odxf::point& point);

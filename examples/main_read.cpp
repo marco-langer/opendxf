@@ -15,6 +15,7 @@ struct document_stats final
 
     int arcs{ 0 };
     int circles{ 0 };
+    int ellipses{ 0 };
     int lines{ 0 };
     int lw_polylines{ 0 };
     int points{ 0 };
@@ -24,10 +25,12 @@ struct document_stats final
 void print_document_stats(const document_stats& stats)
 {
     std::println(
-        "layers: {}\narcs: {}\ncircles: {}\nlines: {}\nlw polylines: {}\npoints: {}\nrays: {}",
+        "layers: {}\narcs: {}\ncircles: {}\nellipses: {}\nlines: {}\nlw polylines: {}\npoints: "
+        "{}\nrays: {}",
         stats.layers,
         stats.arcs,
         stats.circles,
+        stats.ellipses,
         stats.lines,
         stats.lw_polylines,
         stats.points,
@@ -65,6 +68,8 @@ private:
     void arc(const odxf::arc& /* arc */) override { m_doc_stats.arcs += 1; }
 
     void circle(const odxf::circle& /* circle */) override { m_doc_stats.circles += 1; }
+
+    void ellipse(const odxf::ellipse& /* ellipse */) override { m_doc_stats.ellipses += 1; }
 
     void line(const odxf::line& /* line */) override { m_doc_stats.lines += 1; }
 
