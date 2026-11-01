@@ -904,12 +904,13 @@ std::expected<void, error> reader::read_lw_polyline()
     odxf::vertex vertex;
     int num_xy{ 0 };
 
-    // A vertex is complete once it has x and y. Its bulge, if any, follows directly.
+    // A vertex is complete once it has x and y. Its widths and bulge, if any, follow directly,
+    // the bulge last.
     const auto push_complete_vertex = [&](odxf::lw_polyline& lw_polyline) {
         if (num_xy == 2) {
             lw_polyline.vertices.push_back(vertex);
             num_xy = 0;
-            vertex.bulge.reset();
+            vertex = {};
         }
     };
 
@@ -938,6 +939,7 @@ std::expected<void, error> reader::read_lw_polyline()
 
             case 38: return parse_into(lw_polyline.elevation);
             case 39: return parse_into(lw_polyline.thickness);
+            case 43: return parse_into(lw_polyline.constant_width);
             case 210: return parse_into(extrusion(lw_polyline).x);
             case 220: return parse_into(extrusion(lw_polyline).y);
             case 230: return parse_into(extrusion(lw_polyline).z);
@@ -957,6 +959,9 @@ std::expected<void, error> reader::read_lw_polyline()
                 }
                 num_xy++;
                 return true;
+
+            case 40: return parse_into(vertex.start_width);
+            case 41: return parse_into(vertex.end_width);
 
             case 42:
                 if (!parse_into(vertex.bulge)) {

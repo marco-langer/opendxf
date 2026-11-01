@@ -107,6 +107,9 @@ struct ellipse final
 struct vertex final
 {
     coordinate2d position;
+    // in drawing units, of the segment from this vertex to the next one
+    std::optional<double> start_width{};
+    std::optional<double> end_width{};
     std::optional<double> bulge{};
 };
 
@@ -119,6 +122,7 @@ struct lw_polyline final
     // the z of all vertices, which have only x and y
     std::optional<double> elevation{};
     bool is_closed{ false };
+    std::optional<double> constant_width{};
     odxf::vertices vertices;
 
     // defines the object coordinate system the vertices and the elevation are in
