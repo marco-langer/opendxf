@@ -42,10 +42,10 @@ struct point final
 
     coordinate3d coordinate;
 
-    std::optional<vector3d> extrusion;
-    std::optional<double> thickness;
+    std::optional<vector3d> extrusion{};
+    std::optional<double> thickness{};
     // in degrees, rotates the symbol of the point when $PDMODE is not a dot
-    std::optional<double> x_axis_angle;
+    std::optional<double> x_axis_angle{};
 };
 
 struct ray final
@@ -63,8 +63,8 @@ struct line final
     coordinate3d start;
     coordinate3d end;
 
-    std::optional<vector3d> extrusion;
-    std::optional<double> thickness;
+    std::optional<vector3d> extrusion{};
+    std::optional<double> thickness{};
 };
 
 struct circle final
@@ -74,8 +74,8 @@ struct circle final
     coordinate3d center;
     double radius{ 0.0 };
 
-    std::optional<vector3d> extrusion;
-    std::optional<double> thickness;
+    std::optional<vector3d> extrusion{};
+    std::optional<double> thickness{};
 };
 
 struct arc final
@@ -87,8 +87,8 @@ struct arc final
     double start_angle{ 0.0 };
     double end_angle{ 0.0 };
 
-    std::optional<vector3d> extrusion;
-    std::optional<double> thickness;
+    std::optional<vector3d> extrusion{};
+    std::optional<double> thickness{};
 };
 
 struct ellipse final
@@ -101,13 +101,13 @@ struct ellipse final
     double start_parameter{ 0.0 };
     double end_parameter{ 2 * std::numbers::pi };
 
-    std::optional<vector3d> extrusion;
+    std::optional<vector3d> extrusion{};
 };
 
 struct vertex final
 {
     coordinate2d position;
-    std::optional<double> bulge;
+    std::optional<double> bulge{};
 };
 
 using vertices = std::vector<vertex>;
@@ -117,13 +117,13 @@ struct lw_polyline final
     entity_properties properties;
 
     // the z of all vertices, which have only x and y
-    std::optional<double> elevation;
+    std::optional<double> elevation{};
     bool is_closed{ false };
     odxf::vertices vertices;
 
     // defines the object coordinate system the vertices and the elevation are in
-    std::optional<vector3d> extrusion;
-    std::optional<double> thickness;
+    std::optional<vector3d> extrusion{};
+    std::optional<double> thickness{};
 };
 
 using entity = std::variant<arc, circle, ellipse, line, lw_polyline, point, ray>;

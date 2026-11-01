@@ -1092,7 +1092,7 @@ std::expected<void, error> reader::make_error() const { return std::unexpected(m
 
 std::unexpected<error> reader::parse_error() const
 {
-    return std::unexpected(error{ .line_number = m_current_line });
+    return std::unexpected(error{ .line_number = m_current_line, .what = {} });
 }
 
 bool reader::is_section_begin() const
