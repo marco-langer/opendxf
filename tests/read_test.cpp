@@ -14,8 +14,6 @@
 
 TEST(Read, Example)
 {
-    GTEST_SKIP() << "LWPOLYLINE elevation is neither read nor written";
-
     // Arrange
     const auto file_path{ std::filesystem::path{ TEST_DATA_DIR } / "valid" / "example.dxf" };
     ASSERT_TRUE(std::filesystem::is_regular_file(file_path));

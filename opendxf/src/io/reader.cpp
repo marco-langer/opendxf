@@ -921,6 +921,8 @@ std::expected<void, error> reader::read_lw_polyline()
                 return true;
             }
 
+            case 38: return parse_into(lw_polyline.elevation);
+
             case 10:
                 push_complete_vertex(lw_polyline);
                 if (!parse_into(vertex.position.x)) {

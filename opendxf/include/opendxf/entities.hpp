@@ -114,6 +114,7 @@ struct lw_polyline final
 {
     entity_properties properties;
 
+    // the z of all vertices, which have only x and y
     std::optional<double> elevation;
     bool is_closed{ false };
     odxf::vertices vertices;
