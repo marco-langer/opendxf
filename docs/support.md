@@ -60,6 +60,18 @@ RAY. LWPOLYLINE has an elevation, the z of all of its vertices, instead of z val
 code 30 or 31 means 0; a missing elevation, thickness or extrusion stays empty, which DXF treats as
 0, 0 and (0, 0, 1).
 
+## Widths
+
+| Group code | Meaning                         | Entities read | Write |
+|------------|---------------------------------|:-------------:|:-----:|
+| 43         | Constant width of LWPOLYLINE    | ✓             | ✓     |
+| 40, 41     | Start and end width of a vertex | ✓             | ✓     |
+
+Widths are in drawing units, unlike lineweights, and give a LWPOLYLINE segment the shape of a band.
+The constant width applies to all segments; a vertex's start and end widths apply to the segment
+from that vertex to the next. A missing width stays empty, which DXF treats as 0. Files with both a
+constant width and vertex widths keep both as read.
+
 ## Colors
 
 | Group code | Meaning     | LAYER read | Entities read | Write |

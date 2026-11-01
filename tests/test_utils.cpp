@@ -190,6 +190,7 @@ odxf::document create_example_document()
             .lineweight = -1,
             .line_type = "BYLAYER",
         },
+        .constant_width = 2.5,
         .vertices = { vertex{ .position = { 200.0, 200.0 } } },
     });
     // no group codes 6, 48 and 440, keeps the defaults
@@ -200,13 +201,17 @@ odxf::document create_example_document()
         .vertices = {
             vertex{
                 .position = { 10.0, 10.0 },
+                .start_width = 1.0,
             },
             vertex{
                 .position = { 10.0, 50.0 },
+                .start_width = 2.0,
+                .end_width = 3.0,
                 .bulge = 1.0,
             },
             vertex{
                 .position = { 20.0, 60.0, },
+                .end_width = 0.5,
             },
             vertex{
                 .position = { 60.0, 60.0, },

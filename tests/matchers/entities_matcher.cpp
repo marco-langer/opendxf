@@ -60,6 +60,14 @@ testing::Matcher<odxf::vertex> is_vertex(const odxf::vertex& expected, double ma
     return testing::AllOf(
         testing::Field(
             "position", &odxf::vertex::position, is_coordinate(expected.position, max_error)),
+        testing::Field(
+            "start_width",
+            &odxf::vertex::start_width,
+            is_optional_double(expected.start_width, max_error)),
+        testing::Field(
+            "end_width",
+            &odxf::vertex::end_width,
+            is_optional_double(expected.end_width, max_error)),
         testing::Field("bulge", &odxf::vertex::bulge, expected.bulge));
 }
 
@@ -88,6 +96,10 @@ is_lw_polyline(const odxf::lw_polyline& expected, double max_error)
             &odxf::lw_polyline::elevation,
             is_optional_double(expected.elevation, max_error)),
         testing::Field("is_closed", &odxf::lw_polyline::is_closed, expected.is_closed),
+        testing::Field(
+            "constant_width",
+            &odxf::lw_polyline::constant_width,
+            is_optional_double(expected.constant_width, max_error)),
         testing::Field(
             "vertices", &odxf::lw_polyline::vertices, are_vertices(expected.vertices, max_error)),
         testing::Field(
