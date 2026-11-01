@@ -14,8 +14,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             # designated initializers in tests, examples and the library
             # leave out members without a default member initializer
             -Wno-missing-field-initializers
-            # write_coordinate() in src/io/write.cpp is unused
-            -Wno-unused-function
             -Wcast-align
             -Wcast-qual
             -Wconversion

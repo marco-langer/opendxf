@@ -43,6 +43,27 @@ void write_value(std::ofstream& stream, int group_code, T value)
     write_number(stream, value);
 }
 
+// DXF writes the y and z values of a point or vector with the group code of x plus 10 and 20.
+void write_coordinate(std::ofstream& stream, int group_code, const odxf::coordinate2d& coordinate)
+{
+    write_value(stream, group_code, coordinate.x);
+    write_value(stream, group_code + 10, coordinate.y);
+}
+
+void write_coordinate(std::ofstream& stream, int group_code, const odxf::coordinate3d& coordinate)
+{
+    write_value(stream, group_code, coordinate.x);
+    write_value(stream, group_code + 10, coordinate.y);
+    write_value(stream, group_code + 20, coordinate.z);
+}
+
+void write_vector(std::ofstream& stream, int group_code, const odxf::vector3d& vector)
+{
+    write_value(stream, group_code, vector.x);
+    write_value(stream, group_code + 10, vector.y);
+    write_value(stream, group_code + 20, vector.z);
+}
+
 void write_header(std::ofstream& stream, const odxf::header& header)
 {
     stream << "999\nopendxf";
@@ -52,61 +73,55 @@ void write_header(std::ofstream& stream, const odxf::header& header)
     for (const auto& [key, value] : header.entries) {
         stream << "\n9\n" << key;
         std::visit(
-            odxf::overload{ [&stream, &key](bool element) {
-                               write_value(stream, 290, static_cast<int>(element));
-                           },
-                            [&stream, &key](int element) {
-                                if (key == "$CECOLOR" || key == "$INTERFERECOLOR") {
-                                    stream << "\n62\n";
-                                } else if (
-                                    key == "$ENDCAPS" || key == "$JOINSTYLE" || key == "$SORTENTS"
-                                    || key == "$INDEXCTL" || key == "$HIDETEXT" || key == "$HALOGAP"
-                                    || key == "$OBSLTYPE" || key == "$INTERSECTIONDISPLAY"
-                                    || key == "$DIMASSOC" || key == "$LOFTNORMALS"
-                                    || key == "$LIGHTGLYPHDISPLAY" || key == "$TILEMODELIGHTSYNCH"
-                                    || key == "$SOLIDHIST" || key == "$SHOWHIST"
-                                    || key == "$DWFFRAME" || key == "$DGNFRAME"
-                                    || key == "$CSHADOW") {
-                                    stream << "\n280\n";
-                                } else if (key == "$CELWEIGHT") {
-                                    stream << "\n370\n";
-                                } else if (key == "$CEPSNTYPE") {
-                                    stream << "\n380\n";
-                                } else {
-                                    stream << "\n70\n";
-                                }
-                                write_number(stream, element);
-                            },
-                            [&stream, &key](double element) {
-                                write_value(stream, key == "$ANGBASE" ? 50 : 40, element);
-                            },
-                            [&stream, &key](const std::string& element) {
-                                if (key == "$DIMSTYLE") {
-                                    stream << "\n2\n";
-                                } else if (key == "$HANDSEED") {
-                                    stream << "\n5\n";
-                                } else if (
-                                    key == "$CELTYPE" || key == "$DIMLTYPE" || key == "$DIMLTEX1"
-                                    || key == "$DIMLTEX2") {
-                                    stream << "\n6\n";
-                                } else if (key == "$TEXTSTYLE" || key == "$DIMTXSTY") {
-                                    stream << "\n7\n";
-                                } else if (key == "$CLAYER") {
-                                    stream << "\n8\n";
-                                } else {
-                                    stream << "\n1\n";
-                                }
-                                stream << element;
-                            },
-                            [&stream](const odxf::coordinate2d& coord) {
-                                write_value(stream, 10, coord.x);
-                                write_value(stream, 20, coord.y);
-                            },
-                            [&stream](const odxf::coordinate3d& coord) {
-                                write_value(stream, 10, coord.x);
-                                write_value(stream, 20, coord.y);
-                                write_value(stream, 30, coord.z);
-                            } },
+            odxf::overload{
+                [&stream, &key](bool element) {
+                    write_value(stream, 290, static_cast<int>(element));
+                },
+                [&stream, &key](int element) {
+                    if (key == "$CECOLOR" || key == "$INTERFERECOLOR") {
+                        stream << "\n62\n";
+                    } else if (
+                        key == "$ENDCAPS" || key == "$JOINSTYLE" || key == "$SORTENTS"
+                        || key == "$INDEXCTL" || key == "$HIDETEXT" || key == "$HALOGAP"
+                        || key == "$OBSLTYPE" || key == "$INTERSECTIONDISPLAY" || key == "$DIMASSOC"
+                        || key == "$LOFTNORMALS" || key == "$LIGHTGLYPHDISPLAY"
+                        || key == "$TILEMODELIGHTSYNCH" || key == "$SOLIDHIST" || key == "$SHOWHIST"
+                        || key == "$DWFFRAME" || key == "$DGNFRAME" || key == "$CSHADOW") {
+                        stream << "\n280\n";
+                    } else if (key == "$CELWEIGHT") {
+                        stream << "\n370\n";
+                    } else if (key == "$CEPSNTYPE") {
+                        stream << "\n380\n";
+                    } else {
+                        stream << "\n70\n";
+                    }
+                    write_number(stream, element);
+                },
+                [&stream, &key](double element) {
+                    write_value(stream, key == "$ANGBASE" ? 50 : 40, element);
+                },
+                [&stream, &key](const std::string& element) {
+                    if (key == "$DIMSTYLE") {
+                        stream << "\n2\n";
+                    } else if (key == "$HANDSEED") {
+                        stream << "\n5\n";
+                    } else if (
+                        key == "$CELTYPE" || key == "$DIMLTYPE" || key == "$DIMLTEX1"
+                        || key == "$DIMLTEX2") {
+                        stream << "\n6\n";
+                    } else if (key == "$TEXTSTYLE" || key == "$DIMTXSTY") {
+                        stream << "\n7\n";
+                    } else if (key == "$CLAYER") {
+                        stream << "\n8\n";
+                    } else {
+                        stream << "\n1\n";
+                    }
+                    stream << element;
+                },
+                [&stream](const odxf::coordinate2d& coord) { write_coordinate(stream, 10, coord); },
+                [&stream](const odxf::coordinate3d& coord) {
+                    write_coordinate(stream, 10, coord);
+                } },
             value);
     }
 
@@ -223,13 +238,6 @@ void write_blocks(std::ofstream& stream)
     stream << "\n0\nENDSEC";
 }
 
-void write_coordinate(std::ofstream& stream, const odxf::coordinate3d& coordinate)
-{
-    write_value(stream, 10, coordinate.x);
-    write_value(stream, 20, coordinate.y);
-    write_value(stream, 30, coordinate.z);
-}
-
 void write_thickness(std::ofstream& stream, const std::optional<double>& maybe_thickness)
 {
     if (maybe_thickness) {
@@ -240,10 +248,7 @@ void write_thickness(std::ofstream& stream, const std::optional<double>& maybe_t
 void write_extrusion(std::ofstream& stream, const std::optional<odxf::vector3d>& maybe_extrusion)
 {
     if (maybe_extrusion) {
-        const odxf::vector3d& extrusion{ *maybe_extrusion };
-        write_value(stream, 210, extrusion.x);
-        write_value(stream, 220, extrusion.y);
-        write_value(stream, 230, extrusion.z);
+        write_vector(stream, 210, *maybe_extrusion);
     }
 }
 
@@ -266,9 +271,7 @@ void write_entity(std::ofstream& stream, const odxf::point& point)
     stream << "\n0\nPOINT\n100\nAcDbPoint";
     write_entity_properties(stream, point.properties);
     write_thickness(stream, point.thickness);
-    write_value(stream, 10, point.coordinate.x);
-    write_value(stream, 20, point.coordinate.y);
-    write_value(stream, 30, point.coordinate.z);
+    write_coordinate(stream, 10, point.coordinate);
     write_extrusion(stream, point.extrusion);
     if (point.x_axis_angle) {
         write_value(stream, 50, *point.x_axis_angle);
@@ -280,12 +283,8 @@ void write_entity(std::ofstream& stream, const odxf::ray& ray)
 {
     stream << "\n0\nRAY\n100\nAcDbRay";
     write_entity_properties(stream, ray.properties);
-    write_value(stream, 10, ray.start_point.x);
-    write_value(stream, 20, ray.start_point.y);
-    write_value(stream, 30, ray.start_point.z);
-    write_value(stream, 11, ray.direction.x);
-    write_value(stream, 21, ray.direction.y);
-    write_value(stream, 31, ray.direction.z);
+    write_coordinate(stream, 10, ray.start_point);
+    write_vector(stream, 11, ray.direction);
 }
 
 void write_entity(std::ofstream& stream, const odxf::line& line)
@@ -293,12 +292,8 @@ void write_entity(std::ofstream& stream, const odxf::line& line)
     stream << "\n0\nLINE\n100\nAcDbLine";
     write_entity_properties(stream, line.properties);
     write_thickness(stream, line.thickness);
-    write_value(stream, 10, line.start.x);
-    write_value(stream, 20, line.start.y);
-    write_value(stream, 30, line.start.z);
-    write_value(stream, 11, line.end.x);
-    write_value(stream, 21, line.end.y);
-    write_value(stream, 31, line.end.z);
+    write_coordinate(stream, 10, line.start);
+    write_coordinate(stream, 11, line.end);
     write_extrusion(stream, line.extrusion);
 }
 
@@ -307,9 +302,7 @@ void write_entity(std::ofstream& stream, const odxf::circle& circle)
     stream << "\n0\nCIRCLE\n100\nAcDbCircle";
     write_entity_properties(stream, circle.properties);
     write_thickness(stream, circle.thickness);
-    write_value(stream, 10, circle.center.x);
-    write_value(stream, 20, circle.center.y);
-    write_value(stream, 30, circle.center.z);
+    write_coordinate(stream, 10, circle.center);
     write_value(stream, 40, circle.radius);
     write_extrusion(stream, circle.extrusion);
 }
@@ -319,9 +312,7 @@ void write_entity(std::ofstream& stream, const odxf::arc& arc)
     stream << "\n0\nARC\n100\nAcDbCircle";
     write_entity_properties(stream, arc.properties);
     write_thickness(stream, arc.thickness);
-    write_value(stream, 10, arc.center.x);
-    write_value(stream, 20, arc.center.y);
-    write_value(stream, 30, arc.center.z);
+    write_coordinate(stream, 10, arc.center);
     write_value(stream, 40, arc.radius);
     stream << "\n100\nAcDbArc";
     write_value(stream, 50, arc.start_angle);
@@ -333,12 +324,8 @@ void write_entity(std::ofstream& stream, const odxf::ellipse& ellipse)
 {
     stream << "\n0\nELLIPSE\n100\nAcDbEllipse";
     write_entity_properties(stream, ellipse.properties);
-    write_value(stream, 10, ellipse.center.x);
-    write_value(stream, 20, ellipse.center.y);
-    write_value(stream, 30, ellipse.center.z);
-    write_value(stream, 11, ellipse.major_axis.x);
-    write_value(stream, 21, ellipse.major_axis.y);
-    write_value(stream, 31, ellipse.major_axis.z);
+    write_coordinate(stream, 10, ellipse.center);
+    write_vector(stream, 11, ellipse.major_axis);
     write_value(stream, 40, ellipse.axis_ratio);
     write_value(stream, 41, ellipse.start_parameter);
     write_value(stream, 42, ellipse.end_parameter);
@@ -357,8 +344,7 @@ void write_entity(std::ofstream& stream, const odxf::lw_polyline& lw_polyline)
     write_thickness(stream, lw_polyline.thickness);
 
     for (const odxf::vertex& vertex : lw_polyline.vertices) {
-        write_value(stream, 10, vertex.position.x);
-        write_value(stream, 20, vertex.position.y);
+        write_coordinate(stream, 10, vertex.position);
         if (vertex.bulge.has_value()) {
             write_value(stream, 42, *vertex.bulge);
         }
