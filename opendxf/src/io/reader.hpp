@@ -106,7 +106,7 @@ private:
 
     struct group
     {
-        int code;
+        int code{ 0 };
         std::string value;
     };
 
