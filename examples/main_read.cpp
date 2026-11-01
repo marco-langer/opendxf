@@ -9,6 +9,8 @@
 #include <print>
 #include <string>
 
+namespace {
+
 struct document_stats final
 {
     int layers{ 0 };
@@ -84,6 +86,8 @@ private:
 
     document_stats m_doc_stats;
 };
+
+}   // namespace
 
 int main(int argc, char** argv)
 {

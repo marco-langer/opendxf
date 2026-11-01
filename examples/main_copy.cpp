@@ -10,6 +10,8 @@
 #include <string>
 #include <utility>
 
+namespace {
+
 // Copies a file entity by entity and keeps only the entities on one layer. Header and tables are
 // kept as they are. No more than one entity is held in memory.
 class layer_filter final : public odxf::read_stream_base
@@ -97,6 +99,8 @@ void print_error(const std::string& context, const odxf::error& error)
         std::println("{}: {}", context, error.what);
     }
 }
+
+}   // namespace
 
 int main(int argc, char** argv)
 {
