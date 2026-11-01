@@ -96,7 +96,7 @@ struct ellipse final
     entity_properties properties;
 
     coordinate3d center;
-    coordinate3d end_point_major;
+    vector3d major_axis;
     double axis_ratio{ 1.0 };
     double start_parameter{ 0.0 };
     double end_parameter{ 2 * std::numbers::pi };
