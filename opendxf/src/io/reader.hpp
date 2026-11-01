@@ -104,15 +104,15 @@ private:
 
     bool is_eof() const;
 
-    struct data
+    struct group
     {
-        int group_code;
+        int code{ 0 };
         std::string value;
     };
 
     read_stream_base& m_stream;
     std::ifstream m_file_stream;
-    data m_data;
+    group m_group;
     int m_current_line{ 0 };
     std::optional<error> m_error;
     std::vector<std::string> m_layer_names;
