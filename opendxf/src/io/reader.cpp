@@ -762,6 +762,11 @@ std::expected<void, error> reader::read_entities()
             if (!maybe_result) {
                 return maybe_result;
             }
+        } else if (is_ray()) {
+            std::expected<void, error> maybe_result{ read_ray() };
+            if (!maybe_result) {
+                return maybe_result;
+            }
         } else {
             read_next();
         }
@@ -987,6 +992,22 @@ std::expected<void, error> reader::read_point()
         .transform([this](const odxf::point& point) { m_stream.point(point); });
 }
 
+std::expected<void, error> reader::read_ray()
+{
+    return read_entity<ray>([this](odxf::ray& ray) -> bool {
+               switch (m_data.group_code) {
+               case 10: return parse_into(ray.start_point.x);
+               case 20: return parse_into(ray.start_point.y);
+               case 30: return parse_into(ray.start_point.z);
+               case 11: return parse_into(ray.direction.x);
+               case 21: return parse_into(ray.direction.y);
+               case 31: return parse_into(ray.direction.z);
+               default: return read_entity_property(ray.properties);
+               }
+           })
+        .transform([this](const odxf::ray& ray) { m_stream.ray(ray); });
+}
+
 bool reader::read_next()
 {
     // Group code 999 is a comment, possibly several in a row. Comments are skipped.
@@ -1087,6 +1108,8 @@ bool reader::is_lw_polyline() const
 }
 
 bool reader::is_point() const { return m_data.group_code == 0 && m_data.value == "POINT"; }
+
+bool reader::is_ray() const { return m_data.group_code == 0 && m_data.value == "RAY"; }
 
 bool reader::is_eof() const { return m_data.group_code == 0 && m_data.value == "EOF"; }
 
