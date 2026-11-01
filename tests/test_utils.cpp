@@ -253,5 +253,23 @@ odxf::document create_example_document()
         .direction = vector3d{ 0.6, 0.0, 0.8 },
     });
 
+    entities.push_back(ellipse{
+        .properties = {
+            .layer = layer_name_test,
+            .color = 1,
+            .true_color = 0xC0C0C0,
+            .lineweight = 50,
+            .line_type = "DOT_DASH",
+            .line_type_scale = 0.75,
+            .transparency = transparency{ .alpha = 0x99 },
+        },
+        .center = coordinate3d{ 2.0, 3.0, 1.0 },
+        .major_axis = vector3d{ 4.0, 0.0, 0.0 },
+        .axis_ratio = 0.5,
+        .start_parameter = 0.5,
+        .end_parameter = 3.0,
+        .extrusion = vector3d{ 0.0, 0.0, -1.0 },
+    });
+
     return expected_document;
 }

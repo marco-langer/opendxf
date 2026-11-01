@@ -180,7 +180,11 @@ testing::Matcher<const odxf::ellipse&> is_ellipse(const odxf::ellipse& expected,
         testing::Field(
             "end_parameter",
             &odxf::ellipse::end_parameter,
-            testing::DoubleNear(expected.end_parameter, max_error)));
+            testing::DoubleNear(expected.end_parameter, max_error)),
+        testing::Field(
+            "extrusion",
+            &odxf::ellipse::extrusion,
+            is_optional_vector(expected.extrusion, max_error)));
 }
 
 testing::Matcher<const odxf::point&> is_point(const odxf::point& expected, double max_error)

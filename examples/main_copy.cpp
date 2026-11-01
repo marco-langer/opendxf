@@ -44,6 +44,7 @@ private:
 
     void arc(const odxf::arc& arc) override { copy(arc); }
     void circle(const odxf::circle& circle) override { copy(circle); }
+    void ellipse(const odxf::ellipse& ellipse) override { copy(ellipse); }
     void line(const odxf::line& line) override { copy(line); }
     void lw_polyline(const odxf::lw_polyline& lw_polyline) override { copy(lw_polyline); }
     void point(const odxf::point& point) override { copy(point); }

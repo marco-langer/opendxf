@@ -25,6 +25,7 @@ private:
 
     void arc(const odxf::arc& arc) override { m_document.entities.push_back(arc); }
     void circle(const odxf::circle& circle) override { m_document.entities.push_back(circle); }
+    void ellipse(const odxf::ellipse& ellipse) override { m_document.entities.push_back(ellipse); }
     void line(const odxf::line& line) override { m_document.entities.push_back(line); }
     void lw_polyline(const odxf::lw_polyline& lw_polyline) override
     {

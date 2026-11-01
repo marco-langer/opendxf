@@ -20,6 +20,8 @@ void read_stream_base::arc(const odxf::arc& /* arc */) {}
 
 void read_stream_base::circle(const odxf::circle& /* circle */) {}
 
+void read_stream_base::ellipse(const odxf::ellipse& /* ellipse */) {}
+
 void read_stream_base::line(const odxf::line& /* line */) {}
 
 void read_stream_base::lw_polyline(const odxf::lw_polyline& /* lw_polyline */) {}
