@@ -183,7 +183,7 @@ void write_layer(std::ofstream& stream, const odxf::layer& layer)
     write_value(stream, 70, std::to_underlying(layer.flags));
     write_value(stream, 62, layer.color);
     write_true_color(stream, layer.true_color);
-    stream << "\n6\n" << layer.line_type;
+    stream << "\n6\n" << layer.line_type_name;
     write_value(stream, 370, layer.lineweight);
     // xdata comes last in a record
     if (layer.transparency) {
@@ -254,8 +254,8 @@ void write_extrusion(std::ofstream& stream, const std::optional<odxf::vector3d>&
 
 void write_entity_properties(std::ofstream& stream, const odxf::entity_properties& properties)
 {
-    stream << "\n8\n" << properties.layer;
-    stream << "\n6\n" << properties.line_type;
+    stream << "\n8\n" << properties.layer_name;
+    stream << "\n6\n" << properties.line_type_name;
     write_value(stream, 62, properties.color);
     write_value(stream, 370, properties.lineweight);
     write_value(stream, 48, properties.line_type_scale);

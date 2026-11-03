@@ -30,5 +30,5 @@ Common properties of entities are in an `entity_properties` struct that each ent
 ## Consequences
 
 - Code shared by all entities has to be written once explicitly, e.g. `read_entity_property` and `read_entity` in the reader. Without that, it is duplicated per entity type.
-- Common properties are accessed through the member, e.g. `line.properties.layer`. The member also lets an entity including its common properties be built in one designated initializer, which C++23 doesn't allow for base classes. C++29 adds this for base classes (P2287); the member stays because the `entity` variant needs no common base.
+- Common properties are accessed through the member, e.g. `line.properties.layer_name`. The member also lets an entity including its common properties be built in one designated initializer, which C++23 doesn't allow for base classes. C++29 adds this for base classes (P2287); the member stays because the `entity` variant needs no common base.
 - Adding an entity type touches the model, the reader, the writer, `read_stream_base`, the test matchers and the test data.
