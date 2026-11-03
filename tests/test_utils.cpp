@@ -8,12 +8,12 @@
 #include "opendxf/header.hpp"
 #include "opendxf/layer.hpp"
 
-odxf::document create_example_document()
+odxf::drawing create_example_drawing()
 {
     using namespace odxf;
 
-    document expected_document;
-    auto& header_entries{ expected_document.header.entries };
+    drawing expected_drawing;
+    auto& header_entries{ expected_drawing.header.entries };
     header_entries.try_emplace("$TEXTSIZE", 2.5);
     header_entries.try_emplace("$LTSCALE", 2.0);
     header_entries.try_emplace("$REGENMODE", 1);
@@ -66,7 +66,7 @@ odxf::document create_example_document()
     const std::string layer_name_lw_polylines{ "LW Polylines" };
     const std::string layer_name_true_color{ "True Color" };
 
-    odxf::line_types& line_types{ expected_document.tables.line_types };
+    odxf::line_types& line_types{ expected_drawing.tables.line_types };
     line_types.push_back(
         line_type{
             .name = "CONTINUOUS",
@@ -100,7 +100,7 @@ odxf::document create_example_document()
                           { .length = -0.25 } },
         });
 
-    odxf::layers& layers{ expected_document.tables.layers };
+    odxf::layers& layers{ expected_drawing.tables.layers };
     // layer_name_test has no group code 370 and keeps the default lineweight
     layers.emplace_back(layer{ .name = layer_name_test }).flags = layer::flag::frozen;
     layers.push_back(
@@ -115,7 +115,7 @@ odxf::document create_example_document()
     layers[1].transparency = transparency{ .alpha = 0x4C };
     layers[2].transparency = transparency{ .alpha = 0xFF };
 
-    odxf::entities& entities{ expected_document.entities };
+    odxf::entities& entities{ expected_drawing.entities };
 
     // no group codes 62, 370, 6, 48 and 440, keeps the defaults
     entities.push_back(
@@ -277,5 +277,5 @@ odxf::document create_example_document()
         .extrusion = vector3d{ 0.0, 0.0, -1.0 },
     });
 
-    return expected_document;
+    return expected_drawing;
 }

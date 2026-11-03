@@ -11,7 +11,7 @@
 
 namespace {
 
-struct document_stats final
+struct drawing_stats final
 {
     int layers{ 0 };
 
@@ -24,7 +24,7 @@ struct document_stats final
     int rays{ 0 };
 };
 
-void print_document_stats(const document_stats& stats)
+void print_drawing_stats(const drawing_stats& stats)
 {
     std::println(
         "layers: {}\narcs: {}\ncircles: {}\nellipses: {}\nlines: {}\nlw polylines: {}\npoints: "
@@ -62,29 +62,29 @@ void print_usage(const std::string& error) { std::println("error: {}", error); }
 class reader final : public odxf::read_stream_base
 {
 public:
-    const document_stats& stats() const& { return m_doc_stats; }
+    const drawing_stats& stats() const& { return m_drawing_stats; }
 
 private:
-    void layer(const odxf::layer& /* layer */) override { m_doc_stats.layers += 1; }
+    void layer(const odxf::layer& /* layer */) override { m_drawing_stats.layers += 1; }
 
-    void arc(const odxf::arc& /* arc */) override { m_doc_stats.arcs += 1; }
+    void arc(const odxf::arc& /* arc */) override { m_drawing_stats.arcs += 1; }
 
-    void circle(const odxf::circle& /* circle */) override { m_doc_stats.circles += 1; }
+    void circle(const odxf::circle& /* circle */) override { m_drawing_stats.circles += 1; }
 
-    void ellipse(const odxf::ellipse& /* ellipse */) override { m_doc_stats.ellipses += 1; }
+    void ellipse(const odxf::ellipse& /* ellipse */) override { m_drawing_stats.ellipses += 1; }
 
-    void line(const odxf::line& /* line */) override { m_doc_stats.lines += 1; }
+    void line(const odxf::line& /* line */) override { m_drawing_stats.lines += 1; }
 
     void lw_polyline(const odxf::lw_polyline& /* lw_polyline */) override
     {
-        m_doc_stats.lw_polylines += 1;
+        m_drawing_stats.lw_polylines += 1;
     }
 
-    void point(const odxf::point& /* point */) override { m_doc_stats.points += 1; }
+    void point(const odxf::point& /* point */) override { m_drawing_stats.points += 1; }
 
-    void ray(const odxf::ray& /* ray */) override { m_doc_stats.rays += 1; }
+    void ray(const odxf::ray& /* ray */) override { m_drawing_stats.rays += 1; }
 
-    document_stats m_doc_stats;
+    drawing_stats m_drawing_stats;
 };
 
 }   // namespace
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    print_document_stats(reader.stats());
+    print_drawing_stats(reader.stats());
 
     return EXIT_SUCCESS;
 }

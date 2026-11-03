@@ -1,10 +1,10 @@
-# 3. Streaming read and write, with documents built on the streams
+# 3. Streaming read and write, with drawings built on the streams
 
 Status: accepted
 
 ## Context
 
-CAD files can be huge. A library that always holds the whole document in memory makes users pay for that even if they only need part of a file, e.g. the layers or a single entity type, or generate entities faster than they want to keep them.
+CAD files can be huge. A library that always holds the whole drawing in memory makes users pay for that even if they only need part of a file, e.g. the layers or a single entity type, or generate entities faster than they want to keep them.
 
 DXF constrains what a writer can stream: the sections have a fixed order (HEADER, TABLES, BLOCKS, ENTITIES), each table is written as one block, and the writer derives the APPID table from all layers.
 
@@ -14,21 +14,21 @@ Reading passes everything it reads, in file order, to a `read_stream_base` imple
 
 Writing opens a `write_stream` with the header and tables up front. `write_stream::entity()` appends one entity, `write_stream::close()` ends and closes the file. Only entities are streamed.
 
-Reading and writing a whole `document` are built on the streams:
+Reading and writing a whole `drawing` are built on the streams:
 
-| Document                        | Stream                                                      |
+| Drawing                         | Stream                                                      |
 |---------------------------------|-------------------------------------------------------------|
-| `read(path)` returns a document | `read(path, stream)` calls a `read_stream_base`             |
-| `write(path, document)`         | `write_stream::open(path, header, tables)` returns a stream |
+| `read(path)` returns a drawing  | `read(path, stream)` calls a `read_stream_base`             |
+| `write(path, drawing)`          | `write_stream::open(path, header, tables)` returns a stream |
 
 The path comes first in all of them. All of them return `std::expected` ([ADR 5](0005-errors-as-expected.md)).
 
 ## Rationale
 
 - Memory use depends on what the user keeps, not on the size of the file.
-- Users can filter or process entities while reading, without a second pass over a document, and copy a file entity by entity.
+- Users can filter or process entities while reading, without a second pass over a drawing, and copy a file entity by entity.
 - Entities are the part of a file that grows. Header and tables are small and must be complete before the first entity anyway, so streaming them would only add a state machine with "table after entity" errors. Passing them to `write_stream::open()` makes the section order a property of the API instead of a runtime check.
-- `read` is overloaded, because the arguments already say whether a whole document or a stream is meant. The write stream is opened by `write_stream::open()` instead of a second `write()` overload, because a `write()` that returns an open stream reads as if it wrote the whole file. `open()` pairs with `close()`, like `std::ofstream`.
+- `read` is overloaded, because the arguments already say whether a whole drawing or a stream is meant. The write stream is opened by `write_stream::open()` instead of a second `write()` overload, because a `write()` that returns an open stream reads as if it wrote the whole file. `open()` pairs with `close()`, like `std::ofstream`.
 
 ## Consequences
 

@@ -34,18 +34,18 @@ Tests and examples are only built when opendxf is the top-level project. Use `OP
 
 opendxf has two APIs:
 
-- The document API reads a whole file into an `odxf::document` and writes one, similar to a DOM.
+- The drawing API reads a whole file into an `odxf::drawing` and writes one, similar to a DOM.
 - The stream API reads and writes one entity at a time, so the memory use doesn't grow with the number of entities. Reading calls a callback for each entity, similar to SAX.
 
-### Documents
+### Drawings
 
-Read a whole file into an `odxf::document`:
+Read a whole file into an `odxf::drawing`:
 
 ```cpp
-const std::expected<odxf::document, odxf::error> document{ odxf::read("drawing.dxf") };
+const std::expected<odxf::drawing, odxf::error> drawing{ odxf::read("drawing.dxf") };
 ```
 
-Fill an `odxf::document` and write it:
+Fill an `odxf::drawing` and write it:
 
 ```cpp
 #include <opendxf/opendxf.hpp>
@@ -54,7 +54,7 @@ Fill an `odxf::document` and write it:
 
 int main()
 {
-    const odxf::document document{
+    const odxf::drawing drawing{
         .header{ .entries{ { "$ACADVER", "AC1032" } } },
         .tables{
             .line_types{ { .name{ "CONTINUOUS" }, .display_name{ "Solid Line" } } },
@@ -66,7 +66,7 @@ int main()
         },
     };
 
-    const std::expected<void, odxf::error> result{ odxf::write("drawing.dxf", document) };
+    const std::expected<void, odxf::error> result{ odxf::write("drawing.dxf", drawing) };
     if (!result) {
         std::println("error: {}", result.error().what);
         return EXIT_FAILURE;

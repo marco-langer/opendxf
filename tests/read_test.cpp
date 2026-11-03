@@ -3,7 +3,7 @@
 
 #include "opendxf/opendxf.hpp"
 
-#include "matchers/document_matcher.hpp"
+#include "matchers/drawing_matcher.hpp"
 #include "test_utils.hpp"
 
 #include <gmock/gmock.h>
@@ -19,7 +19,7 @@ TEST(Read, Example)
     ASSERT_TRUE(std::filesystem::is_regular_file(file_path));
 
     // Act
-    const std::expected<odxf::document, odxf::error> result{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> result{ odxf::read(file_path) };
 
     // Assert
     if (!result) {
@@ -27,9 +27,9 @@ TEST(Read, Example)
         FAIL() << std::format("Line ({}): {}", error.line_number.value_or(-1), error.what);
     }
 
-    const odxf::document expected_document{ create_example_document() };
+    const odxf::drawing expected_drawing{ create_example_drawing() };
 
-    EXPECT_THAT(*result, is_document(expected_document));
+    EXPECT_THAT(*result, is_drawing(expected_drawing));
 }
 
 TEST(Read, CrlfLineEndings)
@@ -42,8 +42,8 @@ TEST(Read, CrlfLineEndings)
     ASSERT_TRUE(std::filesystem::is_regular_file(crlf_path));
 
     // Act
-    const std::expected<odxf::document, odxf::error> lf_result{ odxf::read(lf_path) };
-    const std::expected<odxf::document, odxf::error> crlf_result{ odxf::read(crlf_path) };
+    const std::expected<odxf::drawing, odxf::error> lf_result{ odxf::read(lf_path) };
+    const std::expected<odxf::drawing, odxf::error> crlf_result{ odxf::read(crlf_path) };
 
     // Assert
     for (const auto* result : { &lf_result, &crlf_result }) {
@@ -53,7 +53,7 @@ TEST(Read, CrlfLineEndings)
         }
     }
 
-    EXPECT_THAT(*crlf_result, is_document(*lf_result));
+    EXPECT_THAT(*crlf_result, is_drawing(*lf_result));
 }
 
 TEST(Read, Padded)
@@ -63,7 +63,7 @@ TEST(Read, Padded)
     ASSERT_TRUE(std::filesystem::is_regular_file(file_path));
 
     // Act
-    const std::expected<odxf::document, odxf::error> result{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> result{ odxf::read(file_path) };
 
     // Assert
     EXPECT_TRUE(result.has_value());
@@ -83,7 +83,7 @@ TEST(Read, MinimalExample)
     ASSERT_TRUE(std::filesystem::is_regular_file(file_path));
 
     // Act
-    const std::expected<odxf::document, odxf::error> result{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> result{ odxf::read(file_path) };
 
     // Assert
     if (!result) {
@@ -110,7 +110,7 @@ TEST_P(ParseErrorFixture, ParseError)
     ASSERT_TRUE(std::filesystem::is_regular_file(file_path));
 
     // Act
-    const std::expected<odxf::document, odxf::error> result{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> result{ odxf::read(file_path) };
 
     // Assert
     ASSERT_FALSE(result.has_value());

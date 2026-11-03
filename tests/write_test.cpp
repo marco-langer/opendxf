@@ -5,7 +5,7 @@
 #include "opendxf/io/read.hpp"
 #include "opendxf/io/write.hpp"
 
-#include "matchers/document_matcher.hpp"
+#include "matchers/drawing_matcher.hpp"
 #include "test_utils.hpp"
 
 #include <gmock/gmock.h>
@@ -44,30 +44,30 @@ std::vector<std::string> read_file(const std::filesystem::path& file_path)
 TEST(Write, Example)
 {
     // Arrange
-    const odxf::document document{ create_example_document() };
+    const odxf::drawing drawing{ create_example_drawing() };
 
     const std::filesystem::path file_path{ "test.dxf" };
     std::filesystem::remove(file_path);
     ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, drawing) };
 
     // Assert
     ASSERT_TRUE(write_result.has_value());
     ASSERT_TRUE(std::filesystem::is_regular_file(file_path));
 
-    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> read_drawing{ odxf::read(file_path) };
 
-    ASSERT_TRUE(read_document.has_value());
-    EXPECT_THAT(*read_document, is_document(document));
+    ASSERT_TRUE(read_drawing.has_value());
+    EXPECT_THAT(*read_drawing, is_drawing(drawing));
 }
 
 TEST(Write, KeepsEntityOrder)
 {
     // Arrange
-    odxf::document document;
-    document.entities = {
+    odxf::drawing drawing;
+    drawing.entities = {
         odxf::circle{ .properties = {}, .center = {}, .radius = 1.0 },
         odxf::line{ .properties = {}, .start = {}, .end = { 1.0, 0.0, 0.0 } },
         odxf::circle{ .properties = {}, .center = {}, .radius = 2.0 },
@@ -80,14 +80,14 @@ TEST(Write, KeepsEntityOrder)
     ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, drawing) };
 
     // Assert
     ASSERT_TRUE(write_result.has_value());
-    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> read_drawing{ odxf::read(file_path) };
 
-    ASSERT_TRUE(read_document.has_value());
-    EXPECT_THAT(*read_document, is_document(document));
+    ASSERT_TRUE(read_drawing.has_value());
+    EXPECT_THAT(*read_drawing, is_drawing(drawing));
 }
 
 TEST(Write, DoublesRoundTrip)
@@ -97,9 +97,9 @@ TEST(Write, DoublesRoundTrip)
     const double scale{ 0.1 + 0.2 };
     const odxf::coordinate3d start{ 212.5115730819539, 1e-7, 0.0 };
 
-    odxf::document document;
-    odxf::set_line_type_scale(document.header, scale);
-    document.entities = {
+    odxf::drawing drawing;
+    odxf::set_line_type_scale(drawing.header, scale);
+    drawing.entities = {
         odxf::line{ .properties = {}, .start = start, .end = {} },
         odxf::circle{ .properties = {}, .center = {}, .radius = scale },
     };
@@ -109,24 +109,24 @@ TEST(Write, DoublesRoundTrip)
     ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, drawing) };
 
     // Assert
     ASSERT_TRUE(write_result.has_value());
-    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> read_drawing{ odxf::read(file_path) };
 
-    ASSERT_TRUE(read_document.has_value());
+    ASSERT_TRUE(read_drawing.has_value());
     const std::expected<std::optional<double>, odxf::header_error> maybe_scale{
-        odxf::line_type_scale(read_document->header)
+        odxf::line_type_scale(read_drawing->header)
     };
     ASSERT_TRUE(maybe_scale.has_value());
     EXPECT_EQ(*maybe_scale, scale);
-    ASSERT_EQ(read_document->entities.size(), 2);
+    ASSERT_EQ(read_drawing->entities.size(), 2);
 
-    const auto& line{ std::get<odxf::line>(read_document->entities[0]) };
+    const auto& line{ std::get<odxf::line>(read_drawing->entities[0]) };
     EXPECT_EQ(line.start.x, start.x);
     EXPECT_EQ(line.start.y, start.y);
-    EXPECT_EQ(std::get<odxf::circle>(read_document->entities[1]).radius, scale);
+    EXPECT_EQ(std::get<odxf::circle>(read_drawing->entities[1]).radius, scale);
 }
 
 // groups digits and uses a decimal comma, like de_DE, without needing that locale installed
@@ -140,10 +140,10 @@ struct german_numpunct final : std::numpunct<char>
 TEST(Write, IgnoresGlobalLocale)
 {
     // Arrange
-    odxf::document document;
-    document.tables.layers.push_back(
+    odxf::drawing drawing;
+    drawing.tables.layers.push_back(
         odxf::layer{ .name = "0", .transparency = odxf::transparency{ .alpha = 0x4C } });
-    document.entities = {
+    drawing.entities = {
         odxf::line{
             .properties = { .layer = {}, .true_color = 1234567 },
             .start = { 1234.5, 0.25, 0.0 },
@@ -159,22 +159,22 @@ TEST(Write, IgnoresGlobalLocale)
         std::locale{ std::locale::classic(), new german_numpunct }) };
 
     // Act
-    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, drawing) };
     std::locale::global(previous_locale);
 
     // Assert
     ASSERT_TRUE(write_result.has_value());
-    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> read_drawing{ odxf::read(file_path) };
 
-    ASSERT_TRUE(read_document.has_value());
-    EXPECT_THAT(*read_document, is_document(document));
+    ASSERT_TRUE(read_drawing.has_value());
+    EXPECT_THAT(*read_drawing, is_drawing(drawing));
 }
 
 TEST(Write, LayerTransparencyRegistersApp)
 {
     // Arrange
-    odxf::document document;
-    document.tables.layers.push_back(
+    odxf::drawing drawing;
+    drawing.tables.layers.push_back(
         odxf::layer{ .name = "0", .transparency = odxf::transparency{ .alpha = 0x4C } });
 
     const std::filesystem::path file_path{ "test_appid.dxf" };
@@ -182,7 +182,7 @@ TEST(Write, LayerTransparencyRegistersApp)
     ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, drawing) };
 
     // Assert
     ASSERT_TRUE(write_result.has_value());
@@ -195,15 +195,15 @@ TEST(Write, LayerTransparencyRegistersApp)
 TEST(Write, NoAppIdsWithoutLayerTransparency)
 {
     // Arrange
-    odxf::document document;
-    document.tables.layers.push_back(odxf::layer{ .name = "0" });
+    odxf::drawing drawing;
+    drawing.tables.layers.push_back(odxf::layer{ .name = "0" });
 
     const std::filesystem::path file_path{ "test_no_appid.dxf" };
     std::filesystem::remove(file_path);
     ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, drawing) };
 
     // Assert
     ASSERT_TRUE(write_result.has_value());
@@ -227,15 +227,15 @@ TEST_P(EntityTypeFixture, EntityType)
     // Arrange
     const auto& [entity, type, subclass]{ GetParam() };
 
-    odxf::document document;
-    document.entities = { entity };
+    odxf::drawing drawing;
+    drawing.entities = { entity };
 
     const std::filesystem::path file_path{ std::format("test_entity_type_{}.dxf", type) };
     std::filesystem::remove(file_path);
     ASSERT_FALSE(std::filesystem::exists(file_path));
 
     // Act
-    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, drawing) };
 
     // Assert
     ASSERT_TRUE(write_result.has_value());
@@ -269,7 +269,7 @@ TEST(Write, FileOpenError)
     ASSERT_FALSE(std::filesystem::exists(file_path.parent_path()));
 
     // Act
-    const std::expected<void, odxf::error> result{ odxf::write(file_path, odxf::document{}) };
+    const std::expected<void, odxf::error> result{ odxf::write(file_path, odxf::drawing{}) };
 
     // Assert
     ASSERT_FALSE(result.has_value());
@@ -315,22 +315,22 @@ TEST(WriteStream, DestructorCloses)
     std::filesystem::remove(file_path);
     ASSERT_FALSE(std::filesystem::exists(file_path));
 
-    odxf::document document;
-    document.entities = {
+    odxf::drawing drawing;
+    drawing.entities = {
         odxf::line{ .properties = {}, .start = {}, .end = { 1.0, 0.0, 0.0 } },
     };
 
     // Act
     {
         std::expected<odxf::write_stream, odxf::error> stream{ odxf::write_stream::open(
-            file_path, document.header, document.tables) };
+            file_path, drawing.header, drawing.tables) };
         ASSERT_TRUE(stream.has_value());
-        ASSERT_TRUE(stream->entity(document.entities.front()).has_value());
+        ASSERT_TRUE(stream->entity(drawing.entities.front()).has_value());
     }
 
     // Assert
-    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> read_drawing{ odxf::read(file_path) };
 
-    ASSERT_TRUE(read_document.has_value());
-    EXPECT_THAT(*read_document, is_document(document));
+    ASSERT_TRUE(read_drawing.has_value());
+    EXPECT_THAT(*read_drawing, is_drawing(drawing));
 }
