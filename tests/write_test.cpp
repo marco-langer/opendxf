@@ -145,7 +145,7 @@ TEST(Write, IgnoresGlobalLocale)
         odxf::layer{ .name = "0", .transparency = odxf::transparency{ .alpha = 0x4C } });
     document.entities = {
         odxf::line{
-            .properties = { .layer = {}, .true_color = 1234567 },
+            .properties = { .layer_name = {}, .true_color = 1234567 },
             .start = { 1234.5, 0.25, 0.0 },
             .end = {},
         },

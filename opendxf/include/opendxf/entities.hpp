@@ -24,13 +24,13 @@ struct vector3d final
 // The properties all entities share.
 struct entity_properties final
 {
-    std::string layer;
+    std::string layer_name;
     int color{ 256 };                  // BYLAYER
     std::optional<int> true_color{};   // 0x00RRGGBB, takes precedence over color
     // hundredths of a millimeter, or -1 BYLAYER, -2 BYBLOCK, -3 DEFAULT
     int lineweight{ -1 };
     // The name of an entry in the LTYPE table, or BYLAYER or BYBLOCK.
-    std::string line_type{ "BYLAYER" };
+    std::string line_type_name{ "BYLAYER" };
     double line_type_scale{ 1.0 };
     entity_transparency transparency{ by_layer{} };
     bool is_visible{ true };
