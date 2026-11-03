@@ -379,15 +379,15 @@ std::expected<void, odxf::error> check_stream(const std::ofstream& stream)
 namespace odxf {
 
 std::expected<void, error>
-write(const std::filesystem::path& file_path, const odxf::document& document)
+write(const std::filesystem::path& file_path, const odxf::drawing& drawing)
 {
     std::expected<write_stream, error> maybe_stream{ write_stream::open(
-        file_path, document.header, document.tables) };
+        file_path, drawing.header, drawing.tables) };
     if (!maybe_stream) {
         return std::unexpected(maybe_stream.error());
     }
 
-    for (const odxf::entity& entity : document.entities) {
+    for (const odxf::entity& entity : drawing.entities) {
         if (std::expected<void, error> maybe_error = maybe_stream->entity(entity); !maybe_error) {
             return maybe_error;
         }

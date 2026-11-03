@@ -21,8 +21,8 @@ endif()
 add_executable(opendxf-tests
     matchers/coordinate_matcher.cpp
     matchers/coordinate_matcher.hpp
-    matchers/document_matcher.cpp
-    matchers/document_matcher.hpp
+    matchers/drawing_matcher.cpp
+    matchers/drawing_matcher.hpp
     matchers/entities_matcher.cpp
     matchers/entities_matcher.hpp
     matchers/header_matcher.cpp
