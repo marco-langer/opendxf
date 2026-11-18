@@ -4,7 +4,7 @@ Status: accepted
 
 ## Context
 
-opendxf depends only on the standard library ([ADR 4](0004-standard-library-only.md)), so user code that calls opendxf mostly calls the standard library around it. Mixed naming styles in one expression, like `document.tables.lineTypes.push_back(...)`, make it harder to read.
+opendxf depends only on the standard library ([ADR 4](0004-standard-library-only.md)), so user code that calls opendxf mostly calls the standard library around it. Mixed naming styles in one expression, like `drawing.tables.lineTypes.push_back(...)`, make it harder to read.
 
 ## Decision
 

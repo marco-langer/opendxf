@@ -9,7 +9,7 @@
 
 namespace odxf {
 
-struct document final
+struct drawing final
 {
     odxf::header header;
     odxf::tables tables;

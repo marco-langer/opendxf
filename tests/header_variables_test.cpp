@@ -93,21 +93,21 @@ TEST(SetInsertionUnits, OverwritesExistingValue)
 TEST(InsertionUnits, RoundTrip)
 {
     // Arrange
-    odxf::document document{ create_example_document() };
-    odxf::set_insertion_units(document.header, odxf::length_unit::us_survey_feet);
+    odxf::drawing drawing{ create_example_drawing() };
+    odxf::set_insertion_units(drawing.header, odxf::length_unit::us_survey_feet);
 
     const std::filesystem::path file_path{ "insunits.dxf" };
     std::filesystem::remove(file_path);
 
     // Act
-    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, document) };
+    const std::expected<void, odxf::error> write_result{ odxf::write(file_path, drawing) };
 
-    const std::expected<odxf::document, odxf::error> read_document{ odxf::read(file_path) };
+    const std::expected<odxf::drawing, odxf::error> read_drawing{ odxf::read(file_path) };
 
     // Assert
     ASSERT_TRUE(write_result.has_value());
-    ASSERT_TRUE(read_document.has_value());
-    EXPECT_EQ(odxf::insertion_units(read_document->header), odxf::length_unit::us_survey_feet);
+    ASSERT_TRUE(read_drawing.has_value());
+    EXPECT_EQ(odxf::insertion_units(read_drawing->header), odxf::length_unit::us_survey_feet);
 }
 
 TEST(LineTypeScale, Valid)

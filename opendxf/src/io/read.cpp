@@ -10,42 +10,42 @@
 
 namespace {
 
-class document_stream final : public odxf::read_stream_base
+class drawing_stream final : public odxf::read_stream_base
 {
 public:
-    odxf::document document() && { return std::move(m_document); }
+    odxf::drawing drawing() && { return std::move(m_drawing); }
 
 private:
-    void header(const odxf::header& header) override { m_document.header = header; }
+    void header(const odxf::header& header) override { m_drawing.header = header; }
     void line_type(const odxf::line_type& line_type) override
     {
-        m_document.tables.line_types.push_back(line_type);
+        m_drawing.tables.line_types.push_back(line_type);
     }
-    void layer(const odxf::layer& layer) override { m_document.tables.layers.push_back(layer); }
+    void layer(const odxf::layer& layer) override { m_drawing.tables.layers.push_back(layer); }
 
-    void arc(const odxf::arc& arc) override { m_document.entities.push_back(arc); }
-    void circle(const odxf::circle& circle) override { m_document.entities.push_back(circle); }
-    void ellipse(const odxf::ellipse& ellipse) override { m_document.entities.push_back(ellipse); }
-    void line(const odxf::line& line) override { m_document.entities.push_back(line); }
+    void arc(const odxf::arc& arc) override { m_drawing.entities.push_back(arc); }
+    void circle(const odxf::circle& circle) override { m_drawing.entities.push_back(circle); }
+    void ellipse(const odxf::ellipse& ellipse) override { m_drawing.entities.push_back(ellipse); }
+    void line(const odxf::line& line) override { m_drawing.entities.push_back(line); }
     void lw_polyline(const odxf::lw_polyline& lw_polyline) override
     {
-        m_document.entities.push_back(lw_polyline);
+        m_drawing.entities.push_back(lw_polyline);
     }
-    void point(const odxf::point& point) override { m_document.entities.push_back(point); }
-    void ray(const odxf::ray& ray) override { m_document.entities.push_back(ray); }
+    void point(const odxf::point& point) override { m_drawing.entities.push_back(point); }
+    void ray(const odxf::ray& ray) override { m_drawing.entities.push_back(ray); }
 
-    odxf::document m_document;
+    odxf::drawing m_drawing;
 };
 
 }   // namespace
 
 namespace odxf {
 
-std::expected<document, error> read(const std::filesystem::path& file_path)
+std::expected<drawing, error> read(const std::filesystem::path& file_path)
 {
-    document_stream stream;
+    drawing_stream stream;
 
-    return read(file_path, stream).transform([&stream] { return std::move(stream).document(); });
+    return read(file_path, stream).transform([&stream] { return std::move(stream).drawing(); });
 }
 
 std::expected<void, error> read(const std::filesystem::path& file_path, read_stream_base& stream)

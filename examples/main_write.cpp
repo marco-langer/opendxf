@@ -7,7 +7,7 @@
 
 int main()
 {
-    odxf::document document{
+    odxf::drawing drawing{
         .header{ .entries{ { "$ACADVER", "AC1032" } } },
         .tables{
             .line_types{
@@ -27,7 +27,7 @@ int main()
         },
     };
 
-    const std::expected<void, odxf::error> result{ odxf::write("test.dxf", document) };
+    const std::expected<void, odxf::error> result{ odxf::write("test.dxf", drawing) };
     if (!result) {
         std::println("error: {}", result.error().what);
 

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opendxf/document.hpp"
+#include "opendxf/drawing.hpp"
 #include "opendxf/entities.hpp"
 #include "opendxf/header.hpp"
 #include "opendxf/io/error.hpp"
@@ -46,6 +46,6 @@ private:
 };
 
 std::expected<void, error>
-write(const std::filesystem::path& file_path, const odxf::document& document);
+write(const std::filesystem::path& file_path, const odxf::drawing& drawing);
 
 }   // namespace odxf

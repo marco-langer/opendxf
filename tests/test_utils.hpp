@@ -3,6 +3,6 @@
 
 #pragma once
 
-#include "opendxf/document.hpp"
+#include "opendxf/drawing.hpp"
 
-odxf::document create_example_document();
+odxf::drawing create_example_drawing();

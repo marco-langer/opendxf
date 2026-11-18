@@ -4,7 +4,7 @@
 #pragma once
 
 #include "opendxf/coordinate.hpp"
-#include "opendxf/document.hpp"
+#include "opendxf/drawing.hpp"
 #include "opendxf/entities.hpp"
 #include "opendxf/header.hpp"
 #include "opendxf/header_variables.hpp"
