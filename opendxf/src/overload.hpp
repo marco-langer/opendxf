@@ -6,7 +6,7 @@
 namespace odxf {
 
 template <typename... Ts>
-struct overload : Ts...
+struct overload final : Ts...
 {
     using Ts::operator()...;
 };

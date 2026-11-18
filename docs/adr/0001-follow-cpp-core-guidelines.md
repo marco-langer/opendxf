@@ -23,6 +23,8 @@ opendxf follows the [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidel
   | Guideline     | Deviation                       | Reason                              |
   | ------------- | ------------------------------- | ----------------------------------- |
   | [E.2], [I.10] | Errors are returned, not thrown | [ADR 5](0005-errors-as-expected.md) |
+  | [C.139]       | Leaf classes are final          | [ADR 7](0007-classes-are-final.md)  |
 
+[C.139]: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#rh-final
 [E.2]: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#re-throw
 [I.10]: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#ri-except
