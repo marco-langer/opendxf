@@ -17,9 +17,9 @@ namespace {
 class layer_filter final : public odxf::read_stream_base
 {
 public:
-    layer_filter(std::filesystem::path output_path, std::string layer)
+    layer_filter(std::filesystem::path output_path, std::string layer_name)
         : m_output_path{ std::move(output_path) }
-        , m_layer{ std::move(layer) }
+        , m_layer_name{ std::move(layer_name) }
     {
     }
 
@@ -55,7 +55,7 @@ private:
     template <typename E>
     void copy(const E& entity)
     {
-        if (m_error || entity.properties.layer != m_layer || !open()) {
+        if (m_error || entity.properties.layer_name != m_layer_name || !open()) {
             return;
         }
 
@@ -83,7 +83,7 @@ private:
     }
 
     std::filesystem::path m_output_path;
-    std::string m_layer;
+    std::string m_layer_name;
 
     odxf::header m_header;
     odxf::tables m_tables;

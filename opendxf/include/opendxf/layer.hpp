@@ -27,7 +27,7 @@ struct layer final
     flag flags{ flag::none };
     // hundredths of a millimeter, or -3 DEFAULT
     int lineweight{ -3 };
-    std::string line_type{ "CONTINUOUS" };
+    std::string line_type_name{ "CONTINUOUS" };
     // Empty means opaque.
     std::optional<odxf::transparency> transparency{};
 };

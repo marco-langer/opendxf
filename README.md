@@ -97,8 +97,8 @@ double length(const odxf::line& line)
 class line_length final : public odxf::read_stream_base
 {
 public:
-    explicit line_length(std::string layer)
-        : m_layer{ std::move(layer) }
+    explicit line_length(std::string layer_name)
+        : m_layer_name{ std::move(layer_name) }
     {
     }
 
@@ -107,12 +107,12 @@ public:
 private:
     void line(const odxf::line& line) override
     {
-        if (line.properties.layer == m_layer) {
+        if (line.properties.layer_name == m_layer_name) {
             total += length(line);
         }
     }
 
-    std::string m_layer;
+    std::string m_layer_name;
 };
 
 int main()

@@ -41,11 +41,12 @@ testing::Matcher<odxf::entity_properties>
 is_entity_properties(const odxf::entity_properties& expected, double max_error)
 {
     return testing::AllOf(
-        testing::Field("layer", &odxf::entity_properties::layer, expected.layer),
+        testing::Field("layer_name", &odxf::entity_properties::layer_name, expected.layer_name),
         testing::Field("color", &odxf::entity_properties::color, expected.color),
         testing::Field("true_color", &odxf::entity_properties::true_color, expected.true_color),
         testing::Field("lineweight", &odxf::entity_properties::lineweight, expected.lineweight),
-        testing::Field("line_type", &odxf::entity_properties::line_type, expected.line_type),
+        testing::Field(
+            "line_type_name", &odxf::entity_properties::line_type_name, expected.line_type_name),
         testing::Field(
             "line_type_scale",
             &odxf::entity_properties::line_type_scale,

@@ -104,7 +104,8 @@ odxf::document create_example_document()
     // layer_name_test has no group code 370 and keeps the default lineweight
     layers.emplace_back(layer{ .name = layer_name_test }).flags = layer::flag::frozen;
     layers.push_back(
-        layer{ .name = layer_name_lines, .color = 1, .lineweight = 50, .line_type = "DASHED" });
+        layer{
+            .name = layer_name_lines, .color = 1, .lineweight = 50, .line_type_name = "DASHED" });
     layers.push_back(layer{ .name = layer_name_lw_polylines, .color = -3, .lineweight = -3 });
     layers.push_back(
         layer{
@@ -120,16 +121,16 @@ odxf::document create_example_document()
     // no group codes 62, 370, 6, 48 and 440, keeps the defaults
     entities.push_back(
         line{
-            .properties = { .layer = layer_name_lines, .true_color = 0xFF8000 },
+            .properties = { .layer_name = layer_name_lines, .true_color = 0xFF8000 },
             .start = coordinate3d{ 0.0, 0.5, 0.25 },
             .end = coordinate3d{ 1.0, 1.5, 0.75 },
         });
     entities.push_back(line{
         .properties = {
-            .layer = layer_name_lines,
+            .layer_name = layer_name_lines,
             .color = 3,
             .lineweight = 35,
-            .line_type = "DOT_DASH",
+            .line_type_name = "DOT_DASH",
             .line_type_scale = 2.5,
             .transparency = transparency{ .alpha = 0x7F },
             .is_visible = false,
@@ -142,11 +143,11 @@ odxf::document create_example_document()
     // has an explicit 60 of 0, which is visible like a missing one
     entities.push_back(circle{
         .properties = {
-            .layer = layer_name_test,
+            .layer_name = layer_name_test,
             .color = 2,
             .true_color = 0x00FF00,
             .lineweight = -2,
-            .line_type = "BYBLOCK",
+            .line_type_name = "BYBLOCK",
             .transparency = by_block{},
         },
         .center = coordinate3d{ 0.0, 0.0, 3.0 },
@@ -156,11 +157,11 @@ odxf::document create_example_document()
 
     entities.push_back(arc{
         .properties = {
-            .layer = layer_name_test,
+            .layer_name = layer_name_test,
             .color = 5,
             .true_color = 0x0000FF,
             .lineweight = -3,
-            .line_type = "CONTINUOUS",
+            .line_type_name = "CONTINUOUS",
             .line_type_scale = 0.5,
             .transparency = transparency{ .alpha = 0x00 },
         },
@@ -173,11 +174,11 @@ odxf::document create_example_document()
 
     entities.push_back(lw_polyline{
         .properties = {
-            .layer = layer_name_lw_polylines,
+            .layer_name = layer_name_lw_polylines,
             .color = 6,
             .true_color = 0x808080,
             .lineweight = 211,
-            .line_type = "GAS",
+            .line_type_name = "GAS",
             .transparency = transparency{ .alpha = 0xFF },
         },
         .vertices = {},
@@ -185,17 +186,17 @@ odxf::document create_example_document()
     // has a 440 without the flag of a set value, which counts as BYLAYER
     entities.push_back(lw_polyline{
         .properties = {
-            .layer = layer_name_lw_polylines,
+            .layer_name = layer_name_lw_polylines,
             .color = 256,
             .lineweight = -1,
-            .line_type = "BYLAYER",
+            .line_type_name = "BYLAYER",
         },
         .constant_width = 2.5,
         .vertices = { vertex{ .position = { 200.0, 200.0 } } },
     });
     // no group codes 6, 48 and 440, keeps the defaults
     entities.push_back(lw_polyline{
-        .properties = { .layer = layer_name_lw_polylines, .color = 0, .lineweight = 13 },
+        .properties = { .layer_name = layer_name_lw_polylines, .color = 0, .lineweight = 13 },
         .elevation = 5.0,
         .is_closed = true,
         .vertices = {
@@ -234,10 +235,10 @@ odxf::document create_example_document()
 
     entities.push_back(point{
         .properties = {
-            .layer = layer_name_test,
+            .layer_name = layer_name_test,
             .color = 4,
             .lineweight = 25,
-            .line_type = "DASHED",
+            .line_type_name = "DASHED",
             .transparency = transparency{ .alpha = 0x40 },
         },
         .coordinate = coordinate3d{ 5.0, 6.0, 7.0 },
@@ -248,10 +249,10 @@ odxf::document create_example_document()
 
     entities.push_back(ray{
         .properties = {
-            .layer = layer_name_test,
+            .layer_name = layer_name_test,
             .color = 5,
             .lineweight = 35,
-            .line_type = "DASHED",
+            .line_type_name = "DASHED",
             .transparency = by_block{},
             .is_visible = false,
         },
@@ -261,11 +262,11 @@ odxf::document create_example_document()
 
     entities.push_back(ellipse{
         .properties = {
-            .layer = layer_name_test,
+            .layer_name = layer_name_test,
             .color = 1,
             .true_color = 0xC0C0C0,
             .lineweight = 50,
-            .line_type = "DOT_DASH",
+            .line_type_name = "DOT_DASH",
             .line_type_scale = 0.75,
             .transparency = transparency{ .alpha = 0x99 },
         },

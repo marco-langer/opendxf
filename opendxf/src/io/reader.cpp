@@ -622,7 +622,7 @@ std::expected<void, error> reader::read_layer()
         }
 
         case 6: {
-            layer.line_type = m_group.value;
+            layer.line_type_name = m_group.value;
 
             break;
         }
@@ -804,7 +804,7 @@ std::expected<E, error> reader::read_entity(F read_group_code)
 bool reader::read_entity_property(entity_properties& properties)
 {
     switch (m_group.code) {
-    case 8: properties.layer = m_group.value; return true;
+    case 8: properties.layer_name = m_group.value; return true;
 
     case 62: return parse_into(properties.color);
 
@@ -812,7 +812,7 @@ bool reader::read_entity_property(entity_properties& properties)
 
     case 370: return parse_into(properties.lineweight);
 
-    case 6: properties.line_type = m_group.value; return true;
+    case 6: properties.line_type_name = m_group.value; return true;
 
     case 48: return parse_into(properties.line_type_scale);
 
